@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class CourseRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize()
+    {
+        // Change to true if authorization is handled elsewhere
+        return true;
+    }
+
+    public function rules()
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'code' => 'required|string',
+            'description' => 'nullable|string',
+            'is_elective' => 'boolean',
+            'major_ids' => 'required|array',
+            'major_ids.*' => 'exists:majors,id',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'name.required' => 'အမည်ထည့်ရန် လိုအပ်သည်။',
+            'name.string' => 'အမည်သည် စာသားဖြစ်ရမည်။',
+            'name.max' => 'အမည်သည် အကြီးဆုံးအက္ခရာ ၂၅၅ အထိသာဖြစ်ရမည်။',
+
+            'code.required' => 'ကုဒ်ထည့်ရန် လိုအပ်သည်။',
+            'code.string' => 'ကုဒ်သည် စာသားဖြစ်ရမည်။',
+
+            'description.string' => 'ဖော်ပြချက်သည် စာသားဖြစ်ရမည်။',
+
+            'is_elective.boolean' => 'ရွေးချယ်မှု သို့မဟုတ် မဟုတ်မှုသည် true/false ဖြစ်ရမည်။',
+
+            'major_ids.required' => 'အထူးပြုဘာသာရပ်များကို ရွေးချယ်ရန် လိုအပ်သည်။',
+            'major_ids.array' => 'အထူးပြုဘာသာရပ်များသည် စာရင်းအဖြစ် ရှိရမည်။',
+
+            'major_ids.*.exists' => 'ရွေးချယ်ထားသော အထူးပြုဘာသာရပ်တစ်ခုခု မမှန်ကန်ပါ။',
+        ];
+    }
+}
