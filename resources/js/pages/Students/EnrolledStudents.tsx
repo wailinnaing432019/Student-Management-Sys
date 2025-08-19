@@ -76,32 +76,41 @@ export default function EnrolledStudents({
                 <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 items-end ">
                     <div className="space-y-1 no-print">
                         <label className="text-sm font-medium  ">ပညာသင်နှစ်</label>
-                        <Select value={String(selectedAcademicYearId)} onValueChange={handleAcademicYearChange}>
+                        <Select value={selectedAcademicYearId == null ? "" : String(selectedAcademicYearId)} onValueChange={handleAcademicYearChange}>
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="ပညာသင်နှစ် ရွေးပါ" />
                             </SelectTrigger>
                             <SelectContent>
-                                {academicYears.map((year) => (
+                                {academicYears.length === 0 ? (
+                                    <div className="px-4 py-2 text-red-500 text-sm">ပညာသင်နှစ်များ မရှိပါ</div>
+                                ) : (academicYears.map((year) => (
                                     <SelectItem key={year.id} value={String(year.id)}>
                                         {year.name}
                                     </SelectItem>
-                                ))}
+                                ))
+                                )}
                             </SelectContent>
                         </Select>
                     </div>
 
                     <div>
                         <label className="text-sm font-medium">သင်တန်းကာလ</label>
-                        <Select value={String(selectedSemesterId)} onValueChange={handleSemesterChange}>
+                        <Select value={semesters.length === 0 ? "" : String(selectedSemesterId)} onValueChange={handleSemesterChange}>
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="သင်တန်းကာလ ရွေးပါ" />
                             </SelectTrigger>
                             <SelectContent>
-                                {semesters.map((semester) => (
-                                    <SelectItem key={semester.id} value={String(semester.id)}>
-                                        {semester.year_name} - {getSemesterText(semester.semester_number)}
-                                    </SelectItem>
-                                ))}
+                                {semesters.length === 0 ? (
+                                    <>
+                                        <div className="px-4 py-2 text-red-500 text-sm">ဘာသာရပ်များ မရှိပါ</div>
+                                    </>
+                                ) : (
+                                    semesters.map((semester) => (
+                                        <SelectItem key={semester.id} value={String(semester.id)}>
+                                            {semester.year_name} - {getSemesterText(semester.semester_number)}
+                                        </SelectItem>
+                                    ))
+                                )}
                             </SelectContent>
                         </Select>
                     </div>
@@ -109,23 +118,42 @@ export default function EnrolledStudents({
                     {/* Major filter */}
                     <div>
                         <Label>အထူးပြုဘာသာရပ်</Label>
-                        <Select value={String(selectedMajorId)} onValueChange={handleMajorChange}>
+                        <Select value={majors.length === 0 ? "" : String(selectedMajorId)} onValueChange={handleMajorChange}>
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="အဓိကဘာသာရပ် ရွေးပါ" />
                             </SelectTrigger>
                             <SelectContent>
-                                {majors.map((major) => (
-                                    <SelectItem key={major.id} value={String(major.id)}>
-                                        {major.name}
-                                    </SelectItem>
-                                ))}
+                                {majors.length === 0 ? (
+                                    <div className="px-4 py-2 text-red-500 text-sm">ဘာသာရပ်များ မရှိပါ</div>
+                                ) : (
+                                    majors.map((major) => (
+                                        <SelectItem key={major.id} value={String(major.id)}>
+                                            {major.name}
+                                        </SelectItem>
+                                    ))
+                                )}
                             </SelectContent>
                         </Select>
                     </div>
                 </div>
 
                 <div className="rounded-xl border   shadow-sm">
-                    <DataTable columns={enrolledStudentColumns} data={enrollStudents} />
+                    <DataTable columns={enrolledStudentColumns} data={enrollStudents.data}
+                        pagination={{
+                            currentPage: enrollStudents.current_page,
+                            totalPages: enrollStudents.last_page,
+                            onPageChange: (page) => {
+                                router.get(route("enroll-students.index"), {
+                                    academic_year_id: selectedAcademicYearId || undefined,
+                                    semester_id: selectedSemesterId || undefined,
+                                    major_id: selectedMajorId || undefined,
+                                    page: page,
+                                }, {
+                                    preserveScroll: true,
+                                    preserveState: true,
+                                });
+                            },
+                        }} />
                 </div>
             </div>
         </AppLayout>

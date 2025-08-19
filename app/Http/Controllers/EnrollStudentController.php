@@ -45,7 +45,7 @@ public function index(Request $request)
         ->get();
 
     $selectedSemesterId = $request->input('semester_id', $semesters->first()?->id ?? null);
- $selectedMajorId = $request->input('major_id', $majors->first()->id ?? null);
+    $selectedMajorId = $request->input('major_id', $majors->first()->id ?? null);
     $sortCol = $request->input('col');
     $sortDir = $request->input('dir') === 'desc' ? 'desc' : 'asc';
 
@@ -72,17 +72,22 @@ public function index(Request $request)
                     $sortDir
                 );
         }
-
-        // Join profiles for email sorting
-        if ($sortCol === 'email') {
-            $query->join('student_semester_profiles', 'student_semester_profiles.id', '=', 'student_enrollments.student_semester_profile_id')
-                ->select('student_enrollments.*')
-                ->orderBy('student_semester_profiles.email', $sortDir);
+ 
+        // Join profiles for email, roll_no, phone sorting
+        if (in_array($sortCol, ['email', 'roll_no', 'phone'])) {
+            $query->join(
+                'student_semester_profiles',
+                'student_semester_profiles.id',
+                '=',
+                'student_enrollments.student_semester_profile_id'
+            )
+            ->select('student_enrollments.*')
+            ->orderBy("student_semester_profiles.$sortCol", $sortDir);
         }
 
-        $enrollStudents = $query->get();
+        $enrollStudents = $query->paginate(10)->withQueryString();
     }
-
+ 
     return Inertia::render('Students/EnrolledStudents', [
         'academicYears' => $academicYears,
         'selectedAcademicYearId' => $selectedAcademicYearId,
@@ -135,11 +140,11 @@ public function updateStatus(Request $request, StudentEnrollment $enrollment)
     $enrollment->save();
 
     return to_route('enroll-students.index', [
-    'academic_year_id' => $enrollment->academic_year_id,
-    'semester_id' => $selectedSemesterId,
-    'major_id' => $selectedMajorId,
-])->with('success', 'Status updated successfully.');
-    return to_route('enroll-students.index')->with('success', 'Status updated successfully.');
+        'academic_year_id' => $enrollment->academic_year_id,
+        'semester_id' => $selectedSemesterId,
+        'major_id' => $selectedMajorId,
+    ])->with('success', 'Status updated successfully.');
+    
 }
 
 // print
@@ -187,7 +192,7 @@ public function print( $id)
      */
     public function store(StudentRequest $request)
     {
-        // dd($request->all());
+        
         DB::beginTransaction();
 
         try {
@@ -222,139 +227,140 @@ public function print( $id)
                 // 'phone'=>$request->phone, 
                 // 'email'=>$request->email,
                 // 'image'=>$filePath,
-            ]);
-            $studentProfile=StudentSemesterProfile::create([
-                'student_id'=>$student->id,
-                'academic_year_id'=> $request->academic_year_id,
-                'semester_id'=>$request->semester_id,
-                'major_id'=>$request->major_id,
-                'roll_no'=>$request->roll_no,
-                'permanent_address'=>$request->permanent_address,
-                'temporary_address'=>$request->temporary_address,
-                'phone'=>$request->phone,
-                'email'=>$request->email,
-                'image'=>$filePath,
-            ]);
-
-            $studentEnrollment=StudentEnrollment::create([
-                'student_id'=>$student->id,
-                'student_semester_profile_id'=>$studentProfile->id, 
-                'semester_id'=>$request->semester_id, 
-                'major_id'=>$request->major_id, 
-                'academic_year_id'=>$request->academic_year_id,
-                'registration_date'=>Carbon::now(),
-                'status'=>"Accept",
-                
-            ]);
-
-
-        $selectedSemesterId=$request->semester_id;
-        $selectedMajorId=$request->major_id;
-        $semester = Semester::with(['courses' => function ($query) use ($selectedMajorId) {
-        if ($selectedMajorId) {
-            $query->whereHas('majors', function ($q) use ($selectedMajorId) {
-                $q->where('majors.id', $selectedMajorId);
-            });
-        }
-    }])->findOrFail($selectedSemesterId);
-
-           
-            
-            // stud course enrollment
-            foreach ($semester->courses as $course) {  
-                StudentCourseEnrollment::create([
-                    'student_enrollment_id'=>$studentEnrollment->id, 
-                    'course_id'=>$course->id
                 ]);
-            }
+                $studentProfile=StudentSemesterProfile::create([
+                    'student_id'=>$student->id,
+                    'academic_year_id'=> $request->academic_year_id,
+                    'semester_id'=>$request->semester_id,
+                    'major_id'=>$request->major_id,
+                    'roll_no'=>$request->roll_no,
+                    'permanent_address'=>$request->permanent_address,
+                    'temporary_address'=>$request->temporary_address,
+                    'phone'=>$request->phone,
+                    'email'=>$request->email,
+                    'image'=>$filePath,
+                ]);
 
-            // Create Father
-            $father = Father::create([
-                'student_id' => $student->id,
-                'name_myan'=>$request->father_name_myan,
-                'name_eng'=>$request->father_name_eng,
-                'ethnicity'=>$request->father_ethnicity,
-                'religion'=>$request->father_religion,
-                'hometown'=>$request->father_hometown,
-                'township_state_region'=>$request->father_township_state_region,
-                'nrc_state'=>$request->nrc_state,
-                'nrc_township'=>$request->nrc_township,
-                'nrc_type'=>$request->nrc_type,
-                'nrc_number'=>$request->nrc_number,
-                'job'=>$request->father_job,
-                'job_position_address'=>$request->father_job_position_address,
-                'local_foreign'=>$request->father_local_foreign,
-            ]);
+                $studentEnrollment=StudentEnrollment::create([
+                    'student_id'=>$student->id,
+                    'student_semester_profile_id'=>$studentProfile->id, 
+                    'semester_id'=>$request->semester_id, 
+                    'major_id'=>$request->major_id, 
+                    'academic_year_id'=>$request->academic_year_id,
+                    'registration_date'=>Carbon::now(),
+                    'status'=>"Accept",
+                    
+                ]);
 
-            // Create Mother
-            $mother = Mother::create([
-                'student_id' => $student->id,
-                'name_myan'=>$request->mother_name_myan,
-                'name_eng'=>$request->mother_name_eng,
-                'ethnicity'=>$request->mother_ethnicity,
-                'religion'=>$request->mother_religion,
-                'hometown'=>$request->mother_hometown,
-                'township_state_region'=>$request->mother_township_state_region,
-                'nrc_state'=>$request->nrc_state,
-                'nrc_township'=>$request->nrc_township,
-                'nrc_type'=>$request->nrc_type,
-                'nrc_number'=>$request->nrc_number,
-                'job'=>$request->mother_job,
-                'job_position_address'=>$request->mother_job_position_address,
-                'local_foreign'=>$request->mother_local_foreign,
-            ]);
 
-            // Donor table  
-            $donor=Donor::create([
-                'name'=>$request->donor_name,
-                'relationship'=>$request->donor_relationship,
-                'job'=>$request->donor_job, 
-                'phone'=>$request->donor_phone,
-                'status'=>$request->donor_status,
-                'student_semester_profile_id'=>$studentProfile->id,
-            ]);
+                    $selectedSemesterId=$request->semester_id;
+                    $selectedMajorId=$request->major_id;
+                    $semester = Semester::with(['courses' => function ($query) use ($selectedMajorId) {
+                    if ($selectedMajorId) {
+                        $query->whereHas('majors', function ($q) use ($selectedMajorId) {
+                            $q->where('majors.id', $selectedMajorId);
+                        });
+                    }
+                }])->findOrFail($selectedSemesterId);
 
-            // create exams_taken 
-            if($request->exam_records!== null){
-            foreach ($request->exam_records as $record) { 
-                              // Skip if any required field is null
-        if (
-            !empty($record['exam_name']) &&
-            !empty($record['exam_major']) &&
-            !empty($record['exam_roll_no']) &&
-            !empty($record['exam_year']) &&
-            isset($record['exam_pass_fail']) // could be 0 or 1, so use isset
-        ) {
-            ExamsTaken::create([
-                'exam_name'   => $record['exam_name'],
-                'major'       => $record['exam_major'],
-                'roll_no'     => $record['exam_roll_no'],
-                'year'        => $record['exam_year'],
-                'pass_fail'   => $record['exam_pass_fail'],
-                'student_id'  => $student->id,
-            ]);
-        }
-            }
+            
+                
+                // stud course enrollment
+                foreach ($semester->courses as $course) {  
+                    StudentCourseEnrollment::create([
+                        'student_enrollment_id'=>$studentEnrollment->id, 
+                        'course_id'=>$course->id
+                    ]);
+                }
+
+                // Create Father
+                $father = Father::create([
+                    'student_id' => $student->id,
+                    'name_myan'=>$request->father_name_myan,
+                    'name_eng'=>$request->father_name_eng,
+                    'ethnicity'=>$request->father_ethnicity,
+                    'religion'=>$request->father_religion,
+                    'hometown'=>$request->father_hometown,
+                    'township_state_region'=>$request->father_township_state_region,
+                    'nrc_state'=>$request->nrc_state,
+                    'nrc_township'=>$request->nrc_township,
+                    'nrc_type'=>$request->nrc_type,
+                    'nrc_number'=>$request->nrc_number,
+                    'job'=>$request->father_job,
+                    'job_position_address'=>$request->father_job_position_address,
+                    'local_foreign'=>$request->father_local_foreign,
+                ]);
+
+                // Create Mother
+                $mother = Mother::create([
+                    'student_id' => $student->id,
+                    'name_myan'=>$request->mother_name_myan,
+                    'name_eng'=>$request->mother_name_eng,
+                    'ethnicity'=>$request->mother_ethnicity,
+                    'religion'=>$request->mother_religion,
+                    'hometown'=>$request->mother_hometown,
+                    'township_state_region'=>$request->mother_township_state_region,
+                    'nrc_state'=>$request->nrc_state,
+                    'nrc_township'=>$request->nrc_township,
+                    'nrc_type'=>$request->nrc_type,
+                    'nrc_number'=>$request->nrc_number,
+                    'job'=>$request->mother_job,
+                    'job_position_address'=>$request->mother_job_position_address,
+                    'local_foreign'=>$request->mother_local_foreign,
+                ]);
+
+                // Donor table  
+                $donor=Donor::create([
+                    'name'=>$request->donor_name,
+                    'relationship'=>$request->donor_relationship,
+                    'job'=>$request->donor_job, 
+                    'phone'=>$request->donor_phone,
+                    'status'=>$request->donor_status,
+                    'student_semester_profile_id'=>$studentProfile->id,
+                ]);
+
+                // create exams_taken 
+                if($request->exam_records!== null){
+                foreach ($request->exam_records as $record) { 
+                                // Skip if any required field is null
+                if (
+                    !empty($record['exam_name']) &&
+                    !empty($record['exam_major']) &&
+                    !empty($record['exam_roll_no']) &&
+                    !empty($record['exam_year']) &&
+                    isset($record['exam_pass_fail']) // could be 0 or 1, so use isset
+                ) {
+                    ExamsTaken::create([
+                        'exam_name'   => $record['exam_name'],
+                        'major'       => $record['exam_major'],
+                        'roll_no'     => $record['exam_roll_no'],
+                        'year'        => $record['exam_year'],
+                        'pass_fail'   => $record['exam_pass_fail'],
+                        'student_id'  => $student->id,
+                    ]);
+                }
+                }
             }
             
-            RegistrationAgreement::create([
-                'student_semester_profile_id'=>$studentProfile->id,
-                'name'=>$request->name,
-                'gender'=>$request->gender,
-                'examed_year'=>$request->examed_year,
-                'examed_month'=>$request->examed_month,
-                'examed_name'=>$request->examed_name,
-                'examed_roll_no'=>$request->examed_roll_no,
-                'examed_status'=>$request->examed_status,
-                'class'=>$request->class,
-                'fee'=>$request->fee,
-                'guardian'=>$request->guardian,
-                'nrc_state'=>$request->g_nrc_state,
-                'nrc_township'=>$request->g_nrc_township,
-                'nrc_type'=>$request->g_nrc_type,
-                'nrc_number'=>$request->g_nrc_number,
-                'agreed'=>$request->agreed,
-            ]);
+            // Registration agreement
+            // RegistrationAgreement::create([
+            //     'student_semester_profile_id'=>$studentProfile->id,
+            //     'name'=>$request->name,
+            //     'gender'=>$request->gender,
+            //     'examed_year'=>$request->examed_year,
+            //     'examed_month'=>$request->examed_month,
+            //     'examed_name'=>$request->examed_name,
+            //     'examed_roll_no'=>$request->examed_roll_no,
+            //     'examed_status'=>$request->examed_status,
+            //     'class'=>$request->class,
+            //     'fee'=>$request->fee,
+            //     'guardian'=>$request->guardian,
+            //     'nrc_state'=>$request->g_nrc_state,
+            //     'nrc_township'=>$request->g_nrc_township,
+            //     'nrc_type'=>$request->g_nrc_type,
+            //     'nrc_number'=>$request->g_nrc_number,
+            //     'agreed'=>$request->agreed,
+            // ]);
             
             // return Semester::with('courses')->get();
          $fullPath=$this->generateAndStorePdf($student->id,$request->semester_id);
@@ -364,11 +370,16 @@ public function print( $id)
 
             DB::commit();
 
-            return redirect()->route('enroll-students.index')->with('success', 'Student registered successfully.');
+            return to_route('enroll-students.index', [
+                'academic_year_id' => $request->academic_year_id,
+                'semester_id' => $request->semester_id,
+                'major_id' => $request->major_id,
+            ])->with('success', 'ကျောင်းသားစားရင်းသွင်းခြင်း အောင်မြင်ပါသည်။'); 
+            // return redirect()->route('enroll-students.index')->with('success', 'Student registered successfully.');
         } catch (\Exception $e) {
             dd($e->getMessage());
             DB::rollBack();
-            return back()->withErrors(['error' => 'Failed to register student. ' . $e->getMessage()])->withInput();
+            return back()->withErrors(['error' => 'ကျောင်းသားစားရင်းသွင်းခြင်း မအောင်မြင်ပါ။ ' . $e->getMessage()])->withInput();
         }
     }
 
@@ -378,77 +389,76 @@ public function print( $id)
     public function show(string $id)
     {
  
-    $enrollment = StudentEnrollment::with([
-        'student.father',
-        'student.mother',
-        'studentSemesterProfile.donor',
-        'student.examsTaken',
-        'studentSemesterProfile.registrationAgreement',
-        'studentSemesterProfile',
-        'semester',
-        'major',
-        'academicYear',
+        $enrollment = StudentEnrollment::with([
+            'student.father',
+            'student.mother',
+            'studentSemesterProfile.donor',
+            'student.examsTaken',
+            'studentSemesterProfile.registrationAgreement',
+            'studentSemesterProfile',
+            'semester',
+            'major',
+            'academicYear',
 
-    ])->findOrFail($id);
-// dd($enrollment->toArray());
- 
+        ])->findOrFail($id); 
+    
 
-    return Inertia::render('Students/test', [
-        'studentEnrollment' => $enrollment,
-    ]);
+        return Inertia::render('Students/test', [
+            'studentEnrollment' => $enrollment,
+        ]);
     }
 
 
        public function reregister(string $id)
     {
  
-    $enrollment = StudentEnrollment::with([
-        'student.father',
-        'student.mother',
-        'studentSemesterProfile.donor',
-        'student.examsTaken',
-        'studentSemesterProfile.registrationAgreement',
-        'studentSemesterProfile',
-        'semester',
-        'major',
-        'academicYear',
+        $enrollment = StudentEnrollment::with([
+            'student.father',
+            'student.mother',
+            'studentSemesterProfile.donor',
+            'student.examsTaken',
+            'studentSemesterProfile.registrationAgreement',
+            'studentSemesterProfile',
+            'semester',
+            'major',
+            'academicYear',
 
-    ])->findOrFail($id);
+        ])->findOrFail($id);
 
-            $academic_years=AcademicYear::with('semesters')->get();
-        $majors=Major::all();
-        return Inertia::render('Students/Reregister', [
-           'academic_years'=>$academic_years,
-           'majors'=>$majors,
-        'studentEnrollment' => $enrollment,
-    ]);
+                $academic_years=AcademicYear::with('semesters')->get();
+            $majors=Major::all();
+            return Inertia::render('Students/Reregister', [
+            'academic_years'=>$academic_years,
+            'majors'=>$majors,
+            'studentEnrollment' => $enrollment,
+        ]);
     }
     /**
      * Show the form for editing the specified resource.
      */
-public function edit(string $id)
-{
-    $enrollment = StudentEnrollment::with([
-        'student.father',
-        'student.mother',
-        'studentSemesterProfile.donor',
-        'student.examsTaken',
-        'studentSemesterProfile.registrationAgreement',
-        'studentSemesterProfile',
-        'semester',
-        'major',
-        'academicYear',
+    public function edit(string $id)
+    {
+        $enrollment = StudentEnrollment::with([
+            'student.father',
+            'student.mother',
+            'studentSemesterProfile.donor',
+            'student.examsTaken',
+            'studentSemesterProfile.registrationAgreement',
+            'studentSemesterProfile',
+            'semester',
+            'major',
+            'academicYear',
 
-    ])->findOrFail($id);
+        ])->findOrFail($id);
 
-            $academic_years=AcademicYear::with('semesters')->get();
-        $majors=Major::all();
-        return Inertia::render('Students/Edit', [
-           'academic_years'=>$academic_years,
-           'majors'=>$majors,
-        'studentEnrollment' => $enrollment,
-    ]);
-}
+                $academic_years=AcademicYear::with('semesters')->get();
+            $majors=Major::all();
+            return Inertia::render('Students/Edit', [
+            'academic_years'=>$academic_years,
+            'majors'=>$majors,
+            'studentEnrollment' => $enrollment,
+        ]);
+    }
 
 
     /**
@@ -484,29 +494,30 @@ public function edit(string $id)
                 'major_id'=>$request->major_id, 
                 'academic_year_id'=>$request->academic_year_id,
                 'registration_date'=>Carbon::now(),
+                'status'=>"Accept",
                 
             ]);
 
 
-    //     $selectedSemesterId=$request->semester_id;
-    //     $selectedMajorId=$request->major_id;
-    //     $semester = Semester::with(['courses' => function ($query) use ($selectedMajorId) {
-    //     if ($selectedMajorId) {
-    //         $query->whereHas('majors', function ($q) use ($selectedMajorId) {
-    //             $q->where('majors.id', $selectedMajorId);
-    //         });
-    //     }
-    // }])->findOrFail($selectedSemesterId);
+                $selectedSemesterId=$request->semester_id;
+                $selectedMajorId=$request->major_id;
+                $semester = Semester::with(['courses' => function ($query) use ($selectedMajorId) {
+                if ($selectedMajorId) {
+                    $query->whereHas('majors', function ($q) use ($selectedMajorId) {
+                        $q->where('majors.id', $selectedMajorId);
+                    });
+                }
+            }])->findOrFail($selectedSemesterId);
 
            
             
             // stud course enrollment
-            // foreach ($semester->courses as $course) {  
-            //     StudentCourseEnrollment::create([
-            //         'student_enrollment_id'=>$studentEnrollment->id, 
-            //         'course_id'=>$course->id
-            //     ]);
-            // }
+            foreach ($semester->courses as $course) {  
+                StudentCourseEnrollment::create([
+                    'student_enrollment_id'=>$studentEnrollment->id, 
+                    'course_id'=>$course->id
+                ]);
+            }
 
             // Create Father
             $father = Father::where('student_id',$id)->update([ 
@@ -544,58 +555,63 @@ public function edit(string $id)
             if($request->exam_records!== null){
             foreach ($request->exam_records as $record) { 
                               // Skip if any required field is null
-        if (
-            !empty($record['exam_name']) &&
-            !empty($record['exam_major']) &&
-            !empty($record['exam_roll_no']) &&
-            !empty($record['exam_year']) &&
-            isset($record['exam_pass_fail']) // could be 0 or 1, so use isset
-        ) {
-            ExamsTaken::create([
-                'exam_name'   => $record['exam_name'],
-                'major'       => $record['exam_major'],
-                'roll_no'     => $record['exam_roll_no'],
-                'year'        => $record['exam_year'],
-                'pass_fail'   => $record['exam_pass_fail'],
-                'student_id'  => $id,
-            ]);
-        }
+            if (
+                !empty($record['exam_name']) &&
+                !empty($record['exam_major']) &&
+                !empty($record['exam_roll_no']) &&
+                !empty($record['exam_year']) &&
+                isset($record['exam_pass_fail']) // could be 0 or 1, so use isset
+            ) {
+                ExamsTaken::create([
+                    'exam_name'   => $record['exam_name'],
+                    'major'       => $record['exam_major'],
+                    'roll_no'     => $record['exam_roll_no'],
+                    'year'        => $record['exam_year'],
+                    'pass_fail'   => $record['exam_pass_fail'],
+                    'student_id'  => $id,
+                ]);
             }
+                }
             }
             
-            if($request->semester_id%2 !==0){ 
-            RegistrationAgreement::create([
-                'student_semester_profile_id'=>$studentProfile->id,
-                'name'=>$request->name,
-                'gender'=>$request->gender,
-                'examed_year'=>$request->examed_year,
-                'examed_month'=>$request->examed_month,
-                'examed_name'=>$request->examed_name,
-                'examed_roll_no'=>$request->examed_roll_no,
-                'examed_status'=>$request->examed_status,
-                'class'=>$request->class,
-                'fee'=>$request->fee,
-                'guardian'=>$request->guardian,
-                'nrc_state'=>$request->g_nrc_state,
-                'nrc_township'=>$request->g_nrc_township,
-                'nrc_type'=>$request->g_nrc_type,
-                'nrc_number'=>$request->g_nrc_number,
-                'agreed'=>$request->agreed,
-            ]);
-        }
+        //     if($request->semester_id%2 !==0){ 
+        //     RegistrationAgreement::create([
+        //         'student_semester_profile_id'=>$studentProfile->id,
+        //         'name'=>$request->name,
+        //         'gender'=>$request->gender,
+        //         'examed_year'=>$request->examed_year,
+        //         'examed_month'=>$request->examed_month,
+        //         'examed_name'=>$request->examed_name,
+        //         'examed_roll_no'=>$request->examed_roll_no,
+        //         'examed_status'=>$request->examed_status,
+        //         'class'=>$request->class,
+        //         'fee'=>$request->fee,
+        //         'guardian'=>$request->guardian,
+        //         'nrc_state'=>$request->g_nrc_state,
+        //         'nrc_township'=>$request->g_nrc_township,
+        //         'nrc_type'=>$request->g_nrc_type,
+        //         'nrc_number'=>$request->g_nrc_number,
+        //         'agreed'=>$request->agreed,
+        //     ]);
+        // }
             // return Semester::with('courses')->get();
-         $fullPath=$this->generateAndStorePdf($id,$request->semester_id);
-            $studentEnrollment->update([
-                'pdf_path'=>$fullPath
-            ]);
+            $fullPath=$this->generateAndStorePdf($id,$request->semester_id);
+                $studentEnrollment->update([
+                    'pdf_path'=>$fullPath
+                ]);
 
-            DB::commit();
+                DB::commit();
 
-            return redirect()->route('enroll-students.index')->with('success', 'Student registered successfully.');
+                return to_route('enroll-students.index', [
+                    'academic_year_id' => $request->academic_year_id,
+                    'semester_id' => $request->semester_id,
+                    'major_id' => $request->major_id,
+                ])->with('success', 'ကျောင်းသားအား အတန်းသစ်တစ်ခုသို့ စားရင်းသွင်းခြင်း အောင်မြင်ပါသည်။'); 
+                // return redirect()->route('enroll-students.index')->with('success', 'Student registered successfully.');
         } catch (\Exception $e) {
             dd($e->getMessage());
             DB::rollBack();
-            return back()->withErrors(['error' => 'Failed to register student. ' . $e->getMessage()])->withInput();
+            return back()->withErrors(['error' => 'ကျောင်းသားအား အတန်းသစ်တစ်ခုသို့ စာရင်းသွင်းခြင်းမအောင်မြင်ပါ။ ' . $e->getMessage()])->withInput();
         }
     }
 
@@ -613,85 +629,65 @@ public function edit(string $id)
     return response()->download(storage_path('app/public/' . $form->pdf_path));
 }
     public function generateAndStorePdf($studentId,$semesterId)
-{
-    $stuEnrollment = StudentEnrollment::with([
-    'student.father',
-    'student.mother',
-    'studentSemesterProfile.donor',
-    'student.examsTaken',
-    'studentSemesterProfile',
-    'student',
-    'semester',
-    'major',
-    'academicYear',
-    'studentSemesterProfile.registrationAgreement'
-])
-->where('student_id', $studentId)
-->where('semester_id', $semesterId)
-->firstOrFail();
+    {
+        $stuEnrollment = StudentEnrollment::with([
+        'student.father',
+        'student.mother',
+        'studentSemesterProfile.donor',
+        'student.examsTaken',
+        'studentSemesterProfile',
+        'student',
+        'semester',
+        'major',
+        'academicYear',
+        'studentSemesterProfile.registrationAgreement'
+        ])
+        ->where('student_id', $studentId)
+        ->where('semester_id', $semesterId)
+        ->firstOrFail();
+ 
+        // ✅ Prepare mPDF
+        $defaultConfig = (new ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
 
-//  dd($stuEnrollment->toArray());
-// return view('pdfs.DownloadStudent', ['stuEnrollment' => $stuEnrollment]);
-    // ✅ Prepare mPDF
-    $defaultConfig = (new ConfigVariables())->getDefaults();
-    $fontDirs = $defaultConfig['fontDir'];
+        $defaultFontConfig = (new FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
 
-    $defaultFontConfig = (new FontVariables())->getDefaults();
-    $fontData = $defaultFontConfig['fontdata'];
-
-    $mpdf = new Mpdf([
-        'mode' => 'utf-8',
-        'format' => 'A4',
-        'fontDir' => array_merge($fontDirs, [
-            storage_path('fonts'),
-        ]),
-        'fontdata' => $fontData + [
-            'pyidaungsu' => [
-                'R' => 'Pyidaungsu-2.5.3_Regular.ttf',
-                'useOTL' => 0xFF,
-                'useKashida' => 75,
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'fontDir' => array_merge($fontDirs, [
+                storage_path('fonts'),
+            ]),
+            'fontdata' => $fontData + [
+                'pyidaungsu' => [
+                    'R' => 'Pyidaungsu-2.5.3_Regular.ttf',
+                    'useOTL' => 0xFF,
+                    'useKashida' => 75,
+                ],
             ],
-        ],
-        'default_font' => 'pyidaungsu',
-        'autoScriptToLang' => true,
-        'autoLangToFont' => true,
-        'shaper' => 'disabled',
-    ]);
+            'default_font' => 'pyidaungsu',
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+            'shaper' => 'disabled',
+        ]);
 
-    $html = view('pdfs.DownloadStudent', ['stuEnrollment' => $stuEnrollment])->render();
-    $mpdf->WriteHTML($html);
+        $html = view('pdfs.DownloadStudent', ['stuEnrollment' => $stuEnrollment])->render();
+        $mpdf->WriteHTML($html);
 
-    // ✅ Build storage path: storage/app/public/registration_forms/{student_id}/{year}.pdf
-    $year = $stuEnrollment->academicYear->name ?? date('Y');
-    $semester=$stuEnrollment->semester->name;  
-    $studentName=$stuEnrollment->student->name_eng; 
-    $folderPath = "registration_forms/{$stuEnrollment->student_id}/{$year}/{$semester}";
-    $fileName = "{$studentName}.pdf";
-    $fullPath = "{$folderPath}/{$fileName}";
+        // ✅ Build storage path: storage/app/public/registration_forms/{student_id}/{year}.pdf
+        $year = $stuEnrollment->academicYear->name ?? date('Y');
+        $semester=$stuEnrollment->semester->name;  
+        $studentName=$stuEnrollment->student->name_eng; 
+        $folderPath = "registration_forms/{$stuEnrollment->student_id}/{$year}/{$semester}";
+        $fileName = "{$studentName}.pdf";
+        $fullPath = "{$folderPath}/{$fileName}";
 
-    // ✅ Save PDF to storage
-    Storage::disk('public')->put($fullPath, $mpdf->Output('', 'S'));
-
-
-
-    // ✅ Save DB record
-    // StudentEnrollment::updateOrCreate(
-    //     [
-    //         'i' => $stuEnrollment->student_id,
-    //         'academic_year' => $year,
-    //     ],
-    //     [
-    //         'pdf_path' => $fullPath
-    //     ]
-    // );
-
-    return $fullPath;
-    return response()->json([
-        'message' => 'PDF generated and stored successfully',
-        'path' => $fullPath,
-        // 'url' => Storage::disk('public')->url($fullPath)
-    ]);
-}
+        // ✅ Save PDF to storage
+        Storage::disk('public')->put($fullPath, $mpdf->Output('', 'S'));
+        return $fullPath;
+        
+    }
 
   
     public function downloadPdfTest($student)
@@ -741,29 +737,24 @@ public function edit(string $id)
                 ->header('Content-Type', 'application/pdf'); 
 }
     public function downloadPdf($id)
-{ 
+    { 
     
-    // dd("HE");
-$enrollment = StudentEnrollment::with([
-        'student.father',
-        'student.mother',
-        'studentSemesterProfile.donor',
-        'student.examsTaken',
-        'studentSemesterProfile',
-        'semester',
-        'major',
-        'academicYear',
-        'studentSemesterProfile.registrationAgreement'
+        $enrollment = StudentEnrollment::with([
+            'student.father',
+            'student.mother',
+            'studentSemesterProfile.donor',
+            'student.examsTaken',
+            'studentSemesterProfile',
+            'semester',
+            'major',
+            'academicYear',
+            'studentSemesterProfile.registrationAgreement'
 
-    ])->findOrFail($id);
-    // return $enrollment;
-    $pdf = Pdf::loadView('pdfs.enrollment', [
-        'studentEnrollment' => $enrollment,
-    ]);
-// return view('pdfs.enrollment', [
-//     'studentEnrollment' => $enrollment,
-// ]);
+        ])->findOrFail($id); 
+        $pdf = Pdf::loadView('pdfs.enrollment', [
+            'studentEnrollment' => $enrollment,
+        ]); 
 
-    return $pdf->download("student-enrollment-{$id}.pdf");
-}
+        return $pdf->download("student-enrollment-{$id}.pdf");
+    }
 }

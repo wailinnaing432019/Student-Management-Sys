@@ -51,7 +51,7 @@ export default function Filters({
             {/* Academic Year */}
             <div className="space-y-1 no-print">
                 <label className="text-sm font-medium">ပညာသင်နှစ်</label>
-                <Select value={String(selectedAcademicYearId)} onValueChange={handleAcademicYearChange}>
+                <Select value={selectedAcademicYearId == null ? "" : String(selectedAcademicYearId)} onValueChange={handleAcademicYearChange}>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="ပညာသင်နှစ် ရွေးပါ" />
                     </SelectTrigger>
@@ -61,6 +61,9 @@ export default function Filters({
                                 {year.name}
                             </SelectItem>
                         ))}
+                        {selectedAcademicYearId == null && (
+                            <div className="text-red-500">သင်တန်းကာလမရှိပါ။</div>
+                        )}
                     </SelectContent>
                 </Select>
             </div>
@@ -68,7 +71,7 @@ export default function Filters({
             {/* Semester */}
             <div className="space-y-1 no-print">
                 <label className="text-sm font-medium">သင်တန်းကာလ</label>
-                <Select value={String(selectedSemesterId)} onValueChange={handleSemesterChange}>
+                <Select value={selectedSemesterId == null ? "" : String(selectedSemesterId)} onValueChange={handleSemesterChange}>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="သင်တန်းကာလ ရွေးပါ" />
                     </SelectTrigger>
@@ -78,16 +81,19 @@ export default function Filters({
                                 {semester.year_name} - {getSemesterText(semester.semester_number)}
                             </SelectItem>
                         ))}
+                        {selectedSemesterId == null && (
+                            <div className="text-red-500">သင်တန်းကာလမရှိပါ။</div>
+                        )}
                     </SelectContent>
                 </Select>
             </div>
 
             {/* Search Box */}
             <div className="space-y-1 no-print">
-                <label className="text-sm font-medium">Search</label>
+                <label className="text-sm font-medium">ရှာဖွေပါ</label>
                 <input
                     type="text"
-                    placeholder="Search student..."
+                    placeholder="ကျောင်းသားအမည် (သို့) ခုံအမှတ် ဖြင့် ရှာဖွေပါ"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200"

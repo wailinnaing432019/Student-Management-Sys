@@ -159,15 +159,19 @@ public function create()
         // Sync courses with pivot data (this will update existing and add new)
         $semester->courses()->sync($syncData);
 
-        return redirect()->route('course-semesters.index')
-            ->with('success', 'Courses assigned to semester successfully.');
+ 
+
+            return to_route('course-semesters.index', [
+                'academic_year_id' => $semester->academicYear->id,
+                'semester_id' => $data['semester_id'], 
+            ])->with('success', 'ပညာသင်နှစ် နှင့် သင်ကြားမည့် ဘာသာ အားသတ်မှတ်ပြီးပါပြီ။');
     } catch (\Exception $e) {
 
         dd($e);
         // Optionally log error for debugging
         Log::error('Failed to assign courses to semester: ' . $e->getMessage());
 
-        return back()->withErrors('Failed to assign courses: ' . $e->getMessage());
+        return back()->withErrors('ပညာသင်နှစ် နှင့် သင်ကြားမည့် ဘာသာ အားသတ်မှတ်ရာ တွင်အမှားအယွင်းဖြစ်ပေါ်နေပါသည်။' . $e->getMessage());
     }
 }
 
@@ -178,6 +182,6 @@ public function create()
     $semester = Semester::findOrFail($request->semester_id);
     $semester->courses()->detach($request->course_id);
 
-    return redirect()->back()->with('success', 'Course unassigned successfully.');
+    return redirect()->back()->with('success', 'ပညာသင်နှစ် နှင့် သင်ကြားမည့် ဘာသာ ပြင်ဆင်ပြီးပါပြီ။');
 }
 }

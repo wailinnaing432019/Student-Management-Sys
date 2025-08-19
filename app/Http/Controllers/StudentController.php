@@ -40,13 +40,13 @@ public function index(Request $request)
 
     $search = $request->input('search');
 
-$enrollStudents = StudentEnrollment::with([
-        'student',
-        'studentSemesterProfile',
-        'semester',
-        'major',
-        'academicYear'
-    ])
+    $enrollStudents = StudentEnrollment::with([
+            'student',
+            'studentSemesterProfile',
+            'semester',
+            'major',
+            'academicYear'
+        ])
     ->when($selectedAcademicYearId, fn($q) =>
         $q->where('academic_year_id', $selectedAcademicYearId)
     )
@@ -79,39 +79,39 @@ $enrollStudents = StudentEnrollment::with([
 
 
     public function enrollStudents(Request $request){
-            $academicYears = AcademicYear::orderBy('start_date', 'desc')->get();
+        $academicYears = AcademicYear::orderBy('start_date', 'desc')->get();
 
-    $selectedAcademicYearId = $request->input('academic_year_id', $academicYears->first()->id);
+        $selectedAcademicYearId = $request->input('academic_year_id', $academicYears->first()->id);
 
-    // Filter semesters based on academic year
-    $semesters = Semester::where('academic_year_id', $selectedAcademicYearId)
-        ->orderBy('start_date', 'desc')
-        ->get();
-
-    // Get selected semester (fallback to first semester in list)
-    $selectedSemesterId = $request->input('semester_id', $semesters->first()->id ?? null);
-    $enrollStudents = collect();
-    if ($selectedSemesterId) {
-        $enrollStudents = StudentEnrollment::with([
-                'student', 'studentSemesterProfile', 'semester', 'major', 'academicYear'
-            ])
-            ->where('semester_id', $selectedSemesterId)
+        // Filter semesters based on academic year
+        $semesters = Semester::where('academic_year_id', $selectedAcademicYearId)
+            ->orderBy('start_date', 'desc')
             ->get();
-    }
-    // Fetch enrollments filtered by semester
-    // $enrollStudents = StudentEnrollment::with(['student', 'studentSemesterProfile', 'semester', 'major', 'academicYear'])
-    //     ->when($selectedSemesterId, fn ($q) => $q->where('semester_id', $selectedSemesterId))
-    //     ->get();
 
-    // return $enrollStudents;
+        // Get selected semester (fallback to first semester in list)
+        $selectedSemesterId = $request->input('semester_id', $semesters->first()->id ?? null);
+        $enrollStudents = collect();
+        if ($selectedSemesterId) {
+            $enrollStudents = StudentEnrollment::with([
+                    'student', 'studentSemesterProfile', 'semester', 'major', 'academicYear'
+                ])
+                ->where('semester_id', $selectedSemesterId)
+                ->get();
+        }
+        // Fetch enrollments filtered by semester
+        // $enrollStudents = StudentEnrollment::with(['student', 'studentSemesterProfile', 'semester', 'major', 'academicYear'])
+        //     ->when($selectedSemesterId, fn ($q) => $q->where('semester_id', $selectedSemesterId))
+        //     ->get();
 
-    return Inertia::render('Students/EnrolledStudents', [
-        'academicYears' => $academicYears,
-        'selectedAcademicYearId' => $selectedAcademicYearId,
-        'semesters' => $semesters,
-        'selectedSemesterId' => $selectedSemesterId,
-        'enrollStudents' => $enrollStudents,
-    ]);
+        // return $enrollStudents;
+
+        return Inertia::render('Students/EnrolledStudents', [
+            'academicYears' => $academicYears,
+            'selectedAcademicYearId' => $selectedAcademicYearId,
+            'semesters' => $semesters,
+            'selectedSemesterId' => $selectedSemesterId,
+            'enrollStudents' => $enrollStudents,
+        ]);
     }
 
     public function stuCourses( ){

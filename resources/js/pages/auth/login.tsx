@@ -82,11 +82,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     <div className="grid gap-2">
                                         <div className="flex items-center">
                                             <Label htmlFor="password">လျို့၀ှက်နံပါတ်</Label>
-                                            {canResetPassword && (
-                                                <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
-                                                    သင်၏ လျို့၀ှက်နံပါတ် မေ့နေပြီလား?
-                                                </TextLink>
-                                            )}
                                         </div>
                                         <Input
                                             id="password"
@@ -101,30 +96,12 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                         <InputError message={errors.password} />
                                     </div>
 
-                                    <div className="flex items-center space-x-3">
-                                        <Checkbox
-                                            id="remember"
-                                            name="remember"
-                                            checked={data.remember}
-                                            onClick={() => setData('remember', !data.remember)}
-                                            tabIndex={3}
-                                        />
-
-                                        <Label htmlFor="remember">မှတ်ထားပေးပါ</Label>
-                                    </div>
-
-                                    <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
+                                    <Button type="submit" className="mt-4 w-full " tabIndex={4} disabled={processing}>
                                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                                         အကောင့်သို့ ၀င်မည်
                                     </Button>
                                 </div>
 
-                                {/* <div className="text-center text-sm text-muted-foreground">
-                                    Don't have an account?{' '}
-                                    <TextLink href={route('register')} tabIndex={5}>
-                                        Sign up
-                                    </TextLink>
-                                </div> */}
                             </form>
                         </div>
                         <div className="relative -mb-px w-full shrink-0 overflow-hidden rounded-t-lg bg-[#9f1313] lg:mb-0 lg:-ml-px lg:aspect-auto lg:w-[438px] lg:rounded-t-none lg:rounded-r-lg dark:bg-[#1D0002]">

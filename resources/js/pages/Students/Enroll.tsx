@@ -203,7 +203,7 @@ export default function Create() {
     return (
         <AppLayout>
 
-            {
+            {/* {
                 Object.keys(errors).length > 0 && (
                     <div className="text-red-500">
                         {Object.values(errors).map((error, index) => (
@@ -211,7 +211,7 @@ export default function Create() {
                         ))}
                     </div>
                 )
-            }
+            } */}
             <div className="w-full mx-auto  p-2 m-3  rounded shadow" >
                 <form onSubmit={submit} className="flex flex-col gap-2">
                     {/* Student Info */}
@@ -225,7 +225,7 @@ export default function Create() {
                                     onValueChange={(value) => setData('academic_year_id', value)}
                                 >
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select Academic Year" />
+                                        <SelectValue placeholder="ပညာသင်နှစ် ရွေးချယ်ပါ။" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
@@ -236,7 +236,7 @@ export default function Create() {
                                                     </SelectItem>
                                                 ))
                                             ) : (
-                                                <SelectItem value="0">There is no academic year</SelectItem>
+                                                <div className="px-4 py-2 text-red-500 text-sm">ပညာသင်နှစ်မရှိပါ။</div>
                                             )}
                                         </SelectGroup>
                                     </SelectContent>
@@ -260,9 +260,9 @@ export default function Create() {
                                 {data.image && <img src={URL.createObjectURL(data.image)} alt="Preview Image" className="w-42 mt-2 object-cover" />}
                                 <div className="grid gap-2">
 
-                                    <Label htmlFor="amount">Image</Label>
+                                    <Label htmlFor="amount">လိုင်စင်ပုံ</Label>
                                     <Input
-                                        className='w-2/5'
+                                        className='w-3/5'
                                         id="image"
                                         type="file"
                                         required
@@ -297,7 +297,7 @@ export default function Create() {
                                                         onValueChange={(value) => setData('semester_id', value)}
                                                     >
                                                         <SelectTrigger id="semester_id">
-                                                            <SelectValue placeholder="Select semester" />
+                                                            <SelectValue placeholder="သင်တန်းကာလ ရွေးချယ်ပါ။" />
                                                         </SelectTrigger>
                                                         <SelectContent>
                                                             <SelectGroup>
@@ -310,7 +310,7 @@ export default function Create() {
                                                                             </SelectItem>
                                                                         ))
                                                                 ) : (
-                                                                    <SelectItem value="0">No semesters available</SelectItem>
+                                                                    <div className="px-4 py-2 text-red-500 text-sm">သင်တန်းကာလ မရှိပါ</div>
                                                                 )}
                                                             </SelectGroup>
                                                         </SelectContent>
@@ -336,7 +336,7 @@ export default function Create() {
                                                                 {(majors?.length ?? 0) > 0 ? (majors.map((s) => (
                                                                     <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
                                                                 ))) : (
-                                                                    <SelectItem value='0'>There is no semester</SelectItem>
+                                                                    <div className="px-4 py-2 text-red-500 text-sm">အထူးပြုဘာသာရပ်များ မရှီသေးပါ။</div>
 
                                                                 )}
                                                             </SelectGroup>
@@ -359,12 +359,12 @@ export default function Create() {
 
                                         </div>
                                         <div >
-                                            <div  >တက္ကသိုလ်၀င်ရောက်သည့်အမှတ်</div>
+                                            <div  >ကျောင်းသားမှတ်ပုံတင် အမှတ်</div>
                                             <div><Input
                                                 id="uid"
                                                 value={data.uid}
                                                 onChange={(e) => setData('uid', e.target.value)}
-                                                placeholder="တက္ကသိုလ်၀င်ရောက်သည့်အမှတ်"
+                                                placeholder="ကျောင်းသားမှတ်ပုံတင် အမှတ်"
                                             />
                                                 <InputError message={errors.uid} /></div>
 
@@ -396,22 +396,22 @@ export default function Create() {
                                 {/* Name in Burmese and English */}
                                 <div>
                                     <Label>အမည် (မြန်မာ)</Label>
-                                    <Input id="name_myan" value={data.name_myan} onChange={(e) => setData('name_myan', e.target.value)} />
+                                    <Input id="name_myan" value={data.name_myan} onChange={(e) => setData('name_myan', e.target.value)} placeholder='အမည်' />
                                     <InputError message={errors.name_myan} />
                                 </div>
                                 <div>
                                     <Label>အဖအမည် (မြန်မာ)</Label>
-                                    <Input id="father_name_myan" value={data.father_name_myan} onChange={(e) => setData('father_name_myan', e.target.value)} />
+                                    <Input id="father_name_myan" value={data.father_name_myan} onChange={(e) => setData('father_name_myan', e.target.value)} placeholder='အဖ အမည်' />
                                     <InputError message={errors.father_name_myan} />
                                 </div>
                                 <div>
                                     <Label>အမိအမည် (မြန်မာ)</Label>
-                                    <Input id="mother_name_myan" value={data.mother_name_myan} onChange={(e) => setData('mother_name_myan', e.target.value)} />
+                                    <Input id="mother_name_myan" value={data.mother_name_myan} onChange={(e) => setData('mother_name_myan', e.target.value)} placeholder='အမိ အမည်' />
                                     <InputError message={errors.mother_name_myan} />
                                 </div>
                                 <div>
                                     <Label>အမည် (အင်္ဂလိပ်)</Label>
-                                    <Input id="name_eng" value={data.name_eng} onChange={(e) => setData('name_eng', e.target.value)} />
+                                    <Input id="name_eng" value={data.name_eng} onChange={(e) => setData('name_eng', e.target.value)} placeholder="Student's name" />
                                     <InputError message={errors.name_eng} />
                                 </div>
 
@@ -419,7 +419,7 @@ export default function Create() {
 
                                 <div>
                                     <Label>အဖအမည် (အင်္ဂလိပ်)</Label>
-                                    <Input id="father_name_eng" value={data.father_name_eng} onChange={(e) => setData('father_name_eng', e.target.value)} />
+                                    <Input id="father_name_eng" value={data.father_name_eng} onChange={(e) => setData('father_name_eng', e.target.value)} placeholder="Father's name" />
                                     <InputError message={errors.father_name_eng} />
                                 </div>
 
@@ -427,7 +427,7 @@ export default function Create() {
 
                                 <div>
                                     <Label>အမိအမည် (အင်္ဂလိပ်)</Label>
-                                    <Input id="mother_name_eng" value={data.mother_name_eng} onChange={(e) => setData('mother_name_eng', e.target.value)} />
+                                    <Input id="mother_name_eng" value={data.mother_name_eng} onChange={(e) => setData('mother_name_eng', e.target.value)} placeholder="Mother's name" />
                                     <InputError message={errors.mother_name_eng} />
                                 </div>
 
@@ -444,7 +444,7 @@ export default function Create() {
                                 </div>
                                 <div>
                                     <Label>အဖလူမျိုး</Label>
-                                    <Input id="ethnicity" value={data.ethnicity} onChange={(e) => setData('ethnicity', e.target.value)} />
+                                    <Input id="ethnicity" value={data.ethnicity} onChange={(e) => setData('ethnicity', e.target.value)} placeholder="လူမျိုး " />
                                     <InputError message={errors.ethnicity} />
                                 </div>
                                 <div>
@@ -504,38 +504,39 @@ export default function Create() {
 
                                 </div>
                                 <div>
-                                    <Label>ကိုးကွယ်သည့် ဘာသာ</Label>
-                                    <Input id="religion" value={data.religion} onChange={(e) => setData('religion', e.target.value)} />
+                                    <Label>ကိုးကွယ်သည့် ဘာသာ(ကျောင်းသား)</Label>
+                                    <Input id="religion" value={data.religion} onChange={(e) => setData('religion', e.target.value)} placeholder="ကိုးကွယ်သည့် ဘာသာ(ကျောင်းသား)" />
                                     <InputError message={errors.religion} />
                                 </div>
                                 <div>
-                                    <Label>ကိုးကွယ်သည့် ဘာသာ</Label>
+                                    <Label>ကိုးကွယ်သည့် ဘာသာ(အဖ)</Label>
                                     <Input
                                         id="father_religion"
                                         value={data.father_religion}
                                         onChange={(e) => setData('father_religion', e.target.value)}
-                                        placeholder="ကိုးကွယ်သည့် ဘာသာ"
+                                        placeholder="ကိုးကွယ်သည့် ဘာသာ(အဖ)"
                                     />
                                     <InputError message={errors.father_religion} />
                                 </div>
                                 <div>
-                                    <Label>ကိုးကွယ်သည့် ဘာသာ</Label>
+                                    <Label>ကိုးကွယ်သည့် ဘာသာ(အမိ)</Label>
                                     <Input
                                         id="mother_religion"
                                         value={data.mother_religion}
                                         onChange={(e) => setData('mother_religion', e.target.value)}
-                                        placeholder="ကိုးကွယ်သည့် ဘာသာ"
+                                        placeholder="ကိုးကွယ်သည့် ဘာသာ(အမိ)"
                                     />
                                     <InputError message={errors.mother_religion} />
                                 </div>
 
                                 <div>
-                                    <Label>မွေးဖွားရာ ဇာတိ</Label>
+                                    <Label>မွေးဖွားရာ ဇာတိ(ကျောင်းသား)</Label>
                                     <Input
                                         id="hometown"
                                         value={data.hometown}
                                         onChange={(e) => setData('hometown', e.target.value)}
                                         placeholder="မွေးဖွားရာ ဇာတိ"
+                                        className='mb-2'
                                     />
                                     <InputError message={errors.hometown} />
                                     <div><Input
@@ -547,12 +548,13 @@ export default function Create() {
                                         <InputError message={errors.township_state_region} /></div>
                                 </div>
                                 <div>
-                                    <Label>အဖ မွေးဖွားရာ ဇာတိ</Label>
+                                    <Label>အဖ မွေးဖွားရာ ဇာတိ(အဖ)</Label>
                                     <Input
                                         id="father_hometown"
                                         value={data.father_hometown}
                                         onChange={(e) => setData('father_hometown', e.target.value)}
                                         placeholder="မွေးဖွားရာ ဇာတိ"
+                                        className='mb-2'
                                     />
                                     <InputError message={errors.father_hometown} />
                                     <div><Input
@@ -560,16 +562,18 @@ export default function Create() {
                                         value={data.father_township_state_region}
                                         onChange={(e) => setData('father_township_state_region', e.target.value)}
                                         placeholder="မြို့နယ်/ပြည်နယ်/တိုင်း"
+
                                     />
                                         <InputError message={errors.father_township_state_region} /></div>
                                 </div>
                                 <div>
-                                    <Label>အမိ မွေးဖွားရာ ဇာတိ</Label>
+                                    <Label>အမိ မွေးဖွားရာ ဇာတိ(အမိ)</Label>
                                     <Input
                                         id="mother_hometown"
                                         value={data.mother_hometown}
                                         onChange={(e) => setData('mother_hometown', e.target.value)}
                                         placeholder="မွေးဖွားရာ ဇာတိ"
+                                        className='mb-2'
                                     />
                                     <InputError message={errors.mother_hometown} />
                                     <div><Input
@@ -708,12 +712,12 @@ export default function Create() {
                                 </div>
                                 <div>
                                     <Label>အမြဲတမ်းနေရပ် လိပ်စာ</Label>
-                                    <Textarea id="permanent_address" value={data.permanent_address} onChange={(e) => setData('permanent_address', e.target.value)} />
+                                    <Textarea id="permanent_address" value={data.permanent_address} onChange={(e) => setData('permanent_address', e.target.value)} placeholder='ကျောင်းသားအမြဲတမ်း နေရပ်လိပ်စာ' />
                                     <InputError message={errors.permanent_address} />
                                 </div>
                                 <div>
                                     <Label>ဖုန်းနံပါတ်</Label>
-                                    <Input id="phone" value={data.phone} onChange={(e) => setData('phone', e.target.value)} />
+                                    <Input id="phone" value={data.phone} onChange={(e) => setData('phone', e.target.value)} placeholder='ကျောင်းသား၏ ဖုန်း' />
                                     <InputError message={errors.phone} />
                                 </div>
                                 <div>
@@ -722,7 +726,7 @@ export default function Create() {
                                         id="email"
                                         value={data.email}
                                         onChange={(e) => setData('email', e.target.value)}
-                                        placeholder="Email"
+                                        placeholder="ကျောင်းသား၏ အီးမေးလ်"
                                     />
                                     <InputError message={errors.email} />
                                 </div>
@@ -854,7 +858,8 @@ export default function Create() {
                     </section>
                     {/* Creating Register Form */}
 
-                    <section >
+                    {/* Regitration Agreement */}
+                    {/* <section >
                         <Card className='w-8/9 mt-6 mx-auto'>
                             <CardHeader>
                                 <p>သို့</p>
@@ -1046,14 +1051,14 @@ export default function Create() {
                                 {errors.agreed && <p className="text-sm text-red-500">{errors.agreed}</p>}
                             </div>
                         </Card>
-                    </section>
+                    </section> */}
 
 
                     <div className='flex justify-end me-9'>
 
                         <div >
                             <Button type="submit" disabled={processing} className="mt-6 w-full ">
-                                {processing ? 'Saving...' : 'Create Registration'}
+                                {processing ? 'စာရင်းသွင်းနေပါသည်...' : 'စာရင်းသွင်းမည်'}
                             </Button></div>
                     </div>
                 </form>

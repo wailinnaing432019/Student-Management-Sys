@@ -126,7 +126,7 @@ export default function CourseSemesterIndex({
                                             {year.name}
                                         </SelectItem>
                                     )) : (
-                                        <div className="px-4 py-2 text-gray-500 text-sm">ပညာသင်နှစ်များ မရှိသေးပါ။</div>
+                                        <div className="px-4 py-2 text-red-500 text-sm">ပညာသင်နှစ်များ မရှိသေးပါ။</div>
                                     )}
                                 </SelectContent>
                             </Select>
@@ -145,7 +145,7 @@ export default function CourseSemesterIndex({
                                             {getSemesterText(sem.semester_number)}
                                         </SelectItem>
                                     )) : (
-                                        <div className="px-4 py-2 text-gray-500 text-sm">သင်တန်းကာလများ မရှိသေးပါ။</div>
+                                        <div className="px-4 py-2 text-red-500 text-sm">သင်တန်းကာလများ မရှိသေးပါ။</div>
                                     )}
                                 </SelectContent>
                             </Select>
@@ -164,7 +164,7 @@ export default function CourseSemesterIndex({
                                             {major.name}
                                         </SelectItem>
                                     )) : (
-                                        <div className="px-4 py-2 text-gray-500 text-sm">အထူးပြုဘာသာရပ်များ  မရှိသေးပါ။</div>
+                                        <div className="px-4 py-2 text-red-500 text-sm">အထူးပြုဘာသာရပ်များ  မရှိသေးပါ။</div>
                                     )}
                                 </SelectContent>
                             </Select>
@@ -211,13 +211,13 @@ export default function CourseSemesterIndex({
                                             )}
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <Button
+                                            {/* <Button
                                                 variant="destructive"
                                                 size="sm"
                                                 onClick={() => handleUnassign(course.id)}
                                             >
                                                 Unassign
-                                            </Button>
+                                            </Button> */}
                                         </TableCell>
                                     </TableRow>
                                 ))

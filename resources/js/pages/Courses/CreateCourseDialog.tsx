@@ -135,14 +135,7 @@ export default function CreateCourseDialog({ majors, redirect }: CreateCoursePro
                                 <InputError message={errors.major_ids} />
                             </div>
 
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="is_elective"
-                                    checked={data.is_elective}
-                                    onCheckedChange={(checked) => setData('is_elective', !!checked)}
-                                />
-                                <Label htmlFor="is_elective">Elective Course?</Label>
-                            </div>
+
                         </div>
 
                         <DialogFooter className="mt-6 flex justify-end gap-2">

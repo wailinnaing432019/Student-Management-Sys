@@ -64,7 +64,7 @@ export const getColumns = (
         },
         {
             accessorKey: "uid",
-            header: () => getSortHeader("ကျောင်း၀င်အမှတ်", "uid", selectedAcademicYearId, selectedSemesterId, selectedMajorId), // UID
+            header: () => getSortHeader("ကျောင်းဝင်အမှတ်", "uid", selectedAcademicYearId, selectedSemesterId, selectedMajorId), // UID
             cell: ({ row }) => row.original.student.uid,
         },
         {
@@ -89,7 +89,7 @@ export const getColumns = (
         },
         {
             accessorKey: "roll_no",
-            header: "ခုံနံပါတ်", // Roll No
+            header: () => getSortHeader("ခုံနံပါတ်", "roll_no", selectedAcademicYearId, selectedSemesterId, selectedMajorId),
             cell: ({ row }) => row.original.student_semester_profile.roll_no,
         },
         {

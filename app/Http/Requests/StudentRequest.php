@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StudentRequest extends FormRequest
 {
@@ -19,15 +20,30 @@ class StudentRequest extends FormRequest
             'academic_year_id' => 'required|string',
             'semester_id' => 'required|string',
             'major_id' => 'required|string',
-            'roll_no' => 'required|string',
-            'uid' => 'nullable|string',
+            'roll_no' => [
+            'required',
+            'string',
+            Rule::unique('student_semester_profiles')
+                ->where(fn ($query) => 
+                    $query->where('academic_year_id', $this->academic_year_id)
+                        ->where('semester_id', $this->semester_id)
+                        ->where('major_id', $this->major_id)
+                )
+        ],
+            'uid' => 'required|string|unique:students,uid',
             'entried_year' => 'required|string',
-            'nrc_state' => 'required',
-            'nrc_township' => 'required',
-            'nrc_type' => 'required',
+            'nrc_state' => ['required'],
+            'nrc_township' => ['required'],
+            'nrc_type' => ['required'],
             'nrc_number' => [
                 'required',
-                'regex:/^([0-9]{6}|[၀-၉]{6})$/u'
+                'regex:/^([0-9]{6}|[၀-၉]{6})$/u',
+                Rule::unique('students') // 👈 your table name here
+                    ->where(fn ($query) => 
+                        $query->where('nrc_state', $this->nrc_state)
+                              ->where('nrc_township', $this->nrc_township)
+                              ->where('nrc_type', $this->nrc_type)
+                    ),
             ],
             'dob' => 'required|string',
             'ethnicity' => 'required|string',
@@ -68,7 +84,11 @@ class StudentRequest extends FormRequest
             'donor_name' => 'required|string',
             'donor_relationship' => 'required|string',
             'donor_job' => 'required|string',
-            'donor_phone' => 'required|string',
+            'donor_phone' =>    [
+                'required',
+                // +95 or 0 followed by 7–10 digits (mobile or landline)
+                'regex:/^(?:\+?95|0)[0-9]{7,10}$/'
+            ],
             'donor_status' => 'required|string',
 
             // Exams_taken
@@ -97,20 +117,20 @@ class StudentRequest extends FormRequest
             'father_local_foreign' => 'required|string',
 
             // Registration
-            'name' => 'required|string',
-            'examed_year' => 'required|string',
-            'examed_month' => 'required|string',
-            'examed_name' => 'required|string',
-            'examed_roll_no' => 'required|string',
-            'examed_status' => 'required|string',
-            'class' => 'required|string',
-            'fee' => ['required', 'regex:/^[0-9၀-၉]+$/u'],
-            'guardian' => 'required|string',
-            'g_nrc_state' => 'required|string',
-            'g_nrc_township' => 'required|string',
-            'g_nrc_type' => 'required|string',
-            'g_nrc_number' => 'required|string',
-            'agreed' => 'accepted',
+            // 'name' => 'required|string',
+            // 'examed_year' => 'required|string',
+            // 'examed_month' => 'required|string',
+            // 'examed_name' => 'required|string',
+            // 'examed_roll_no' => 'required|string',
+            // 'examed_status' => 'required|string',
+            // 'class' => 'required|string',
+            // 'fee' => ['required', 'regex:/^[0-9၀-၉]+$/u'],
+            // 'guardian' => 'required|string',
+            // 'g_nrc_state' => 'required|string',
+            // 'g_nrc_township' => 'required|string',
+            // 'g_nrc_type' => 'required|string',
+            // 'g_nrc_number' => 'required|string',
+            // 'agreed' => 'accepted',
         ];
     }
 
@@ -118,6 +138,8 @@ class StudentRequest extends FormRequest
     {
         return [
             '*.required' => ':attribute ဖြည့်ပေးရန် လိုအပ်သည်။',
+            '*.regex' => 'မှန်ကန်သော ပုံစံဖြစ်ရမည်။',
+            '*.unique' => ':attribute မှာ ရှိပြီးသားဖြစ်ပါသည်။',
             '*.string' => ':attribute သည် စာသားဖြစ်ရမည်။',
             '*.numeric' => ':attribute သည် ဂဏန်းဖြစ်ရမည်။',
             '*.image' => ':attribute သည် ဓာတ်ပုံဖိုင်ဖြစ်ရမည်။',
@@ -126,6 +148,7 @@ class StudentRequest extends FormRequest
             '*.accepted' => ':attribute ကို သဘောတူရန် လိုအပ်သည်။',
             'phone.required' => 'ဖုန်းနံပါတ်ဖြည့်ရန် လိုအပ်ပါသည်။',
             'phone.regex' => 'မှန်ကန်သော ဖုန်းနံပါတ်ဖြစ်ရမည်။',
+            'donor_phone.regex' => 'မှန်ကန်သော ဖုန်းနံပါတ်ဖြစ်ရမည်။',
         ];
     }
 
@@ -156,6 +179,23 @@ class StudentRequest extends FormRequest
                     }
                 }
             }
+
+
+            $studentNrc = $this->nrc_state.$this->nrc_township.$this->nrc_type.$this->nrc_number;
+        $fatherNrc  = $this->father_nrc_state.$this->father_nrc_township.$this->father_nrc_type.$this->father_nrc_number;
+        $motherNrc  = $this->mother_nrc_state.$this->mother_nrc_township.$this->mother_nrc_type.$this->mother_nrc_number;
+
+        if ($studentNrc === $fatherNrc) {
+            $validator->errors()->add('nrc_number', 'ကျောင်သား၏ မှတ်ပုံတင် နံပါတ်သည် ဖခင်၏ မှတ်ပုံတင် နံပါတ်နှင့် တူနေပါသည်။');
+        }
+
+        if ($studentNrc === $motherNrc) {
+            $validator->errors()->add('nrc_number', 'ကျောင်းသား၏ မှတ်ပုံတင် နံပါတ်သည် မိခင်၏ မှတ်ပုံတင် နံပါတ်နှင့် တူနေပါသည်။');
+        }
+
+        if ($fatherNrc === $motherNrc) {
+            $validator->errors()->add('father_nrc_number', 'ဖခင်၏ မှတ်ပုံတင် နံပါတ်သည် မိခင်၏ မှတ်ပုံတင် နံပါတ်နှင့် တူနေပါသည်။');
+        }
         });
     }
 
@@ -170,10 +210,10 @@ class StudentRequest extends FormRequest
             'roll_no' => 'ခုံနံပါတ်',
             'uid' => 'ကျောင်းသား မှတ်ပုံတင်အမှတ်',
             'entried_year' => 'ဝင်ခွင့်ရနှစ်',
-            'nrc_state' => 'NRC ပြည်နယ်/တိုင်း',
-            'nrc_township' => 'NRC မြို့နယ်',
-            'nrc_type' => 'NRC အမျိုးအစား',
-            'nrc_number' => 'NRC နံပါတ်',
+            'nrc_state' => 'မှတ်ပုံတင် ပြည်နယ်/တိုင်း',
+            'nrc_township' => 'မှတ်ပုံတင် မြို့နယ်',
+            'nrc_type' => 'မှတ်ပုံတင် အမျိုးအစား',
+            'nrc_number' => 'မှတ်ပုံတင် နံပါတ်',
             'dob' => 'မွေးနေ့',
             'ethnicity' => 'လူမျိုး',
             'religion' => 'ဘာသာ',
@@ -194,10 +234,10 @@ class StudentRequest extends FormRequest
             'mother_religion' => 'မိခင်၏ ဘာသာ',
             'mother_hometown' => 'မိခင်၏ မွေးဖွားရာဇာတိ',
             'mother_township_state_region' => 'မိခင် တိုင်း/ပြည်နယ်',
-            'mother_nrc_state' => 'မိခင် NRC ပြည်နယ်/တိုင်း',
-            'mother_nrc_township' => 'မိခင် NRC မြို့နယ်',
-            'mother_nrc_type' => 'မိခင် NRC အမျိုးအစား',
-            'mother_nrc_number' => 'မိခင် NRC နံပါတ်',
+            'mother_nrc_state' => 'မိခင် မှတ်ပုံတင် ပြည်နယ်/တိုင်း',
+            'mother_nrc_township' => 'မိခင် မှတ်ပုံတင် မြို့နယ်',
+            'mother_nrc_type' => 'မိခင် မှတ်ပုံတင် အမျိုးအစား',
+            'mother_nrc_number' => 'မိခင် မှတ်ပုံတင် နံပါတ်',
             'mother_job' => 'မိခင် အလုပ်အကိုင်',
             'mother_local_foreign' => 'မိခင် ပြည်တွင်း/ပြည်ပ',
 
@@ -208,7 +248,7 @@ class StudentRequest extends FormRequest
             'donor_status' => 'ပညာသင်ထောက်ပံ့ကြေးပေးရန် ခွင့်ပြု မပြု',
 
             'exam_records.*.exam_name' => 'စာမေးပွဲအမည်',
-            'exam_records.*.exam_major' => 'စာမေးပွဲဌာန',
+            'exam_records.*.exam_major' => 'စာမေးပွဲ အဓိကဘာသာရပ်',
             'exam_records.*.exam_roll_no' => 'စာမေးပွဲနံပါတ်',
             'exam_records.*.exam_year' => 'စာမေးပွဲနှစ်',
             'exam_records.*.exam_pass_fail' => 'စာမေးပွဲ အောင်/ကျရှုံး',
@@ -219,10 +259,10 @@ class StudentRequest extends FormRequest
             'father_religion' => 'ဖခင်၏ ကိုးကွယ်သည့် ဘာသာ',
             'father_hometown' => 'ဖခင် မွေးဖွားရာဇာတိ',
             'father_township_state_region' => 'ဖခင်၏ တိုင်း/ပြည်နယ်',
-            'father_nrc_state' => 'ဖခင် NRC ပြည်နယ်/တိုင်း',
-            'father_nrc_township' => 'ဖခင် NRC မြို့နယ်',
-            'father_nrc_type' => 'ဖခင် NRC အမျိုးအစား',
-            'father_nrc_number' => 'ဖခင် NRC နံပါတ်',
+            'father_nrc_state' => 'ဖခင် မှတ်ပုံတင် ပြည်နယ်/တိုင်း',
+            'father_nrc_township' => 'ဖခင် မှတ်ပုံတင် မြို့နယ်',
+            'father_nrc_type' => 'ဖခင် မှတ်ပုံတင် အမျိုးအစား',
+            'father_nrc_number' => 'ဖခင် မှတ်ပုံတင် နံပါတ်',
             'father_job' => 'ဖခင် အလုပ်အကိုင်',
             'father_local_foreign' => 'ဖခင် ပြည်တွင်း/ပြည်ပ',
 
@@ -235,10 +275,10 @@ class StudentRequest extends FormRequest
             'class' => 'အတန်း',
             'fee' => 'အခကြေးငွေ',
             'guardian' => 'အုပ်ထိန်းသူ',
-            'g_nrc_state' => 'အုပ်ထိန်းသူ NRC ပြည်နယ်/တိုင်း',
-            'g_nrc_township' => 'အုပ်ထိန်းသူ NRC မြို့နယ်',
-            'g_nrc_type' => 'အုပ်ထိန်းသူ NRC အမျိုးအစား',
-            'g_nrc_number' => 'အုပ်ထိန်းသူ NRC နံပါတ်',
+            'g_nrc_state' => 'အုပ်ထိန်းသူ မှတ်ပုံတင် ပြည်နယ်/တိုင်း',
+            'g_nrc_township' => 'အုပ်ထိန်းသူ မှတ်ပုံတင် မြို့နယ်',
+            'g_nrc_type' => 'အုပ်ထိန်းသူ မှတ်ပုံတင် အမျိုးအစား',
+            'g_nrc_number' => 'အုပ်ထိန်းသူ မှတ်ပုံတင် နံပါတ်',
             'agreed' => 'သဘောတူချက်',
         ];
     }
@@ -248,6 +288,7 @@ class StudentRequest extends FormRequest
     {
         $this->merge([
             'phone' => $this->normalizePhone($this->phone),
+            'donor_phone' => $this->normalizePhone($this->donor_phone),
         ]);
     }
 

@@ -232,17 +232,39 @@ export default function EnrolledStudents({
                     </Select>
                 </div>
 
-                <div className="w-full no-print">
-                    <Button
-                        className=" mr-5"
-                        onClick={() => downloadAllMarksAsCSV(enrollStudents, courseList)}
+                <div className="w-full no-print space-y-2">
+                    <label className="text-sm font-medium text-gray-700">ကြည့်ရှုရန်</label>
+                    <Select
+                        onValueChange={(value) => {
+                            const params = new URLSearchParams({
+                                academic_year_id: String(selectedAcademicYearId ?? ''),
+                                semester_id: String(selectedSemesterId ?? ''),
+                                major_id: String(selectedMajorId ?? ''),
+                            });
+
+                            if (value === 'marks') {
+                                params.set('viewBy', 'marks');
+                                window.open(route('marksBySemester.view') + '?' + params.toString(), '_blank');
+                            } else if (value === 'grade') {
+                                params.set('viewBy', 'grade');
+                                window.open(route('marksBySemester.view') + '?' + params.toString(), '_blank');
+                            } else if (value === 'csv') {
+                                downloadAllMarksAsCSV(enrollStudents, courseList);
+                            }
+                        }}
+                        defaultValue=""
                     >
-                        Download CSV
-                    </Button>
-                    <Button onClick={() => window.print()}>
-                        🖨️ Print
-                    </Button>
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="ရွေးချယ်ပါ" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="marks">အမှတ်များဖြင့် ကြည့်မည်</SelectItem>
+                            <SelectItem value="grade">Grade ကြည့်မည်</SelectItem>
+                            <SelectItem value="csv">Excel File ဒေါင်းလုပ်မည်</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
+
             </div>
 
             {(selectedAcademicYear || selectedSemester || selectedMajor) && (
@@ -251,7 +273,7 @@ export default function EnrolledStudents({
                         {selectedAcademicYear?.name} ပညာသင်နှစ်
                     </h2>
                     <h5 className="text-lg font-semibold  text-center ">
-                        {selectedSemester?.year_name}   - {selectedSemester?.name}
+                        {selectedSemester?.year_name}    {selectedSemester && "-" + getSemesterText(selectedSemester?.semester_number)}
                     </h5>
                     <h6 className="text-lg font-semibold  text-center ">
                         {selectedMajor.name} ၏ ရမှတ်များ
@@ -283,7 +305,7 @@ export default function EnrolledStudents({
                                 <TableRow key={enroll.id} className="hover:bg-gray-50">
                                     <TableCell className="text-center">{rowIndex + 1}</TableCell>
                                     <TableCell className="whitespace-nowrap">
-                                        <div>{enroll.student.name_eng}</div>
+                                        <div>{enroll.student.name_myan}</div>
                                         <div className="text-xs text-gray-500">{enroll.student.uid}</div>
                                     </TableCell>
                                     <TableCell>
@@ -326,23 +348,24 @@ export default function EnrolledStudents({
                                             </TableCell>
                                         );
                                     })}
-                                    <TableCell>
-                                        <div className='flex gap-3 text-sm items-center justify-center'>
+                                    <TableCell className=''>
+                                        <div className='flex gap-3 text-sm items-center justify-center not-print'>
                                             {/* Check if any course mark is missing */}
                                             {courseList.some((courseCode) => {
                                                 const studentCourse = enroll.student_courses?.find(
                                                     (sc) => sc.course.code === courseCode
                                                 );
-                                                return !studentCourse?.mark?.mark && studentCourse?.mark?.mark !== 0;
+                                                return studentCourse?.mark?.mark || studentCourse?.mark?.mark === 0;
                                             }) ? (
-                                                <Link href={route("assign-marks", enroll.id)} title="Assign Marks">
-                                                    <PencilIcon className="text-blue-500 hover:text-blue-700 cursor-pointer" />
-                                                </Link>
-                                            ) : (
+
                                                 <PencilIcon
                                                     className="text-gray-400 cursor-not-allowed"
                                                     title="All marks already assigned"
                                                 />
+                                            ) : (
+                                                <Link href={route("assign-marks", enroll.id)} title="Assign Marks">
+                                                    <PencilIcon className="text-blue-500 hover:text-blue-700 cursor-pointer" />
+                                                </Link>
                                             )}
                                             <a href={route("marks.show", enroll.id)} title="View Marks" target='_blank'>
                                                 <LucideEye className="text-gray-600 hover:text-black" />

@@ -56,11 +56,11 @@ export const columns = (openEditDialog: (course: Course) => void): ColumnDef<Cou
         cell: ({ row }) =>
             row.original.majors.map((m: Major) => m.name).join(", "),
     },
-    {
-        accessorKey: "is_elective",
-        header: "ရွေးချယ်ဘာသာရပ်", // Elective
-        cell: ({ row }) => (row.original.is_elective ? "ဟုတ်သည်" : "မဟုတ်ပါ"), // Yes / No
-    },
+    // {
+    //     accessorKey: "is_elective",
+    //     header: "ရွေးချယ်ဘာသာရပ်", // Elective
+    //     cell: ({ row }) => (row.original.is_elective ? "ဟုတ်သည်" : "မဟုတ်ပါ"), // Yes / No
+    // },
     {
         id: "actions",
         header: "လုပ်ဆောင်ချက်များ", // Actions
@@ -73,32 +73,32 @@ export const columns = (openEditDialog: (course: Course) => void): ColumnDef<Cou
                         onClick={() => openEditDialog(course)}
                         className="mr-2"
                     >
-                        ပြင်ဆင်ရန် {/* Edit */}
+                        ပြင်ဆင်ရန်
                     </Button>
 
-                    <AlertDialog>
+                    {/* <AlertDialog>
                         <AlertDialogTrigger asChild>
                             <Button variant="destructive" size="sm">
-                                ဖျက်ရန် {/* Delete */}
+                                ဖျက်ရန် 
                             </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
-                                <AlertDialogTitle>သေချာပါပြီလား။</AlertDialogTitle> {/* Are you absolutely sure? */}
+                                <AlertDialogTitle>သေချာပါပြီလား။</AlertDialogTitle>  
                                 <AlertDialogDescription>
-                                    ဤသင်တန်း <b>{course.name}</b> ကို အပြီးအပိုင်ဖျက်ပစ်ပါမည်။ {/* This will delete the course ... permanently. */}
+                                    ဤသင်တန်း <b>{course.name}</b> ကို အပြီးအပိုင်ဖျက်ပစ်ပါမည်။ 
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                                <AlertDialogCancel>ပယ်ဖျက်ရန်</AlertDialogCancel> {/* Cancel */}
+                                <AlertDialogCancel>ပယ်ဖျက်ရန်</AlertDialogCancel>  
                                 <AlertDialogAction
                                     onClick={() => router.delete(route("courses.destroy", course.id))}
                                 >
-                                    အတည်ပြုရန် {/* Confirm */}
+                                    အတည်ပြုရန် 
                                 </AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
-                    </AlertDialog>
+                    </AlertDialog> */}
                 </>
             )
         },

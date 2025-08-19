@@ -2,7 +2,7 @@ import AppLayout from "@/layouts/app-layout";
 
 export default function Dashboard() {
     const breadcrumbs = [
-        { name: "Dashboard", href: "/dashboard" },
+        { name: "ပင်မစာမျက်နှာ", href: "/dashboard" },
     ];
 
     return (

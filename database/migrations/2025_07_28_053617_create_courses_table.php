@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('code')->unique();
+            $table->string('code');
             $table->text('description')->nullable(); 
             $table->boolean('is_elective')->default(false);
             $table->timestamps();

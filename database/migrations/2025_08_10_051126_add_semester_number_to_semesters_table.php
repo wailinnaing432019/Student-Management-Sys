@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
          Schema::table('semesters', function (Blueprint $table) {
-            $table->unsignedInteger('semester_number')->after('name'); // or after another column if you prefer
+            $table->unsignedInteger('semester_number')->after('year_name'); // or after another column if you prefer
         });
     }
 

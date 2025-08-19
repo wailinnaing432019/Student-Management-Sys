@@ -28,7 +28,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle, SquarePen } from 'lucide-react';
 import { FormEventHandler, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import InputError from '@/components/input-error';
@@ -44,6 +44,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -155,9 +156,9 @@ export default function Index({ majors }) {
                             </div>
                             <DialogFooter className='m-3'>
                                 <DialogClose asChild>
-                                    <Button ref={closeRef} className=" bg-gray-400  p-2 rounded">ပယ်ဖျက်မည်</Button>
+                                    <Button ref={closeRef} className=" bg-red-500  p-2 rounded">ပယ်ဖျက်မည်</Button>
                                 </DialogClose>
-                                <Button type="submit" className="p-1   rounded" disabled={processing}>
+                                <Button type="submit" className="bg-green-500 p-1   rounded" disabled={processing}>
                                     {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                                     {processing ? "ဖန်တီးနေပါသည်" : "ဖန်တီးမည်"}
                                 </Button>
@@ -172,7 +173,7 @@ export default function Index({ majors }) {
                     <TableCaption>အထူးပြုဘာသာရပ်များ စာရင်း</TableCaption>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>ID</TableHead>
+                            <TableHead>စဉ်</TableHead>
                             <TableHead>အထူးပြု ဘာသာရပ် အမည်</TableHead>
                             <TableHead>အထူးပြု ဘာသာရပ် အတွက်ဖော်ပြချက်</TableHead>
                             <TableHead className="text-right">လုပ်ဆောင်ချက်များ</TableHead>
@@ -180,15 +181,30 @@ export default function Index({ majors }) {
                     </TableHeader>
                     <TableBody>
                         {majors.length > 0 ? (
-                            majors.map((major) => (
+                            majors.map((major, index) => (
                                 <TableRow key={major.id}>
-                                    <TableCell>{major.id}</TableCell>
+                                    <TableCell>{index + 1}</TableCell>
                                     <TableCell>{major.name}</TableCell>
                                     <TableCell>{major.description}</TableCell>
                                     <TableCell className="text-right space-x-1">
-                                        <Button className='mt-4 bg-green-800 hover:bg-green-400' onClick={() => openEditDialog(major)}>Edit</Button>
 
-                                        <AlertDialog>
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => openEditDialog(major)}
+                                                        className="text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+                                                    >
+                                                        <SquarePen className="h-4 w-4" />
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>Edit</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                        {/* <AlertDialog>
                                             <AlertDialogTrigger asChild>
                                                 <Button variant="outline" className='mt-4 bg-red-800 hover:bg-red-400'>Delete</Button>
                                             </AlertDialogTrigger>
@@ -204,7 +220,7 @@ export default function Index({ majors }) {
                                                     <AlertDialogAction className='text-red-700 hover:bg-gray-900' onClick={() => destroyHandle(major.id, major.name)}>သေချာပါသည်</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
-                                        </AlertDialog>
+                                        </AlertDialog> */}
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -226,7 +242,7 @@ export default function Index({ majors }) {
                         <form onSubmit={updateMajors}>
                             <DialogHeader>
                                 <DialogTitle>အဓိက ဘာသာရပ် ပြုပြင်ခြင်း</DialogTitle>
-                                <DialogDescription>အဓိက ဘာသာရပ်ကို အသေးစိပ် ပြုပြင်ခြင်း</DialogDescription>
+                                <DialogDescription>အဓိက ဘာသာရပ်ကို အသေးစိတ် ပြုပြင်ခြင်း</DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4">
                                 <div className="grid gap-3">

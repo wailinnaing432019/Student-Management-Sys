@@ -191,14 +191,14 @@
 
                                                         $roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
                                                         if (
-                                                            $enrollStudent->semester->semester_number < 1 ||
-                                                            $enrollStudent->semester->semester_number > count($roman)
+                                                            $stuEnrollment->semester->semester_number < 1 ||
+                                                            $stuEnrollment->semester->semester_number > count($roman)
                                                         ) {
                                                             return 'Unknown Semester';
                                                         }
                                                         $semester =
                                                             'Semester ' .
-                                                            $roman[$enrollStudent->semester->semester_number - 1];
+                                                            $roman[$stuEnrollment->semester->semester_number - 1];
 
                                                     @endphp
                                                     {{ $semester }}
@@ -238,9 +238,9 @@
                 <table class="table-auto w-full border border-gray-300 text-sm text-left">
                     <thead>
                         <tr>
-                            <th colspan="2" class="border px-3 py-2">၁။ပညာဆက်လက်သင်ခွင့်‌‌‌တောင်းခံသူ</th>
+                            <th colspan="2" class="border px-3 py-2">၁။ပညာဆက်လက်သင်ခွင့်တောင်းခံသူ</th>
                             <th class="border px-3 py-2">‌ကျောင်းသား/သူ</th>
-                            <th class="border px-3 py-2">‌အဖအမည်</th>
+                            <th class="border px-3 py-2">အဖအမည်</th>
                             <th class="border px-3 py-2">အမိအမည်</th>
                         </tr>
                     </thead>
@@ -297,12 +297,12 @@
                         <tr>
                             <td colspan="2" class="border px-3 py-2">နိုင်ငံခြားသား</td>
                             <td class="border px-3 py-2">
-                                {{ $student['local_foreign'] == 'local' ? 'နိုင်ငံသား' : 'နိုင်ငံခြားသား' }}</td>
+                                {{ $student['local_foreign'] == 'local' ? 'တိုင်းရင်းသား' : 'နိုင်ငံခြားသား' }}</td>
                             <td class="border px-3 py-2">
-                                {{ $student['father']['local_foreign'] == 'local' ? 'နိုင်ငံသား' : 'နိုင်ငံခြားသား' }}
+                                {{ $student['father']['local_foreign'] == 'local' ? 'တိုင်းရင်းသား' : 'နိုင်ငံခြားသား' }}
                             </td>
                             <td class="border px-3 py-2">
-                                {{ $student['mother']['local_foreign'] == 'local' ? 'နိုင်ငံသား' : 'နိုင်ငံခြားသား' }}
+                                {{ $student['mother']['local_foreign'] == 'local' ? 'တိုင်းရင်းသား' : 'နိုင်ငံခြားသား' }}
                             </td>
                         </tr>
                     </tbody>
@@ -314,8 +314,9 @@
                             <td colspan="2" class="border px-3 py-2">မွေးသက္ကရာဇ်</td>
                             <td class="border px-3 py-2">{{ $student['dob'] }}</td>
                             <td rowspan="4" colspan="2" class="border px-3 py-2">
-                                <label for="" class="-mt-2">အဘအုပ်ထိန်းသူ၏ အလုပ်အကိုင်ရာထူး/ဌာန/လိပ်စာ
-                                    အပြည့်အစုံ</label>
+                                <div style="font:10px"><label for="" class="-mt-2">အဘအုပ်ထိန်းသူ၏
+                                        အလုပ်အကိုင်ရာထူး/ဌာန/လိပ်စာ
+                                        အပြည့်အစုံ</label></div>
                                 <div class="mt-3">{{ $student['father']['job'] }}</div>
                             </td>
                         </tr>
@@ -365,6 +366,14 @@
                                     {{ $examTaken['pass_fail'] == 'pass' ? 'အောင်' : 'ရှုံး' }}</td>
                             </tr>
                         @empty
+                            <tr>
+                                <td class="border px-3 py-2">-</td>
+                                <td class="border px-3 py-2">-</td>
+                                <td class="border px-3 py-2">-</td>
+                                <td class="border px-3 py-2">-</td>
+                                <td class="border px-3 py-2">
+                                    -</td>
+                            </tr>
                         @endforelse
                         <tr>
                             <td colspan="2" rowspan="4" class="border px-3 py-2">၃။ကျောင်းနေရန်
@@ -389,7 +398,7 @@
                             </td>
                             <td colspan="3" class="border px-3 py-2">
                                 <div>
-                                    {{ $donor['donor_status'] == 1 ? 'ခွင့်ပြု' : 'မပြု' }}
+                                    {{ $donor['status'] == 1 ? 'ခွင့်ပြု' : 'မပြု' }}
                                 </div>
                             </td>
                         </tr>

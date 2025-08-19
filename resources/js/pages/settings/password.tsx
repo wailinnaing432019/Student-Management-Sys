@@ -49,80 +49,80 @@ export default function Password() {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Password settings" />
+        <AppLayout breadcrumbs={[{ name: "လျို့၀ှက်နံပါတ် ပြောင်းလဲခြင်း" }]}>
+            <Head title="လျို့၀ှက်နံပါတ် ပြောင်းလဲခြင်း" />
 
-            <SettingsLayout>
-                <div className="space-y-6">
-                    <HeadingSmall title="Update password" description="Ensure your account is using a long, random password to stay secure" />
+            {/* <SettingsLayout> */}
+            <div className="space-y-6 w-4/5 md:w-3/5 lg:w-3/5 shadow-lg mx-auto rounded-lg p-6">
+                <HeadingSmall title="လျို့၀ှက်နံပါတ် ပြောင်းလဲခြင်း" description="သင့်၏ လျို့၀ှက်နံပါတ် ပြောင်းလဲပြီးပါက သင့်၏အကောင့်သို့ပြန်၀င်ရပါမည်။" />
 
-                    <form onSubmit={updatePassword} className="space-y-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="current_password">Current password</Label>
+                <form onSubmit={updatePassword} className="space-y-6">
+                    <div className="grid gap-2">
+                        <Label htmlFor="current_password">ယခု အသုံးပြုနေသော လျို့၀ှက်နံပါတ်</Label>
 
-                            <Input
-                                id="current_password"
-                                ref={currentPasswordInput}
-                                value={data.current_password}
-                                onChange={(e) => setData('current_password', e.target.value)}
-                                type="password"
-                                className="mt-1 block w-full"
-                                autoComplete="current-password"
-                                placeholder="Current password"
-                            />
+                        <Input
+                            id="current_password"
+                            ref={currentPasswordInput}
+                            value={data.current_password}
+                            onChange={(e) => setData('current_password', e.target.value)}
+                            type="password"
+                            className="mt-1 block w-full"
+                            autoComplete="current-password"
+                            placeholder="ယခု အသုံးပြုနေသော လျို့၀ှက်နံပါတ်"
+                        />
 
-                            <InputError message={errors.current_password} />
-                        </div>
+                        <InputError message={errors.current_password} />
+                    </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">New password</Label>
+                    <div className="grid gap-2">
+                        <Label htmlFor="password">လျို့၀ှက်နံပါတ် အသစ်</Label>
 
-                            <Input
-                                id="password"
-                                ref={passwordInput}
-                                value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
-                                type="password"
-                                className="mt-1 block w-full"
-                                autoComplete="new-password"
-                                placeholder="New password"
-                            />
+                        <Input
+                            id="password"
+                            ref={passwordInput}
+                            value={data.password}
+                            onChange={(e) => setData('password', e.target.value)}
+                            type="password"
+                            className="mt-1 block w-full"
+                            autoComplete="new-password"
+                            placeholder="လျို့၀ှက်နံပါတ် အသစ်"
+                        />
 
-                            <InputError message={errors.password} />
-                        </div>
+                        <InputError message={errors.password} />
+                    </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">Confirm password</Label>
+                    <div className="grid gap-2">
+                        <Label htmlFor="password_confirmation">လျို့၀ှက်နံပါတ် အသစ်ကို ထပ်မံရိုက်ထည့်ပါ။</Label>
 
-                            <Input
-                                id="password_confirmation"
-                                value={data.password_confirmation}
-                                onChange={(e) => setData('password_confirmation', e.target.value)}
-                                type="password"
-                                className="mt-1 block w-full"
-                                autoComplete="new-password"
-                                placeholder="Confirm password"
-                            />
+                        <Input
+                            id="password_confirmation"
+                            value={data.password_confirmation}
+                            onChange={(e) => setData('password_confirmation', e.target.value)}
+                            type="password"
+                            className="mt-1 block w-full"
+                            autoComplete="new-password"
+                            placeholder="လျို့၀ှက်နံပါတ် အသစ်ကို ထပ်မံရိုက်ထည့်ပါ"
+                        />
 
-                            <InputError message={errors.password_confirmation} />
-                        </div>
+                        <InputError message={errors.password_confirmation} />
+                    </div>
 
-                        <div className="flex items-center gap-4">
-                            <Button disabled={processing}>Save password</Button>
+                    <div className="flex items-center   gap-4">
+                        <Button disabled={processing}>လျို့၀ှက်နံပါတ် ပြောင်းလဲမည်</Button>
 
-                            <Transition
-                                show={recentlySuccessful}
-                                enter="transition ease-in-out"
-                                enterFrom="opacity-0"
-                                leave="transition ease-in-out"
-                                leaveTo="opacity-0"
-                            >
-                                <p className="text-sm text-neutral-600">Saved</p>
-                            </Transition>
-                        </div>
-                    </form>
-                </div>
-            </SettingsLayout>
+                        <Transition
+                            show={recentlySuccessful}
+                            enter="transition ease-in-out"
+                            enterFrom="opacity-0"
+                            leave="transition ease-in-out"
+                            leaveTo="opacity-0"
+                        >
+                            <p className="text-sm text-neutral-600">ပြောင်းလဲပြီးပါပြီ</p>
+                        </Transition>
+                    </div>
+                </form>
+            </div>
+            {/* </SettingsLayout> */}
         </AppLayout>
     );
 }

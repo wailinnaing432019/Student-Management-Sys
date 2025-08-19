@@ -13,10 +13,12 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import React, { ReactNode } from "react";
-import { Head, Link } from "@inertiajs/react";
+import React, { ReactNode, useEffect } from "react";
+import { Head, Link, usePage } from "@inertiajs/react";
 
 import { AppSidebar } from "@/components/app-sidebar"; // ✅ your working sidebar
+import { toast, Toaster } from "sonner";
+import AutoLogout from "@/AutoLogout";
 
 export default function AppLayout({
     children,
@@ -27,6 +29,28 @@ export default function AppLayout({
     title?: string;
     breadcrumbs?: Array<{ name: string; href?: string }>;
 }) {
+    const { flash } = usePage().props as {
+        flash: {
+            success?: string;
+            error?: string;
+            message?: string;
+        };
+    };
+
+    useEffect(() => {
+        if (flash.success) {
+            toast.success(flash.success);
+        }
+        if (flash.error) {
+            toast.error(flash.error);
+        }
+        if (flash.message) {
+            toast.success(flash.message)
+        }
+    }, [flash]);
+
+
+
     return (
         <SidebarProvider>
             <Head title={title} />
@@ -67,7 +91,8 @@ export default function AppLayout({
                         )}
                     </div>
                 </header>
-
+                <AutoLogout timeout={5 * 60 * 1000} /> {/* 3 min auto logout */}
+                <Toaster position="top-right" richColors />
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
             </SidebarInset>
         </SidebarProvider>

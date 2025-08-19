@@ -273,9 +273,9 @@ export default function Create() {
                     <section>
                         <div className="flex mx-auto p-4  rounded shadow ">
                             <div className='w-2/5'>
-                                <div>
+                                {/* <div>
                                     <img className='w-42' src={`/storage/${profile.image}`} alt={student.name_eng} />
-                                </div>
+                                </div> */}
                                 {data.image && <img src={URL.createObjectURL(data.image)} alt="Preview Image" className="w-42 mt-2 object-cover" />}
                                 <div className="grid gap-2">
 
@@ -382,6 +382,7 @@ export default function Create() {
                                             <div><Input
                                                 id="uid"
                                                 value={data.uid}
+                                                disabled
                                                 onChange={(e) => setData('uid', e.target.value)}
                                                 placeholder="တက္ကသိုလ်၀င်ရောက်သည့်အမှတ်"
                                             />
@@ -393,6 +394,7 @@ export default function Create() {
                                             <div><Input
                                                 id="entried_year"
                                                 value={data.entried_year}
+                                                disabled
                                                 onChange={(e) => setData('entried_year', e.target.value)}
                                                 placeholder="တက္ကသိုလ်၀င်ရောက်သည့်နှစ်"
                                             />
@@ -901,7 +903,7 @@ export default function Create() {
                         </Card>
                     </section>
                     {/* Creating Register Form */}
-                    {semester['semester_number'] % 2 === 0 &&
+                    {/* {semester['semester_number'] % 2 === 0 &&
                         <section >
                             <Card className='w-8/9 mt-6 mx-auto'>
                                 <CardHeader>
@@ -1095,7 +1097,7 @@ export default function Create() {
                                 </div>
                             </Card>
                         </section>
-                    }
+                    } */}
 
                     <div className='flex justify-end me-9'>
 

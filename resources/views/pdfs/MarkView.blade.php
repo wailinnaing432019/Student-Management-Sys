@@ -158,11 +158,20 @@
                         }
                         $semester = 'Semester ' . $roman[$enrollStudent->semester->semester_number - 1];
                     @endphp
-                    <h4 style="text-align:center">{{ $semester }} တွင်ရရှိခဲ့သောအမှတ်များ</h4>
-                    <h4 style="text-align:center">
-                        Student Name: {{ $enrollStudent->student->name_eng ?? 'N/A' }}
-                    </h4>
-                    <h5 style="  ">Student Name: {{ $enrollStudent->student->name_myan ?? 'N/A' }}</h5>
+                    <h4 style="text-align:center">{{ $enrollStudent->semester->year_name }} - {{ $semester }}
+                        တွင်ရရှိခဲ့သောအမှတ်များ</h4>
+
+                    <table>
+                        <tr>
+                            <td>ကျောင်းသားအမည် </td>
+                            <td>: {{ $enrollStudent->student->name_myan ?? ' ' }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>ခုံနံပါတ် </td>
+                            <td>: {{ $enrollStudent->studentSemesterProfile->roll_no ?? ' ' }}</td>
+                        </tr>
+                    </table>
                 </div>
 
 
@@ -192,6 +201,7 @@
                                 <tr>
                                     <td class="border px-3 py-2">{{ $sc->course->name ?? 'N/A' }}</td>
                                     <td class="border px-3 py-2">{{ $sc->course->code ?? 'N/A' }}</td>
+                                    <td class="border px-3 py-2">{{ $sc->course->description ?? '-' }}</td>
                                     <td class="border px-3 py-2">{{ $sc->course->description ?? '-' }}</td>
                                     <td class="border px-3 py-2">{{ $sc->mark->mark ?? '-' }}</td>
                                     <td class="border px-3 py-2">{{ $sc->mark->grade ?? '-' }}</td>

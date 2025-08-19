@@ -10,6 +10,7 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
+  UserRoundCog,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -97,23 +98,15 @@ const data = {
     {
       title: "ချိန်ညှိမှုများ", // Settings
       url: "#",
-      icon: Settings2,
+      icon: UserRoundCog,
       items: [
         {
           title: "ပရိုဖိုင်", // Profile
           url: "/settings/profile",
         },
         {
-          title: "အသွင်အပြင်", // Appearance
-          url: "/settings/appearance",
-        },
-        {
           title: "စကားဝှက်", // Password
           url: "/settings/password",
-        },
-        {
-          title: "ကန့်သတ်ချက်များ", // Limits
-          url: "#",
         },
       ],
     },
@@ -133,7 +126,7 @@ const data = {
           url: "/enroll-students",
         },
         {
-          title: "ဖန်တီးရန်", // Create
+          title: "အသစ်ထည့်မည်", // Create
           url: "/enroll-students/create",
         }
       ],
@@ -168,24 +161,18 @@ const data = {
     {
       title: "ချိန်ညှိမှုများ", // Settings
       url: "#",
-      icon: Settings2,
+      icon: UserRoundCog,
       items: [
         {
           title: "ပရိုဖိုင်", // Profile
           url: "/settings/profile",
         },
-        {
-          title: "အသွင်အပြင်", // Appearance
-          url: "/settings/appearance",
-        },
+
         {
           title: "စကားဝှက်", // Password
           url: "/settings/password",
         },
-        {
-          title: "ကန့်သတ်ချက်များ", // Limits
-          url: "#",
-        },
+
       ],
     },
   ],

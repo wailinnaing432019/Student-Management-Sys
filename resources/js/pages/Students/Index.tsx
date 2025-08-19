@@ -50,7 +50,7 @@ export default function StudentIndex({ academicYears,
                     <TableHeader>
                         <TableRow>
                             <TableHead className="w-10">#</TableHead>
-                            <TableHead>ကျောင်း၀◌င်အမှတ်</TableHead>
+                            <TableHead>ကျောင်းဝင်အမှတ်</TableHead>
                             <TableHead>ကျောင်းသားအမည်</TableHead>
                             <TableHead>ခုံနံပါတ်</TableHead>
                             <TableHead>မှတ်ပုံတင်အမှတ်</TableHead>
@@ -65,7 +65,7 @@ export default function StudentIndex({ academicYears,
                         {enrollStudents.map((enrollStudent, index) => (
                             <TableRow key={enrollStudent.id}>
                                 <TableCell>{index + 1}</TableCell>
-                                <TableCell>{enrollStudent.id}</TableCell>
+                                <TableCell>{enrollStudent.student.uid}</TableCell>
                                 <TableCell>{enrollStudent.student.name_myan}</TableCell>
                                 <TableCell>{enrollStudent.student_semester_profile.roll_no}</TableCell>
                                 <TableCell>{enrollStudent.student.nrc_state + "/" + enrollStudent.student.nrc_township + "(" + enrollStudent.student.nrc_type + ")" + enrollStudent.student.nrc_number}</TableCell>

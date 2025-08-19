@@ -7,6 +7,7 @@ import { Head, Link, useForm } from "@inertiajs/react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { getSemesterText } from "@/Utils/SemesterText"
 
 export default function StudentShowPage({ studentEnrollment }: { studentEnrollment: any }) {
     if (!studentEnrollment || !studentEnrollment.student) {
@@ -79,7 +80,7 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
                                             <tr >
                                                 <td className="border px-3 py-2">သင်တန်းနှစ်</td>
                                                 <td className="border px-3 py-2">
-                                                    <div> {semester.name}</div>
+                                                    <div> {getSemesterText(semester.semester_number)}</div>
                                                 </td>
 
                                             </tr>
@@ -172,10 +173,10 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
                                         <td className="border px-3 py-2">{student.mother.nrc_state}/{student.mother.nrc_township}({student.mother.nrc_type}){student.mother.nrc_number}</td>
                                     </tr>
                                     <tr >
-                                        <td colSpan={2} className="border px-3 py-2">နိုင်ငံခြားသား</td>
-                                        <td className="border px-3 py-2">{student.local_foreign == "local" ? "နိုင်ငံသား" : "နိုင်ငံခြားသား"}</td>
-                                        <td className="border px-3 py-2">{student.father.local_foreign == "local" ? "နိုင်ငံသား" : "နိုင်ငံခြားသား"}</td>
-                                        <td className="border px-3 py-2">{student.mother.local_foreign == "local" ? "နိုင်ငံသား" : "နိုင်ငံခြားသား"}</td>
+                                        <td colSpan={2} className="border px-3 py-2">တိုင်းရင်းသား/နိုင်ငံခြားသား</td>
+                                        <td className="border px-3 py-2">{student.local_foreign == "local" ? "တိုင်းရင်းသား" : "နိုင်ငံခြားသား"}</td>
+                                        <td className="border px-3 py-2">{student.father.local_foreign == "local" ? "တိုင်းရင်းသား" : "နိုင်ငံခြားသား"}</td>
+                                        <td className="border px-3 py-2">{student.mother.local_foreign == "local" ? "တိုင်းရင်းသား" : "နိုင်ငံခြားသား"}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -186,18 +187,18 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
                                         <td className="border px-3 py-2">{student.dob}</td>
                                         <td rowSpan={4} colSpan={2} className="border px-3 py-2">
                                             <label htmlFor="" className="-mt-2 ">အဘအုပ်ထိန်းသူ၏ အလုပ်အကိုင်ရာထူး/ဌာန/လိပ်စာ အပြည့်အစုံ</label>
-                                            <div className="mt-3">{student.father.job}</div>
+                                            <div className="mt-6 text-center">{student.father.job}</div>
                                         </td>
                                     </tr>
                                     <tr >
                                         <td rowSpan={3} className="border px-3 py-2">တက္ကသိုလ်၀င်တန်း စာမေးပွဲ အောင်မြင်သည့်</td>
-                                        <td colSpan={2} className="border px-3 py-2">ခုံအမှတ် - {student.matriculation_passed_year}
+                                        <td colSpan={2} className="border px-3 py-2">ခုံအမှတ် -{student.matriculation_passed_roll_no}
                                         </td>
                                     </tr>
 
                                     <tr >
 
-                                        <td colSpan={2} className="border px-3 py-2">ခုနှစ် - {student.matriculation_passed_roll_no}
+                                        <td colSpan={2} className="border px-3 py-2">ခုနှစ် -  {student.matriculation_passed_year}
                                         </td>
 
                                     </tr>
@@ -218,10 +219,10 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
                                             ဖုန်း - {profile.phone}
 
                                         </td>
-                                        <td colSpan={2} rowSpan={3} className="border px-3 py-2">
+                                        <td colSpan={2} rowSpan={3} className="border px-3 py-2  ">
 
-                                            <label htmlFor="" className="-mt-2 ">အမိအုပ်ထိန်းသူ၏ အလုပ်အကိုင်ရာထူး/ဌာန/လိပ်စာ အပြည့်အစုံ</label>
-                                            <div className="mt-3">{student.mother.job}</div>
+                                            <label htmlFor="" className=" ">အမိအုပ်ထိန်းသူ၏ အလုပ်အကိုင်ရာထူး/ဌာန/လိပ်စာ အပြည့်အစုံ</label>
+                                            <div className="mt-6 text-center">{student.mother.job}</div>
                                         </td>
 
                                     </tr>
@@ -255,6 +256,19 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
                                         <td className="border px-3 py-2">အောင်/ရှုံး</td>
 
                                     </tr>
+                                    {student.exams_taken.length == 0 && (
+                                        <tr>
+
+                                            <td className="border px-3 py-2">-
+                                            </td>
+                                            <td className="border px-3 py-2">-</td>
+                                            <td className="border px-3 py-2">-</td>
+                                            <td className="border px-3 py-2">-</td>
+                                            <td className="border px-3 py-2">-</td>
+
+                                        </tr>
+                                    )}
+
 
 
                                     {student.exams_taken.map((exam: any) => (
@@ -329,7 +343,7 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
                                         <td colSpan={2} className="border px-3 py-2">၄။ပညာသင်ထောက်ပံ့ကြေးပေးရန် ခွင့်ပြု / မပြု</td>
                                         <td colSpan={3} className="border px-3 py-2">
                                             <div>
-                                                {donor.donor_status == 1 ? "ခွင့်ပြု" : "မပြု"}
+                                                {donor.status == 1 ? "ခွင့်ပြု" : "ပြု"}
                                             </div>
                                         </td>
 
@@ -340,7 +354,7 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
 
 
                         </section>
-                        {registrationAgreement !== null &&
+                        {/* {registrationAgreement !== null &&
                             <section >
                                 <div className='w-full text-justify justify-evenly leading-loose'>
                                     <div className="mt-4">
@@ -421,7 +435,7 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
                                     </div>
                                 </div>
                             </section>
-                        }
+                        } */}
                     </div>
                     <form onSubmit={handleSubmit} className="space-y-4 mt-6 max-w-sm no-print">
                         <div>

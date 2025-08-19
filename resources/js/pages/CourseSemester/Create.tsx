@@ -247,7 +247,7 @@ export default function Create({
                                                         onCheckedChange={() => toggleElective(course.id)}
                                                     />
                                                     <span className="text-sm text-gray-600">
-                                                        Elective
+                                                        ရွေးချယ်နိုင်သော ဘာသာရပ်
                                                     </span>
                                                 </div>
                                             )}
@@ -259,7 +259,7 @@ export default function Create({
                         </div>
 
                         <Button type="submit" disabled={processing}>
-                            Assign Courses
+                            {processing ? "သင်တန်းကာလအလိုက် ဘာသာရပ်များ သတ်မှတ်နေပါသည်.." : "သင်တန်းကာလအလိုက် ဘာသာရပ်များ သတ်မှတ်ရန်"}
                         </Button>
                     </CardContent>
                 </Card>

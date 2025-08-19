@@ -52,10 +52,10 @@ class CourseController extends Controller
 
 // dd($redirectTo);
     if(!$redirectTo){
-        return redirect()->route('courses.index')->with('success', 'Course created successfully.');
+        return redirect()->route('courses.index')->with('success', 'ဘာသာရပ် အသစ်တစ်ခု ထည့်ပြီးပါပြီ။');
 
     }
-    return redirect()->route($redirectTo)->with('success', 'Course created.');
+    return redirect()->route($redirectTo)->with('success', 'ဘာသာရပ် အသစ်တစ်ခု ထည့်ပြီးပါပြီ။');
 
 }
 
@@ -74,7 +74,7 @@ public function update(CourseRequest $request, Course $course)
     // Sync majors
     $course->majors()->sync($data['major_ids'] ?? []);
 
-    return redirect()->route('courses.index')->with('success', 'Course updated successfully.');
+    return redirect()->route('courses.index')->with('success', 'ဘာသာရပ်အချက်အလက် ပြင်ဆင်ပြီးပါပြီ။');
 }
 
     public function destroy(Course $course)
@@ -83,7 +83,7 @@ public function update(CourseRequest $request, Course $course)
 
     $course->delete();
 
-    return redirect()->route('courses.index')->with('success', 'Course deleted successfully.');
+    return redirect()->route('courses.index')->with('success', 'ဘာသာရပ် အားဖယ်ရှားပြီးပါပြီ။');
 }
 
 }

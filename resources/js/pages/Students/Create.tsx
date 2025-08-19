@@ -1027,7 +1027,7 @@ export default function Create() {
 
                 </section>
 
-                <section >
+                {/* <section >
                     <Card className='w-8/9 mt-6 mx-auto'>
                         <CardHeader>
                             <p>သို့</p>
@@ -1258,7 +1258,7 @@ export default function Create() {
                             {errors.agreed && <p className="text-sm text-red-500">{errors.agreed}</p>}
                         </div>
                     </Card>
-                </section>
+                </section> */}
                 <div className='flex justify-end me-9'>
 
                     <div >

@@ -33,7 +33,7 @@ class MajorController extends Controller
     {
         $validated = $request->validated();
         Major::create($validated);
-        return to_route('majors.index')->with('success', "Major added successfully");
+        return to_route('majors.index')->with('success', "အထူးပြု ဘာသာရပ် ထည့်သွင်းခြင်းအောင်မြင်ပါသည်။");
     }
 
     /**
@@ -63,7 +63,7 @@ class MajorController extends Controller
         $major->description= $validated['description'];
         $major->save();
 
-        return to_route('majors.index')->with('message', "Major updated successfully");
+        return to_route('majors.index')->with('success', "အထူးပြု ဘာသာရပ် အချက်အလက်ပြင်ဆင်ခြင်း အောင်မြင်ပါသည်။");
     }
 
     /**
@@ -72,6 +72,6 @@ class MajorController extends Controller
     public function destroy(string $id)
     {
         Major::destroy($id);
-        return to_route('majors.index')->with('error', "Major deleted successfully");
+        return to_route('majors.index')->with('error', "အထူးပြုဘာသာရပ် ဖယ်ရှားခြင်း အောင်မြင်ပါသည်။");
     }
 }

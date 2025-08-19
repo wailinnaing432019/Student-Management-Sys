@@ -15,7 +15,7 @@ Route::get('/', function () {
     return to_route('login');
 })->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified','role:admin,staff'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
@@ -34,9 +34,7 @@ Route::post('/course-semester/unassign', [CourseSemesterController::class, 'unas
 
     Route::resource('/students',StudentController::class);
 
-    Route::get('/assign-mark/{id}',[MarkController::class,'assignMark'])->name('assign-marks');
-    Route::get('/marks/show',[MarkController::class,'showMarks'])->name('studentMarks.show');
-    Route::resource('/marks',MarkController::class);
+    
 
     Route::get('/student-course',[StudentController::class,'stuCourses'])->name('stuCourses');
     // Route::get('/enroll-students',[StudentController::class,'enrollStudents'])->name('enrollStudents');
@@ -52,6 +50,13 @@ Route::post('/course-semester/unassign', [CourseSemesterController::class, 'unas
 Route::post('/enroll-students/{enrollment}/update-status', [EnrollStudentController::class, 'updateStatus'])->name('enroll-students.update-status');
 Route::get('/enroll-students/{id}/print', [EnrollStudentController::class, 'print'])->name('enroll-students.print');
 
+});
+
+Route::middleware(['auth', 'verified','role:admin'])->group(function () {
+Route::get('/assign-mark/{id}',[MarkController::class,'assignMark'])->name('assign-marks');
+    Route::get('/marks/show',[MarkController::class,'showMarks'])->name('studentMarks.show');
+    Route::get('/marksBySemester',[MarkController::class,'viewMarksByPdf'])->name('marksBySemester.view');
+    Route::resource('/marks',MarkController::class);
 });
 
 Route::resource('/students-register',StudentController::class);

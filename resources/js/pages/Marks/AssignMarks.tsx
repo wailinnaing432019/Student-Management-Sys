@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/input-error';
+import { getSemesterText } from '@/Utils/SemesterText';
 
 interface Course {
     id: number;
@@ -30,7 +31,7 @@ interface StudentCourse {
 interface Props {
     student_enrollment_id: number;
     student: { id: number; name: string; roll_no: string | null };
-    semester: { name: string; year_name: string };
+    semester: { semester_number: string; year_name: string };
     student_courses: StudentCourse[];
 }
 
@@ -74,57 +75,66 @@ export default function AssignMarks({
     };
 
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={[
+            { name: "ဘာသာရပ်များ အတွက်  အမှတ်များ သတ်မှတ်ခြင်း" },
+        ]}>
             <Head title="Assign Marks" />
             <form onSubmit={handleSubmit} className="space-y-6 p-6 max-w-3xl mx-auto">
                 <Card>
-                    <CardHeader>Student Name : {student.name}</CardHeader>
+                    <CardHeader>ကျောင်းသားအမည် : {student.name}</CardHeader>
                     <CardContent>
-                        Semester : {semester.year_name} - {semester.name}
+                        သင်တန်းကာလ : {semester.year_name} - {getSemesterText(semester.semester_number)}
                     </CardContent>
                 </Card>
 
-                <div className="flex-auto space-y-6">
+                <div className="space-y-6">
                     {studentCourses.map((sc, index) => (
-                        <div key={sc.id} className="flex gap-8 items-center space-y-3">
-                            <div>
-                                <Label>
+                        <div key={sc.id} className="flex gap-4 items-end">
+                            {/* Course Mark */}
+                            <div className="flex-1 min-w-[120px]">
+                                <Label className="block text-sm font-medium">
                                     {sc.course.name} ({sc.course.code}) Mark
                                 </Label>
                                 <Input
                                     type="number"
                                     value={data.marks[index]?.mark || ''}
                                     onChange={(e) => handleChange(index, 'mark', e.target.value)}
+                                    className="w-full"
                                 />
-                                <InputError message={errors[`marks.${index}.mark`]} className="mt-2" />
+                                <InputError message={errors[`marks.${index}.mark`]} className="mt-1" />
                             </div>
 
-                            <div>
-                                <Label>Grade</Label>
+                            {/* Grade */}
+                            <div className="w-24 min-w-[80px]">
+                                <Label className="block text-sm font-medium">Grade</Label>
                                 <Input
                                     value={data.marks[index]?.grade || ''}
                                     onChange={(e) => handleChange(index, 'grade', e.target.value)}
+                                    className="w-full"
                                 />
                             </div>
 
-                            {Number(sc.course.is_elective) === 1 && (
-                                <div className="flex items-end">
+                            {/* Remove button column (fixed width, always exists but empty if not elective) */}
+                            <div className="w-28 flex items-end">
+                                {Number(sc.course.is_elective) === 1 && (
                                     <button
                                         type="button"
                                         onClick={() => handleRemoveCourse(index)}
-                                        className="ml-4 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                                     >
-                                        Remove
+                                        မထည့်ပါ။
                                     </button>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>
 
+
+
                 <CardFooter className="justify-end">
                     <Button type="submit" disabled={processing}>
-                        Save Marks
+                        အမှတ်များ သိမ်းမည်
                     </Button>
                 </CardFooter>
             </form>

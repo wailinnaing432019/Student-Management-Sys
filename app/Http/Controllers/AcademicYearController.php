@@ -21,7 +21,7 @@ class AcademicYearController extends Controller
 
         AcademicYear::create($validated);
 
-        return redirect()->back()->with('success', 'Academic year created successfully.');
+        return redirect()->back()->with('success', 'ပညာသင်နှစ် အသစ်တစ်ခု ဖန်တီးခြင်း အောင်မြင်ပါသည်။');
     }
 
     public function update(AcademicYearUpdateRequest $request, AcademicYear $academicYear)
@@ -30,13 +30,13 @@ class AcademicYearController extends Controller
 
         $academicYear->update($validated);
 
-        return redirect()->back()->with('success', 'Academic year updated successfully.');
+        return redirect()->back()->with('success', 'ပညာသင်နှစ် အချက်အလက်ပြင်ဆင်ခြင်း အောင်မြင်ပါသည်။');
     }
 
     public function destroy(AcademicYear $academicYear)
     {
         $academicYear->delete();
 
-        return redirect()->back()->with('success', 'Academic year deleted successfully.');
+        return redirect()->back()->with('success', 'ပညာသင်နှစ် ဖယ်ရှားခြင်းအောင်မြင်ပါသည်။');
     }
 }

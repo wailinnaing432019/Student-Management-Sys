@@ -97,7 +97,7 @@ export function NavUser({
                 }}
                 className="cursor-pointer">
                 <BadgeCheck />
-                Account
+                အကောင့်
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={(e) => {
                 e.preventDefault()
@@ -105,17 +105,17 @@ export function NavUser({
               }}
                 className="cursor-pointer">
                 <EyeClosed />
-                Password
+                လျို့၀ှက်နံပါတ်
               </DropdownMenuItem>
 
-              <DropdownMenuItem onSelect={(e) => {
+              {/* <DropdownMenuItem onSelect={(e) => {
                 e.preventDefault()
                 router.get('/settings/appearance')
               }}
                 className="cursor-pointer">
                 <Eye />
                 Appearance
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -126,7 +126,7 @@ export function NavUser({
               className="cursor-pointer"
             >
               <LogOut />
-              Log out
+              အကောင့်မှထွက်မည်
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
