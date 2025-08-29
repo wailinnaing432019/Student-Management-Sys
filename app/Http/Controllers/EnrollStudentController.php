@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StudentRequest;
+use App\Http\Requests\StudentReregisterRequest;
 use App\Models\AcademicYear;
 use App\Models\Donor;
 use App\Models\ExamsTaken;
@@ -87,7 +88,7 @@ public function index(Request $request)
 
         $enrollStudents = $query->paginate(10)->withQueryString();
     }
- 
+    
     return Inertia::render('Students/EnrolledStudents', [
         'academicYears' => $academicYears,
         'selectedAcademicYearId' => $selectedAcademicYearId,
@@ -282,10 +283,10 @@ public function print( $id)
                     'religion'=>$request->father_religion,
                     'hometown'=>$request->father_hometown,
                     'township_state_region'=>$request->father_township_state_region,
-                    'nrc_state'=>$request->nrc_state,
-                    'nrc_township'=>$request->nrc_township,
-                    'nrc_type'=>$request->nrc_type,
-                    'nrc_number'=>$request->nrc_number,
+                    'nrc_state'=>$request->father_nrc_state,
+                    'nrc_township'=>$request->father_nrc_township,
+                    'nrc_type'=>$request->father_nrc_type,
+                    'nrc_number'=>$request->father_nrc_number,
                     'job'=>$request->father_job,
                     'job_position_address'=>$request->father_job_position_address,
                     'local_foreign'=>$request->father_local_foreign,
@@ -300,10 +301,10 @@ public function print( $id)
                     'religion'=>$request->mother_religion,
                     'hometown'=>$request->mother_hometown,
                     'township_state_region'=>$request->mother_township_state_region,
-                    'nrc_state'=>$request->nrc_state,
-                    'nrc_township'=>$request->nrc_township,
-                    'nrc_type'=>$request->nrc_type,
-                    'nrc_number'=>$request->nrc_number,
+                    'nrc_state'=>$request->mother_nrc_state,
+                    'nrc_township'=>$request->mother_nrc_township,
+                    'nrc_type'=>$request->mother_nrc_type,
+                    'nrc_number'=>$request->mother_nrc_number,
                     'job'=>$request->mother_job,
                     'job_position_address'=>$request->mother_job_position_address,
                     'local_foreign'=>$request->mother_local_foreign,
@@ -315,6 +316,7 @@ public function print( $id)
                     'relationship'=>$request->donor_relationship,
                     'job'=>$request->donor_job, 
                     'phone'=>$request->donor_phone,
+                    'address'=>$request->donor_address,
                     'status'=>$request->donor_status,
                     'student_semester_profile_id'=>$studentProfile->id,
                 ]);
@@ -464,7 +466,7 @@ public function print( $id)
     /**
      * Update the specified resource in storage.
      */
-    public function updateRegister(Request $request, string $id)
+    public function updateRegister(StudentReregisterRequest $request, Student $student)
     {
         // dd($request->all());
         DB::beginTransaction();
@@ -475,7 +477,7 @@ public function print( $id)
             $filePath=$file->store('students','public');
 
             $studentProfile=StudentSemesterProfile::create([
-                'student_id'=>$id,
+                'student_id'=>$student->id,
                 'academic_year_id'=> $request->academic_year_id,
                 'semester_id'=>$request->semester_id,
                 'major_id'=>$request->major_id,
@@ -488,7 +490,7 @@ public function print( $id)
             ]);
 
             $studentEnrollment=StudentEnrollment::create([
-                'student_id'=>$id,
+                'student_id'=>$student->id,
                 'student_semester_profile_id'=>$studentProfile->id, 
                 'semester_id'=>$request->semester_id, 
                 'major_id'=>$request->major_id, 
@@ -520,7 +522,7 @@ public function print( $id)
             }
 
             // Create Father
-            $father = Father::where('student_id',$id)->update([ 
+            $father = Father::where('student_id',$student->id)->update([ 
                 'religion'=>$request->father_religion,
                 'hometown'=>$request->father_hometown,
                 'township_state_region'=>$request->father_township_state_region,
@@ -530,7 +532,7 @@ public function print( $id)
             ]);
 
             // Create Mother
-            $mother = Mother::where('student_id',$id)->update([ 
+            $mother = Mother::where('student_id',$student->id)->update([ 
                 
                 
                 'religion'=>$request->mother_religion,
@@ -568,7 +570,7 @@ public function print( $id)
                     'roll_no'     => $record['exam_roll_no'],
                     'year'        => $record['exam_year'],
                     'pass_fail'   => $record['exam_pass_fail'],
-                    'student_id'  => $id,
+                    'student_id'  => $student->id,
                 ]);
             }
                 }
@@ -595,7 +597,7 @@ public function print( $id)
         //     ]);
         // }
             // return Semester::with('courses')->get();
-            $fullPath=$this->generateAndStorePdf($id,$request->semester_id);
+            $fullPath=$this->generateAndStorePdf($student->id,$request->semester_id);
                 $studentEnrollment->update([
                     'pdf_path'=>$fullPath
                 ]);
@@ -640,7 +642,7 @@ public function print( $id)
         'semester',
         'major',
         'academicYear',
-        'studentSemesterProfile.registrationAgreement'
+        // 'studentSemesterProfile.registrationAgreement'
         ])
         ->where('student_id', $studentId)
         ->where('semester_id', $semesterId)
@@ -677,10 +679,10 @@ public function print( $id)
 
         // ✅ Build storage path: storage/app/public/registration_forms/{student_id}/{year}.pdf
         $year = $stuEnrollment->academicYear->name ?? date('Y');
-        $semester=$stuEnrollment->semester->name;  
-        $studentName=$stuEnrollment->student->name_eng; 
+        $semester=$stuEnrollment->semester->semester_number;   
+        $studentRollno=$stuEnrollment->studentSemesterProfile->roll_no;
         $folderPath = "registration_forms/{$stuEnrollment->student_id}/{$year}/{$semester}";
-        $fileName = "{$studentName}.pdf";
+        $fileName = "{$studentRollno}.pdf";
         $fullPath = "{$folderPath}/{$fileName}";
 
         // ✅ Save PDF to storage

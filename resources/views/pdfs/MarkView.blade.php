@@ -145,7 +145,7 @@
 
             <section>
                 <div class="flex text-2xl justify-center">
-                    <h4 style="text-align:center">{{ $enrollStudent->academicYear->name }} ပညာသင်နှစ် ၊ </h4>
+                    <h4 style="text-align:center">{{ $enrollStudent->academicYear->name }} ပညာသင်နှစ်</h4>
 
                     @php
 
@@ -158,7 +158,7 @@
                         }
                         $semester = 'Semester ' . $roman[$enrollStudent->semester->semester_number - 1];
                     @endphp
-                    <h4 style="text-align:center">{{ $enrollStudent->semester->year_name }} - {{ $semester }}
+                    <h4 style="text-align:center">{{ $enrollStudent->semester->year_name }} ({{ $semester }})
                         တွင်ရရှိခဲ့သောအမှတ်များ</h4>
 
                     <table>
@@ -187,7 +187,7 @@
                     <thead>
                         <tr>
                             <th class="border px-3 py-2">ဘာသာရပ် အမည်</th>
-                            <th class="border px-3 py-2">‌ဘာသာရပ် ကုဒ်</th>
+                            <th class="border px-3 py-2">ဘာသာရပ် ကုဒ်</th>
                             <th class="border px-3 py-2">ဖော်ပြချက်</th>
                             <th class="border px-3 py-2">ရမှတ်</th>
                             <th class="border px-3 py-2">အဆင့်</th>
@@ -201,7 +201,6 @@
                                 <tr>
                                     <td class="border px-3 py-2">{{ $sc->course->name ?? 'N/A' }}</td>
                                     <td class="border px-3 py-2">{{ $sc->course->code ?? 'N/A' }}</td>
-                                    <td class="border px-3 py-2">{{ $sc->course->description ?? '-' }}</td>
                                     <td class="border px-3 py-2">{{ $sc->course->description ?? '-' }}</td>
                                     <td class="border px-3 py-2">{{ $sc->mark->mark ?? '-' }}</td>
                                     <td class="border px-3 py-2">{{ $sc->mark->grade ?? '-' }}</td>

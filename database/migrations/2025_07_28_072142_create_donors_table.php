@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('relationship');
             $table->string('job'); 
             $table->string('phone');
+            $table->string('address')->nullable();
             $table->string('status');
             $table->string('student_semester_profile_id')->constrained('student_semester_profiles')->onDelete('cascade');
             $table->timestamps();

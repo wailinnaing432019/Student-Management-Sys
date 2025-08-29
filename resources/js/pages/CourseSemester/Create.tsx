@@ -28,6 +28,7 @@ type Course = {
 type Semester = {
     id: number;
     semester_number: number;
+    year_name: string;
 };
 
 type Major = {
@@ -173,7 +174,7 @@ export default function Create({
                                         .find((year) => String(year.id) === data.academic_year_id)
                                         ?.semesters.map((sem) => (
                                             <SelectItem key={sem.id} value={String(sem.id)}>
-                                                {getSemesterText(sem.semester_number)}
+                                                {getSemesterText(sem.semester_number)} - {sem.year_name}
                                             </SelectItem>
                                         ))}
                                 </SelectContent>
@@ -223,28 +224,42 @@ export default function Create({
                                     </div>
                                 )}
 
+
+
                                 {filteredCourses.map((course) => {
-                                    const selected = isCourseSelected(course.id);
-                                    const elective =
-                                        data.courses.find((c) => c.id === course.id)?.is_elective ?? false;
+                                    const assignedInfo = courseSemesterMap?.[data.semester_id]?.[course.id];
+                                    const isSelected = isCourseSelected(course.id);
+                                    const isAlreadyAssigned = !!assignedInfo; // assigned but not part of current selection
+
+                                    const elective = isSelected
+                                        ? data.courses.find((c) => c.id === course.id)?.is_elective ?? false
+                                        : assignedInfo?.is_elective ?? false;
 
                                     return (
                                         <div
                                             key={course.id}
-                                            className="flex items-center justify-between border rounded-lg p-3"
+                                            className={`flex items-center justify-between border rounded-lg p-3 ${isAlreadyAssigned ? "bg-gray-100" : ""}`}
                                         >
                                             <div className="flex items-center space-x-2">
                                                 <Checkbox
-                                                    checked={selected}
+                                                    checked={isSelected} // only check if user selected
+                                                    disabled={isAlreadyAssigned} // cannot change if already assigned
                                                     onCheckedChange={() => handleCourseToggle(course.id)}
+                                                    className="border-purple-500"
                                                 />
-                                                <span>{course.name} - {course.code}</span>
+                                                <span className={isAlreadyAssigned ? "text-gray-400" : ""}>
+                                                    {course.code} - {course.name} {isAlreadyAssigned && "(ပြီးခဲ့သည်)"}
+                                                </span>
                                             </div>
-                                            {selected && (
+
+                                            {/* Elective checkbox */}
+                                            {(isSelected || isAlreadyAssigned) && (
                                                 <div className="flex items-center space-x-2">
                                                     <Checkbox
-                                                        checked={elective}
+                                                        checked={!!elective}
+                                                        disabled={isAlreadyAssigned} // read-only if already assigned
                                                         onCheckedChange={() => toggleElective(course.id)}
+                                                        className="border-purple-500"
                                                     />
                                                     <span className="text-sm text-gray-600">
                                                         ရွေးချယ်နိုင်သော ဘာသာရပ်
@@ -254,6 +269,9 @@ export default function Create({
                                         </div>
                                     );
                                 })}
+
+
+
                             </div>
                             <InputError message={errors.courses} />
                         </div>

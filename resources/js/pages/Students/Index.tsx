@@ -57,7 +57,6 @@ export default function StudentIndex({ academicYears,
                             <TableHead>အီးမေးလ်</TableHead>
                             <TableHead>ဖုန်း</TableHead>
                             <TableHead>စာရင်းသွင်းသည့် ရက်စွဲ</TableHead>
-                            <TableHead>အခြေအနေ</TableHead>
                             <TableHead>လုပ်ဆောင်ချက်များ</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -73,9 +72,6 @@ export default function StudentIndex({ academicYears,
                                 <TableCell>{enrollStudent.student_semester_profile.phone}</TableCell>
                                 <TableCell>
                                     {enrollStudent.registration_date}
-                                </TableCell>
-                                <TableCell>
-                                    {enrollStudent.status}
                                 </TableCell>
                                 {/* <TableCell>
                                     <TextLink href={route('assign-marks', enrollStudent.id)}>Assign Marks</TextLink>

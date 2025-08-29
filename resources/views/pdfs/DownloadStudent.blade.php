@@ -188,19 +188,20 @@
                                             <td class="border px-3 py-2">
                                                 <div>
                                                     @php
-
                                                         $roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
-                                                        if (
-                                                            $stuEnrollment->semester->semester_number < 1 ||
-                                                            $stuEnrollment->semester->semester_number > count($roman)
-                                                        ) {
-                                                            return 'Unknown Semester';
-                                                        }
-                                                        $semester =
-                                                            'Semester ' .
-                                                            $roman[$stuEnrollment->semester->semester_number - 1];
+                                                        $modules = ['I', 'II', 'III', 'IV'];
 
+                                                        $num = $stuEnrollment->semester->semester_number;
+
+                                                        if ($num >= 1 && $num <= count($roman)) {
+                                                            $semester = 'Semester ' . $roman[$num - 1];
+                                                        } elseif ($num >= 11 && $num <= 14) {
+                                                            $semester = 'Module ' . $modules[$num - 11];
+                                                        } else {
+                                                            $semester = 'Unknown Semester';
+                                                        }
                                                     @endphp
+
                                                     {{ $semester }}
                                                 </div>
                                             </td>
@@ -233,8 +234,8 @@
             {{-- Registration Info --}}
 
 
-
-            <section style="page-break-after: always;">
+            {{-- style="page-break-after: always;" --}}
+            <section>
                 <table class="table-auto w-full border border-gray-300 text-sm text-left">
                     <thead>
                         <tr>
@@ -405,7 +406,7 @@
                     </tbody>
                 </table>
             </section>
-            @if (!empty($registrationAgreement))
+            {{-- @if (!empty($registrationAgreement))
                 <section>
                     <div class='w-full text-justify justify-evenly '>
                         <div class="mt-4">
@@ -496,7 +497,7 @@
                         </div>
                     </div>
                 </section>
-            @endif
+            @endif --}}
 
         </div>
     </div>

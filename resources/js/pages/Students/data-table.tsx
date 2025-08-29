@@ -75,7 +75,7 @@ export function DataTable({ columns, data, pagination }) {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                <TableCell colSpan={columns.length} className="h-24 text-center text-red-500">
                                     ရွေးချယ်ထားသော သင်တန်းကာလတွင် အချက်အလက်များ မရှိပါ
                                 </TableCell>
                             </TableRow>
@@ -86,7 +86,7 @@ export function DataTable({ columns, data, pagination }) {
 
             {/* Pagination Controls */}
 
-            <div className="flex items-center justify-between p-4 border-t">
+            {pagination && (<div className="flex items-center justify-between p-4 border-t">
                 <Button
                     variant="outline"
                     size="sm"
@@ -109,6 +109,7 @@ export function DataTable({ columns, data, pagination }) {
                     နောက်သို့ <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
             </div>
+            )}
 
 
         </div>

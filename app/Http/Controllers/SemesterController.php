@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SemesterRequest;
+use App\Http\Requests\SemesterUpdateRequest;
 use App\Models\AcademicYear;
 use App\Models\Semester;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ class SemesterController extends Controller
     if ($selectedAcademicYearId) {
         $semesters = Semester::with('academicYear')
             ->where('academic_year_id', $selectedAcademicYearId)
+            ->orderBy('semester_number', 'asc')
             ->get();
     }
 
@@ -76,35 +78,10 @@ if ($validated['end_date'] < $academicYear->start_date || $validated['end_date']
         return inertia('Semesters/Edit', compact('semester', 'academicYears'));
     }
 
-    public function update(Request $request, Semester $semester)
+    public function update(SemesterUpdateRequest $request, Semester $semester)
     {
-        $validated = $request->validate([
-            'academic_year_id' => 'required|exists:academic_years,id',
-            'year_name' => 'required|string', 
-            'semester_number'=>'required|numeric',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-        ]);
-if($request->start_date && $request->end_date){
+        $validated = $request->validated();
 
-
-// Fetch academic year dates
-$academicYear = AcademicYear::findOrFail($validated['academic_year_id']);
-
-// Check start date range
-if ($validated['start_date'] < $academicYear->start_date || $validated['start_date'] > $academicYear->end_date) {
-    throw ValidationException::withMessages([
-        'start_date' => 'The semester start date must be within the academic year dates.',
-    ]);
-}
-
-// Check end date range
-if ($validated['end_date'] < $academicYear->start_date || $validated['end_date'] > $academicYear->end_date) {
-    throw ValidationException::withMessages([
-        'end_date' => 'The semester end date must be within the academic year dates.',
-    ]);
-}
-} 
         $semester->update($validated);
 
         return redirect()->back()->with('success', 'သင်တန်းကာလ အချက်အလက်ပြင်ဆင်ခြင်း အောင်မြင်ပါသည်။');

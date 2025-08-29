@@ -47,10 +47,6 @@ export const columns = (openEditDialog: (course: Course) => void): ColumnDef<Cou
         header: "ကုဒ်နံပါတ်", // Code
     },
     {
-        accessorKey: "description",
-        header: "ဖော်ပြချက်", // Description
-    },
-    {
         accessorKey: "majors",
         header: "အထူးပြုဘာသာရပ်များ", // Majors
         cell: ({ row }) =>

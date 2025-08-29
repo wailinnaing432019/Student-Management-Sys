@@ -46,7 +46,7 @@ const data = {
   ],
   navMain: [
     {
-      title: "ကျောင်းသားများ", // Students
+      title: "ကျောင်းသားအချက်အလက်", // Students
       url: "#",
       icon: SquareTerminal,
       items: [
@@ -59,7 +59,7 @@ const data = {
           url: "/enroll-students",
         },
         {
-          title: "ဖန်တီးရန်", // Create
+          title: "အသစ်ထည့်မည်", // Create
           url: "/enroll-students/create",
         },
         {
@@ -113,7 +113,7 @@ const data = {
   ],
   navStaff: [
     {
-      title: "ကျောင်းသားများ", // Students
+      title: "ကျောင်းသားအချက်အလက်", // Students
       url: "#",
       icon: SquareTerminal,
       items: [

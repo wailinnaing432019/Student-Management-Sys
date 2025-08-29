@@ -3,11 +3,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import AppLayout from "@/layouts/app-layout"
-import { Head, Link, useForm } from "@inertiajs/react"
+import { Head, Link, useForm, usePage } from "@inertiajs/react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getSemesterText } from "@/Utils/SemesterText"
+import { SharedData } from "@/types"
 
 export default function StudentShowPage({ studentEnrollment }: { studentEnrollment: any }) {
     if (!studentEnrollment || !studentEnrollment.student) {
@@ -30,6 +31,9 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
         e.preventDefault()
         post(route('enroll-students.update-status', studentEnrollment.id))
     }
+    const { auth } = usePage<SharedData>().props;
+
+    const userRole = auth?.user?.role || 'staff';
 
     return (
 
@@ -437,7 +441,7 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
                             </section>
                         } */}
                     </div>
-                    <form onSubmit={handleSubmit} className="space-y-4 mt-6 max-w-sm no-print">
+                    {userRole !== "staff" && (<form onSubmit={handleSubmit} className="space-y-4 mt-6 max-w-sm no-print">
                         <div>
                             <Label htmlFor="status">Enrollment Status</Label>
                             <Select
@@ -459,7 +463,7 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
                         <Button type="submit" disabled={processing}>
                             Update Status
                         </Button>
-                    </form>
+                    </form>)}
                 </div>
             </div>
         </AppLayout>

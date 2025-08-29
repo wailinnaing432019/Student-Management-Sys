@@ -1,6 +1,6 @@
-import { Head, Link, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Eye, EyeClosed, EyeOff, LoaderCircle } from 'lucide-react';
+import { FormEventHandler, useState } from 'react';
 
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
@@ -23,6 +23,7 @@ interface LoginProps {
 }
 
 export default function Login({ status, canResetPassword }: LoginProps) {
+    const { flash } = usePage().props as any;
     const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
         email: '',
         password: '',
@@ -35,6 +36,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             onFinish: () => reset('password'),
         });
     };
+    const [showPassword, setShowPassword] = useState(false);
 
     return (
         <>
@@ -45,7 +47,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             <div className="flex h-full w-full flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] lg:justify-center lg:p-8 dark:bg-[#0a0a0a]">
 
                 <div className="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 lg:grow starting:opacity-0">
-                    <main className="flex w-full m-9  flex-col-reverse lg:max-w-4xl lg:flex-row">
+                    <main className="flex w-full m-9  flex-col-reverse lg:max-w-5xl lg:flex-row">
                         <div className="flex-1 w-full rounded-br-lg rounded-bl-lg bg-white p-6 pb-12 text-[13px] leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-tl-lg lg:rounded-br-none lg:p-20 dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]">
                             <div className="flex flex-col items-center gap-4">
                                 <Link href={route('home')} className="flex flex-col items-center gap-2 font-medium">
@@ -56,10 +58,15 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 </Link>
 
                                 <div className="space-y-2 text-center">
-                                    <h1 className="text-xl font-medium"> ကွန်ပျူတာတက္ကသိုလ်</h1>
-                                    <p className="text-center text-sm text-muted-foreground">စီမှန်ရန် အကောင့်သို့၀င်ပါ</p>
+                                    <h1 className="text-xl font-medium"> ကွန်ပျူတာတက္ကသိုလ်(မိတ္ထီလာ)</h1>
+                                    <p className="text-center text-sm text-muted-foreground"> အကောင့်သို့၀င်ပါ</p>
                                 </div>
                             </div>
+                            {flash.session_expired && (
+                                <div className="bg-red-100 text-red-600 p-2 rounded mb-3">
+                                    {flash.session_expired}
+                                </div>
+                            )}
                             <form className="flex flex-col gap-6" onSubmit={submit}>
 
                                 <div className="grid gap-6">
@@ -83,17 +90,27 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                         <div className="flex items-center">
                                             <Label htmlFor="password">လျို့၀ှက်နံပါတ်</Label>
                                         </div>
-                                        <Input
-                                            id="password"
-                                            type="password"
-                                            required
-                                            tabIndex={2}
-                                            autoComplete="current-password"
-                                            value={data.password}
-                                            onChange={(e) => setData('password', e.target.value)}
-                                            placeholder="လျို့၀ှက်နံပါတ်"
-                                        />
-                                        <InputError message={errors.password} />
+                                        <div className='relative'>
+                                            <Input
+                                                id="password"
+                                                type={showPassword ? 'text' : 'password'}
+                                                required
+                                                tabIndex={2}
+                                                autoComplete="current-password"
+                                                value={data.password}
+                                                onChange={(e) => setData('password', e.target.value)}
+                                                placeholder="လျို့၀ှက်နံပါတ်"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                                                aria-label={showPassword ? "Hide password" : "Show password"}
+                                            >
+                                                {!showPassword ? <EyeOff className='w-4.5' /> : <Eye className='w-4.5' />}
+                                            </button>
+                                            <InputError message={errors.password} />
+                                        </div>
                                     </div>
 
                                     <Button type="submit" className="mt-4 w-full " tabIndex={4} disabled={processing}>
@@ -104,7 +121,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                             </form>
                         </div>
-                        <div className="relative -mb-px w-full shrink-0 overflow-hidden rounded-t-lg bg-[#9f1313] lg:mb-0 lg:-ml-px lg:aspect-auto lg:w-[438px] lg:rounded-t-none lg:rounded-r-lg dark:bg-[#1D0002]">
+                        <div className="relative -mb-px w-full shrink-0 overflow-hidden rounded-t-lg bg-[#9f1313] lg:mb-0 lg:-ml-px lg:aspect-auto lg:w-[608px] lg:rounded-t-none lg:rounded-r-lg dark:bg-[#1D0002]">
                             <img src={`/storage/logos/ucsmtla.jpg`} className='min-w-full min-h-full' alt="no image" />
 
                         </div>

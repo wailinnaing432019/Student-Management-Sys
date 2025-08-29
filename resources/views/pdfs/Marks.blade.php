@@ -131,7 +131,7 @@
                 </tr>
             @endforelse
 
-
+             
         </tbody>
     </table>
 </body>

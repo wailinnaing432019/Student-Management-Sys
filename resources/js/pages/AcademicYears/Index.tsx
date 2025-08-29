@@ -105,7 +105,7 @@ export default function Index({ academicYears }) {
                         <TableHead>ပညာသင်နှစ်အမည်</TableHead>
                         <TableHead>စတင်သည့်ရက်စွဲ</TableHead>
                         <TableHead>ပြီးဆုံးသည့်ရက်စွဲ</TableHead>
-                        <TableHead className="">လုပ်ဆောင်ချက်များ</TableHead>
+                        {/* <TableHead className="">လုပ်ဆောင်ချက်များ</TableHead> */}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -116,7 +116,7 @@ export default function Index({ academicYears }) {
                                 <TableCell>{year.name}</TableCell>
                                 <TableCell>{year.start_date}</TableCell>
                                 <TableCell>{year.end_date}</TableCell>
-                                <TableCell className="text-right space-x-2">
+                                {/* <TableCell className="text-right space-x-2">
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
@@ -133,9 +133,8 @@ export default function Index({ academicYears }) {
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
-
-                                    {/* Delete Dialog */}
-                                    {/* <AlertDialog>
+ 
+                                    <AlertDialog>
                                         <AlertDialogTrigger asChild>
                                             <Button variant="destructive">Delete</Button>
                                         </AlertDialogTrigger>
@@ -158,8 +157,8 @@ export default function Index({ academicYears }) {
                                                 </AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
-                                    </AlertDialog> */}
-                                </TableCell>
+                                    </AlertDialog>
+                                </TableCell> */}
                             </TableRow>
                         ))
                     ) : (

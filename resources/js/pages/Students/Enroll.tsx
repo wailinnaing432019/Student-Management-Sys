@@ -99,6 +99,7 @@ export default function Create() {
         donor_job: '',
         donor_phone: '',
         donor_status: '',
+        donor_address: '',
 
         // Exams_taken table info
 
@@ -288,10 +289,9 @@ export default function Create() {
 
                                     <div>
                                         <div >
-                                            <div  >သင်တန်းနှစ်</div>
                                             <div>
                                                 <div>
-                                                    <label>Semester</label>
+                                                    <label>သင်တန်းနှစ်</label>
                                                     <Select
                                                         value={String(data.semester_id)}
                                                         onValueChange={(value) => setData('semester_id', value)}
@@ -788,8 +788,8 @@ export default function Create() {
                                                         <SelectValue placeholder="Result" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="pass">Pass</SelectItem>
-                                                        <SelectItem value="fail">Fail</SelectItem>
+                                                        <SelectItem value="အောင်">အောင်</SelectItem>
+                                                        <SelectItem value="ရှုံး">ရှုံး</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                                 <Button type="button" variant="destructive" onClick={() => removeExamRow(index)}>
@@ -826,9 +826,14 @@ export default function Create() {
                                     <InputError message={errors.donor_job} />
                                 </div>
                                 <div>
-                                    <Label>လိပ်စာ/ဖုန်းနံပါတ်</Label>
+                                    <Label>ဖုန်းနံပါတ်</Label>
                                     <Input id="donor_phone" value={data.donor_phone} onChange={(e) => setData('donor_phone', e.target.value)} />
                                     <InputError message={errors.donor_phone} />
+                                </div>
+                                <div>
+                                    <Label>လိပ်စာ</Label>
+                                    <Textarea id="donor_address" value={data.donor_address} onChange={(e) => setData('donor_address', e.target.value)} />
+                                    <InputError message={errors.donor_address} />
                                 </div>
 
                             </div>

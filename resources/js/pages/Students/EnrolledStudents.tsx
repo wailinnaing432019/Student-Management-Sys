@@ -138,10 +138,11 @@ export default function EnrolledStudents({
                 </div>
 
                 <div className="rounded-xl border   shadow-sm">
-                    <DataTable columns={enrolledStudentColumns} data={enrollStudents.data}
+                    {/* {enrollStudents.length !== 0 && ( */}
+                    <DataTable columns={enrolledStudentColumns} data={enrollStudents?.data ?? []}
                         pagination={{
-                            currentPage: enrollStudents.current_page,
-                            totalPages: enrollStudents.last_page,
+                            currentPage: enrollStudents?.current_page ?? 1,
+                            totalPages: enrollStudents?.last_page ?? 1,
                             onPageChange: (page) => {
                                 router.get(route("enroll-students.index"), {
                                     academic_year_id: selectedAcademicYearId || undefined,
@@ -154,6 +155,7 @@ export default function EnrolledStudents({
                                 });
                             },
                         }} />
+                    {/* )} */}
                 </div>
             </div>
         </AppLayout>

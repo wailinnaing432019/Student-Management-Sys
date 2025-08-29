@@ -71,6 +71,16 @@ export default function CreateCourseDialog({ majors, redirect }: CreateCoursePro
 
                         <div className="grid gap-4">
                             <div>
+                                <Label htmlFor="code">ဘာသာရပ် ကုဒ်</Label>
+                                <Input
+                                    id="code"
+                                    name="code"
+                                    value={data.code}
+                                    onChange={(e) => setData('code', e.target.value)}
+                                />
+                                <InputError message={errors.code} />
+                            </div>
+                            <div>
                                 <Label htmlFor="name">ဘာသာရပ် အမည်</Label>
                                 <Input
                                     id="name"
@@ -82,18 +92,9 @@ export default function CreateCourseDialog({ majors, redirect }: CreateCoursePro
                                 <InputError message={errors.name} />
                             </div>
 
-                            <div>
-                                <Label htmlFor="code">ဘာသာရပ် ကုဒ်</Label>
-                                <Input
-                                    id="code"
-                                    name="code"
-                                    value={data.code}
-                                    onChange={(e) => setData('code', e.target.value)}
-                                />
-                                <InputError message={errors.code} />
-                            </div>
 
-                            <div>
+
+                            {/* <div>
                                 <Label htmlFor="description">ဖော်ပြချက်</Label>
                                 <Input
                                     id="description"
@@ -102,7 +103,7 @@ export default function CreateCourseDialog({ majors, redirect }: CreateCoursePro
                                     onChange={(e) => setData('description', e.target.value)}
                                 />
                                 <InputError message={errors.description} />
-                            </div>
+                            </div> */}
 
                             <div>
                                 <Label>အဓိက ဘာသာရပ် ‌ရွေးချယ်ပါ</Label>

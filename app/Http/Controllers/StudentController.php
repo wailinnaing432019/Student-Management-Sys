@@ -115,19 +115,19 @@ public function index(Request $request)
     }
 
     public function stuCourses( ){
-   $enrollment = StudentEnrollment::with([
-        'student.father',
-        'student.mother', 
-        'student.examsTaken',
-        'studentSemesterProfile',
-        'semester',
-        'major',
-        'academicYear'
-    ])->findOrFail(5);
+        $enrollment = StudentEnrollment::with([
+                'student.father',
+                'student.mother', 
+                'student.examsTaken',
+                'studentSemesterProfile',
+                'semester',
+                'major',
+                'academicYear'
+            ])->findOrFail(5);
 
-    return Inertia::render('Students/test', [
-        'studentEnrollment' => $enrollment,
-    ]);
+            return Inertia::render('Students/test', [
+                'studentEnrollment' => $enrollment,
+            ]);
 
     }
 
@@ -264,6 +264,7 @@ public function index(Request $request)
                 'relationship'=>$request->donor_relationship,
                 'job'=>$request->donor_job, 
                 'phone'=>$request->donor_phone,
+                'address'=>$request->donor_address,
                 'status'=>$request->donor_status,
                 'student_semester_profile_id'=>$studentProfile->id,
             ]);

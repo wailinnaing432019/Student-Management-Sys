@@ -45,6 +45,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -131,8 +132,8 @@ export default function Index({ majors }) {
                                 <DialogDescription>အထူးပြု ဘာသာရပ် အသစ်တစ်ခု ဖန်တီးပါ။</DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4">
-                                <div className="grid gap-3">
-                                    <Label htmlFor="name">အထူးပြု ဘာသာရပ် အမည် (ဥပမာ- ကွန်ပျူတာ သိပ္ပံ - CS)</Label>
+                                {/* <div className="grid gap-3">
+                                    <Label htmlFor="name"> အမည် (ဥပမာ- ကွန်ပျူတာ သိပ္ပံ - CS)</Label>
                                     <Input
                                         id="name"
                                         name="name"
@@ -141,6 +142,23 @@ export default function Index({ majors }) {
                                         onChange={(e) => setData('name', e.target.value)}
                                     />
                                     <InputError message={errors.name} className="mt-2" />
+                                </div> */}
+                                <div>
+                                    <Label htmlFor="name">အထူးပြု ဘာသာရပ်</Label>
+                                    <Select
+                                        value={String(data.name)}
+                                        onValueChange={(value) => setData("name", value)}
+                                    >
+                                        <SelectTrigger id="name">
+                                            <SelectValue placeholder="သင်တန်းနှစ် ရွေးချယ်ပါ" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="CST">CST</SelectItem>
+                                            <SelectItem value="CS">CS</SelectItem>
+                                            <SelectItem value="CT">CT</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError message={errors.name} />
                                 </div>
                                 <div className="grid gap-3">
                                     <Label htmlFor="description">အထူးပြု ဘာသာရပ် အတွက်ဖော်ပြချက်</Label>
@@ -192,11 +210,11 @@ export default function Index({ majors }) {
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <Button
-                                                        variant="ghost"
+                                                        variant="outline"
                                                         onClick={() => openEditDialog(major)}
                                                         className="text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
                                                     >
-                                                        <SquarePen className="h-4 w-4" />
+                                                        ပြင်ဆင်ရန်
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
@@ -245,14 +263,23 @@ export default function Index({ majors }) {
                                 <DialogDescription>အဓိက ဘာသာရပ်ကို အသေးစိတ် ပြုပြင်ခြင်း</DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4">
-                                <div className="grid gap-3">
-                                    <Label htmlFor="name">အဓိက ဘာသာရပ် အမည်</Label>
-                                    <Input
-                                        id="name"
-                                        value={editData.name}
-                                        onChange={(e) => setEditData('name', e.target.value)}
-                                    />
-                                    <InputError message={editErrors.name} className="mt-2" />
+
+                                <div>
+                                    <Label htmlFor="name">အထူးပြု ဘာသာရပ်</Label>
+                                    <Select
+                                        value={String(editData.name)}
+                                        onValueChange={(value) => setEditData("name", value)}
+                                    >
+                                        <SelectTrigger id="name">
+                                            <SelectValue placeholder="သင်တန်းနှစ် ရွေးချယ်ပါ" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="CST">CST</SelectItem>
+                                            <SelectItem value="CS">CS</SelectItem>
+                                            <SelectItem value="CT">CT</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError message={editErrors.name} />
                                 </div>
                                 <div className="grid gap-3">
                                     <Label htmlFor="description">အဓိက ဘာသာရပ် အတွက်ဖော်ပြချက်</Label>

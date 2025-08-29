@@ -23,7 +23,7 @@ import TextLink from '@/components/text-link';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import NRCInputFields from '@/components/NRCInputFields';
-import { Table, TableCell, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { getSemesterText } from '@/Utils/SemesterText';
 
 type Semester = {
@@ -111,6 +111,7 @@ export default function Create() {
         donor_job: donor.job ?? '',
         donor_phone: donor.phone ?? '',
         donor_status: donor.status ?? '',
+        donor_address: donor.address ?? '',
 
         // Exams_taken table info
 
@@ -213,21 +214,32 @@ export default function Create() {
     }
 
     // const [selectedAcademicYearId, setSelectedAcademicYearId] = useState(data.academic_year_id || '')
-    const [filteredSemesters, setFilteredSemesters] = useState([])
-
+    const [filteredSemesters, setFilteredSemesters] = useState<any[]>([])
 
     useEffect(() => {
-        const year = academic_years.find((y) => String(y.id) === String(data.academic_year_id));
-        setFilteredSemesters(year ? year.semesters : []);
+        const year = academic_years.find(
+            (y: any) => String(y.id) === String(data.academic_year_id)
+        );
 
-        // Reset semester_id when academic year changes
-        // Only reset if there's no existing semester_id
-        if (!data.semester_id) {
-            setData('semester_id', '');
+        const semesters = year ? year.semesters : [];
+        setFilteredSemesters(semesters);
+
+        if (semesters.length === 0) {
+            // No semesters in this academic year → clear semester_id
+            setData("semester_id", "");
+        } else {
+            // If current semester_id is invalid or empty → auto-select first semester
+            const exists = semesters.some(
+                (s: any) => String(s.id) === String(data.semester_id)
+            );
+            if (!exists) {
+                setData("semester_id", String(semesters[0].id)); // ✅ auto-select first semester
+            }
         }
     }, [data.academic_year_id]);
     return (
         <AppLayout>
+
             <div className="w-full mx-auto  p-2 m-3  rounded shadow" >
                 <form onSubmit={submit} className="flex flex-col gap-2">
                     {/* Student Info */}
@@ -252,7 +264,7 @@ export default function Create() {
                                                     </SelectItem>
                                                 ))
                                             ) : (
-                                                <SelectItem value="0">There is no academic year</SelectItem>
+                                                <SelectItem value="0">ပညာသင်နှစ်မရှိပါ။</SelectItem>
                                             )}
                                         </SelectGroup>
                                     </SelectContent>
@@ -279,9 +291,9 @@ export default function Create() {
                                 {data.image && <img src={URL.createObjectURL(data.image)} alt="Preview Image" className="w-42 mt-2 object-cover" />}
                                 <div className="grid gap-2">
 
-                                    <Label htmlFor="amount">Image</Label>
+                                    {/* <Label htmlFor="amount">Preview Image</Label> */}
                                     <Input
-                                        className='w-2/5'
+                                        className='w-2/5 mt-1'
                                         id="image"
                                         type="file"
                                         required
@@ -306,8 +318,7 @@ export default function Create() {
 
 
                                     <div>
-                                        <div >
-                                            <div  >သင်တန်းနှစ်</div>
+                                        {/* <div >
                                             <div>
                                                 <div>
                                                     <label>Semester</label>
@@ -338,6 +349,35 @@ export default function Create() {
                                                 </div>
                                             </div>
 
+                                        </div> */}
+                                        <div>
+                                            <label>သင်တန်းနှစ်</label>
+                                            <Select
+                                                value={String(data.semester_id)}
+                                                onValueChange={(value) => setData('semester_id', value)}
+                                            >
+                                                <SelectTrigger id="semester_id">
+                                                    <SelectValue placeholder="သင်တန်းကာလ ရွေးချယ်ပါ။" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        {filteredSemesters.length > 0 ? (
+                                                            [...filteredSemesters]
+                                                                .sort((a: any, b: any) => a.semester_number - b.semester_number) // sort numerically
+                                                                .map((s: any) => (
+                                                                    <SelectItem key={s.id} value={String(s.id)}>
+                                                                        {s.year_name} - {getSemesterText(s.semester_number)}
+                                                                    </SelectItem>
+                                                                ))
+                                                        ) : (
+                                                            <div className="px-4 py-2 text-red-500 text-sm">
+                                                                သင်တန်းကာလ မရှိပါ
+                                                            </div>
+                                                        )}
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError message={errors.semester_id} />
                                         </div>
                                         <div >
                                             <div  >အထူးပြု ဘာသာ</div>
@@ -556,12 +596,14 @@ export default function Create() {
                                     <Label>မွေးဖွားရာ ဇာတိ</Label>
                                     <Input
                                         id="hometown"
+                                        disabled
                                         value={data.hometown}
                                         onChange={(e) => setData('hometown', e.target.value)}
                                         placeholder="မွေးဖွားရာ ဇာတိ"
                                     />
                                     <InputError message={errors.hometown} />
                                     <div><Input
+                                        disabled
                                         id="township_state_region"
                                         value={data.township_state_region}
                                         onChange={(e) => setData('township_state_region', e.target.value)}
@@ -572,6 +614,7 @@ export default function Create() {
                                 <div>
                                     <Label>အဖ မွေးဖွားရာ ဇာတိ</Label>
                                     <Input
+                                        disabled
                                         id="father_hometown"
                                         value={data.father_hometown}
                                         onChange={(e) => setData('father_hometown', e.target.value)}
@@ -579,6 +622,7 @@ export default function Create() {
                                     />
                                     <InputError message={errors.father_hometown} />
                                     <div><Input
+                                        disabled
                                         id="father_township_state_region"
                                         value={data.father_township_state_region}
                                         onChange={(e) => setData('father_township_state_region', e.target.value)}
@@ -589,6 +633,7 @@ export default function Create() {
                                 <div>
                                     <Label>အမိ မွေးဖွားရာ ဇာတိ</Label>
                                     <Input
+                                        disabled
                                         id="mother_hometown"
                                         value={data.mother_hometown}
                                         onChange={(e) => setData('mother_hometown', e.target.value)}
@@ -596,6 +641,7 @@ export default function Create() {
                                     />
                                     <InputError message={errors.mother_hometown} />
                                     <div><Input
+                                        disabled
                                         id="mother_township_state_region"
                                         value={data.mother_township_state_region}
                                         onChange={(e) => setData('mother_township_state_region', e.target.value)}
@@ -607,6 +653,7 @@ export default function Create() {
 
                                 <div>
                                     <Select
+                                        disabled
                                         value={data.local_foreign}
                                         onValueChange={(value) => setData('local_foreign', value)}
                                     >
@@ -627,6 +674,7 @@ export default function Create() {
 
                                 <div>
                                     <Select
+                                        disabled
                                         value={data.father_local_foreign}
                                         onValueChange={(value) => setData('father_local_foreign', value)}
                                     >
@@ -647,6 +695,7 @@ export default function Create() {
 
                                 <div>
                                     <Select
+                                        disabled
                                         value={data.mother_local_foreign}
                                         onValueChange={(value) => setData('mother_local_foreign', value)}
                                     >
@@ -719,134 +768,82 @@ export default function Create() {
                                 <h3 className="text-md font-medium">၂။ ဖြေဆိုခဲ့သည့်စာမေးပွဲများ</h3>
                                 <Button type="button" onClick={addExamRow} variant="outline">+ ထည့်မည်</Button>
                             </div>
+
                             <Table>
-                                {examsTaken.map((exam, index) => (
 
-                                    <TableRow key={index} >
-                                        <TableCell>
-                                            <Input
-                                                value={exam.exam_name}
-                                                disabled
-                                                onChange={(e) => handleExamChange(index, 'exam_name', e.target.value)}
-                                                placeholder="စာမေးပွဲအမည်"
-                                            />
-                                            <InputError message={errors?.[`exam_records.${index}.exam_name`]} />
-                                        </TableCell>
 
-                                        <TableCell>
-                                            <Input
-                                                value={exam.major}
-                                                disabled
-                                                onChange={(e) => handleExamChange(index, 'exam_major', e.target.value)}
-                                                placeholder="အဓိကဘာသာ"
-                                            />
-                                            <InputError message={errors?.[`exam_records.${index}.exam_major`]} />
-                                        </TableCell>
+                                <TableBody>
+                                    {examsTaken.concat(data.exam_records).map((exam, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell>
+                                                <Input
+                                                    value={exam.exam_name}
+                                                    disabled={!!exam.id} // disable if it's an existing record
+                                                    onChange={(e) => handleExamChange(index, 'exam_name', e.target.value)}
+                                                    placeholder="စာမေးပွဲအမည်"
+                                                />
+                                                <InputError message={errors?.[`exam_records.${index}.exam_name`]} />
+                                            </TableCell>
 
-                                        <TableCell>
-                                            <Input
-                                                value={exam.roll_no}
-                                                disabled
-                                                onChange={(e) => handleExamChange(index, 'exam_roll_no', e.target.value)}
-                                                placeholder="ခုံအမှတ်"
-                                            />
-                                            <InputError message={errors?.[`exam_records.${index}.exam_roll_no`]} />
-                                        </TableCell>
+                                            <TableCell>
+                                                <Input
+                                                    value={exam.exam_major}
+                                                    disabled={!!exam.id}
+                                                    onChange={(e) => handleExamChange(index, 'exam_major', e.target.value)}
+                                                    placeholder="အဓိကဘာသာ"
+                                                />
+                                                <InputError message={errors?.[`exam_records.${index}.exam_major`]} />
+                                            </TableCell>
 
-                                        <TableCell>
-                                            <Input
-                                                value={exam.year}
-                                                disabled
-                                                onChange={(e) => handleExamChange(index, 'exam_year', e.target.value)}
-                                                placeholder="ခုနှစ်"
-                                            />
-                                            <InputError message={errors?.[`exam_records.${index}.exam_year`]} />
-                                        </TableCell>
+                                            <TableCell>
+                                                <Input
+                                                    value={exam.exam_roll_no}
+                                                    disabled={!!exam.id}
+                                                    onChange={(e) => handleExamChange(index, 'exam_roll_no', e.target.value)}
+                                                    placeholder="ခုံအမှတ်"
+                                                />
+                                                <InputError message={errors?.[`exam_records.${index}.exam_roll_no`]} />
+                                            </TableCell>
 
-                                        <TableCell>
-                                            <div className="flex items-end gap-2">
-                                                <Select
-                                                    value={exam.pass_fail}
-                                                    disabled
-                                                    onValueChange={(value) => handleExamChange(index, 'exam_pass_fail', value)}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Result" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="pass">Pass</SelectItem>
-                                                        <SelectItem value="fail">Fail</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <Button type="button" variant="destructive" disabled onClick={() => removeExamRow(index)}>
-                                                    -
-                                                </Button>
-                                            </div>
-                                            <InputError message={errors?.[`exam_records.${index}.exam_pass_fail`]} />
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                {data.exam_records.map((exam, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>
-                                            <Input
-                                                value={exam.exam_name}
+                                            <TableCell>
+                                                <Input
+                                                    value={exam.exam_year}
+                                                    disabled={!!exam.id}
+                                                    onChange={(e) => handleExamChange(index, 'exam_year', e.target.value)}
+                                                    placeholder="ခုနှစ်"
+                                                />
+                                                <InputError message={errors?.[`exam_records.${index}.exam_year`]} />
+                                            </TableCell>
 
-                                                onChange={(e) => handleExamChange(index, 'exam_name', e.target.value)}
-                                                placeholder="စာမေးပွဲအမည်"
-                                            />
-                                            <InputError message={errors?.[`exam_records.${index}.exam_name`]} />
-                                        </TableCell>
-                                        {/* other cells same pattern */}
-                                        <TableCell>
-                                            <Input
-                                                value={exam.exam_major}
-                                                onChange={(e) => handleExamChange(index, 'exam_major', e.target.value)}
-                                                placeholder="အဓိကဘာသာ"
-                                            />
-                                            <InputError message={errors?.[`exam_records.${index}.exam_major`]} />
-                                        </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-end gap-2">
+                                                    <Select
+                                                        value={exam.exam_pass_fail}
+                                                        disabled={!!exam.id}
+                                                        onValueChange={(value) => handleExamChange(index, 'exam_pass_fail', value)}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Result" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="pass">Pass</SelectItem>
+                                                            <SelectItem value="fail">Fail</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
 
-                                        <TableCell>
-                                            <Input
-                                                value={exam.exam_roll_no}
-                                                onChange={(e) => handleExamChange(index, 'exam_roll_no', e.target.value)}
-                                                placeholder="ခုံအမှတ်"
-                                            />
-                                            <InputError message={errors?.[`exam_records.${index}.exam_roll_no`]} />
-                                        </TableCell>
-
-                                        <TableCell>
-                                            <Input
-                                                value={exam.exam_year}
-                                                onChange={(e) => handleExamChange(index, 'exam_year', e.target.value)}
-                                                placeholder="ခုနှစ်"
-                                            />
-                                            <InputError message={errors?.[`exam_records.${index}.exam_year`]} />
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-end gap-2">
-                                                <Select
-                                                    value={exam.exam_pass_fail}
-                                                    onValueChange={(value) => handleExamChange(index, 'exam_pass_fail', value)}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Result" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="pass">Pass</SelectItem>
-                                                        <SelectItem value="fail">Fail</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <Button type="button" variant="destructive" onClick={() => removeExamRow(index)}>
-                                                    -
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-
-                                <TableRow ></TableRow>
+                                                    <Button
+                                                        type="button"
+                                                        variant="destructive"
+                                                        onClick={() => removeExamRow(index)}
+                                                        disabled={!!exam.id} // disable removal for existing records if needed
+                                                    >
+                                                        -
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
                             </Table>
                         </Card>
                         {/* Section 3 - Exam Records */}
@@ -872,9 +869,14 @@ export default function Create() {
                                     <InputError message={errors.donor_job} />
                                 </div>
                                 <div>
-                                    <Label>လိပ်စာ/ဖုန်းနံပါတ်</Label>
+                                    <Label>ဖုန်းနံပါတ်</Label>
                                     <Input id="donor_phone" value={data.donor_phone} onChange={(e) => setData('donor_phone', e.target.value)} />
                                     <InputError message={errors.donor_phone} />
+                                </div>
+                                <div>
+                                    <Label>လိပ်စာ</Label>
+                                    <Textarea id="donor_address" value={data.donor_address} onChange={(e) => setData('donor_address', e.target.value)} />
+                                    <InputError message={errors.donor_address} />
                                 </div>
 
                             </div>
@@ -1103,7 +1105,7 @@ export default function Create() {
 
                         <div >
                             <Button type="submit" disabled={processing} className="mt-6 w-full ">
-                                {processing ? 'Saving...' : 'Create Registration'}
+                                {processing ? 'စာရင်းသွင်းနေပါသည်...' : 'စာရင်းသွင်းမည်'}
                             </Button></div>
                     </div>
                 </form>

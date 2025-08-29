@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class MajorRequest extends FormRequest
+class MajorUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -19,12 +20,17 @@ class MajorRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+        public function rules(): array
     { 
-            return [
-            'name'=>'required|string|max:255|unique:majors,name',
-            'description'=>'nullable|string'
-        ]; 
+        return [
+        'name' => [
+            'required',
+            'string',
+            'max:255',
+            Rule::unique('majors', 'name')->ignore($this->route('major')), // <-- ignore current major ID
+        ],
+        'description' => 'nullable|string',
+    ];
     }
     public function messages()
     {

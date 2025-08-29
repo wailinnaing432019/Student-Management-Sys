@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MajorRequest;
+use App\Http\Requests\MajorUpdateRequest;
 use App\Models\Major;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -55,7 +56,7 @@ class MajorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(MajorRequest $request, string $id)
+    public function update(MajorUpdateRequest $request, string $id)
     {
         $validated = $request->validated();
         $major = Major::findOrFail($id);

@@ -5,22 +5,30 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StudentRequest extends FormRequest
+class StudentReregisterRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
     public function rules(): array
-    {
-        return [
-            'name_myan' => 'required|string',
-            'name_eng' => 'required|string',
-            'academic_year_id' => 'required|string',
-            'semester_id' => 'required|string',
-            'major_id' => 'required|string',
-            'roll_no' => [
+{
+$studentId = $this->route('student')->id;
+
+    return [
+        'academic_year_id' => ['required', 'exists:academic_years,id'],
+        'semester_id'      => ['required', 'exists:semesters,id'],
+        'major_id'         => ['required', 'exists:majors,id'],
+        'roll_no' => [
             'required',
             'string',
             Rule::unique('student_semester_profiles')
@@ -30,111 +38,52 @@ class StudentRequest extends FormRequest
                         ->where('major_id', $this->major_id)
                 )
         ],
-            'uid' => 'required|string|unique:students,uid',
-            'entried_year' => 'required|string',
-            'nrc_state' => ['required'],
-            'nrc_township' => ['required'],
-            'nrc_type' => ['required'],
-            'nrc_number' => [
-                'required',
-                'regex:/^([၀-၉]{6})$/u',
-                Rule::unique('students') // 👈 your table name here
-                    ->where(fn ($query) => 
-                        $query->where('nrc_state', $this->nrc_state)
-                              ->where('nrc_township', $this->nrc_township)
-                              ->where('nrc_type', $this->nrc_type)
-                    ),
-            ],
-            'dob' => 'required|string',
-            'ethnicity' => 'required|string',
-            'religion' => 'required|string',
-            'hometown' => 'required|string',
-            'township_state_region' => 'required|string',
-            'local_foreign' => 'required|string',
-            'matriculation_passed_year' => 'required|string',
-            'matriculation_passed_roll_no' => 'required|string',
-            'examination_center' => 'required|string',
-            'permanent_address' => 'required|string',
-            'phone' => [
-                'required',
-                // +95 or 0 followed by 7–10 digits (mobile or landline)
-                'regex:/^(?:\+?95|0)[0-9]{7,10}$/'
-            ],
-            'email' => 'required|string',
-            'image' => 'required|image',
+        'permanent_address'=> ['required', 'string'], 
+        'phone'            => ['required', 'string', 'max:20'],
+        'email'            => ['required', 'email', 'max:255'],
+        'image'            => ['required', 'image', 'max:2048'],
 
-            // Mother info
-            'mother_name_myan' => 'required|string',
-            'mother_name_eng' => 'required|string',
-            'mother_ethnicity' => 'required|string',
-            'mother_religion' => 'required|string',
-            'mother_hometown' => 'required|string',
-            'mother_township_state_region' => 'required|string',
-            'mother_nrc_state' => 'required',
-            'mother_nrc_township' => 'required',
-            'mother_nrc_type' => 'required',
-            'mother_nrc_number' =>[
-                'required',
-                'regex:/^([၀-၉]{6})$/u'
-            ],
-            'mother_job' => 'required|string',
-            'mother_local_foreign' => 'required|string',
+     
 
-            // Donor
-            'donor_name' => 'required|string',
-            'donor_relationship' => 'required|string',
-            'donor_job' => 'required|string',
-            'donor_phone' =>    [
-                'required',
-                // +95 or 0 followed by 7–10 digits (mobile or landline)
-                'regex:/^(?:\+?95|0)[0-9]{7,10}$/'
-            ],
-            'donor_status' => 'required|string',
-            'donor_address' => 'required|string',
+        // father fields …
+        'father_religion' => ['required', 'string'],
+        'father_hometown' => ['required', 'string'],
+        'father_township_state_region' => ['required', 'string'],
+        'father_job' => ['required', 'string'],
+        'father_job_position_address' => ['nullable', 'string'],
 
-            // Exams_taken
+        // mother fields …
+        'mother_religion' => ['required', 'string'],
+        'mother_hometown' => ['required', 'string'],
+        'mother_township_state_region' => ['required', 'string'],
+        'mother_job' => ['required', 'string'],
+        'mother_job_position_address' => ['nullable', 'string'],
+
+        // donor fields …
+        'donor_name' => ['required', 'string'],
+        'donor_relationship' => ['required', 'string'],
+        'donor_job' => ['required', 'string'],
+        'donor_phone' => ['required', 'string'],
+        'donor_status' => ['required', 'string'],
+        'donor_address' => 'required|string',
+
+ 
+       // Exams_taken
             'exam_records' => 'nullable|array',
             'exam_records.*.exam_name' => 'nullable|string',
             'exam_records.*.exam_major' => 'nullable|string',
             'exam_records.*.exam_roll_no' => 'nullable|string',
             'exam_records.*.exam_year' => 'nullable|string',
             'exam_records.*.exam_pass_fail' => 'nullable|string',
+    ];
+}
 
-            // Father info
-            'father_name_myan' => 'required|string',
-            'father_name_eng' => 'required|string',
-            'father_ethnicity' => 'required|string',
-            'father_religion' => 'required|string',
-            'father_hometown' => 'required|string',
-            'father_township_state_region' => 'required|string',
-            'father_nrc_state' => 'required',
-            'father_nrc_township' => 'required',
-            'father_nrc_type' => 'required',
-            'father_nrc_number' => [
-                'required',
-                'regex:/^([၀-၉]{6})$/u'
-            ],
-            'father_job' => 'required|string',
-            'father_local_foreign' => 'required|string',
-
-            // Registration
-            // 'name' => 'required|string',
-            // 'examed_year' => 'required|string',
-            // 'examed_month' => 'required|string',
-            // 'examed_name' => 'required|string',
-            // 'examed_roll_no' => 'required|string',
-            // 'examed_status' => 'required|string',
-            // 'class' => 'required|string',
-            // 'fee' => ['required', 'regex:/^[0-9၀-၉]+$/u'],
-            // 'guardian' => 'required|string',
-            // 'g_nrc_state' => 'required|string',
-            // 'g_nrc_township' => 'required|string',
-            // 'g_nrc_type' => 'required|string',
-            // 'g_nrc_number' => 'required|string',
-            // 'agreed' => 'accepted',
-        ];
-    }
-
+    // public function messages(): array
+    // {
+    //     return [
+    //         'student_id.unique' => 'This student has already been registered for the selected semester, major, and academic year.',
+    //     ];
+    // }
     public function messages()
     {
         return [
@@ -156,54 +105,7 @@ class StudentRequest extends FormRequest
         ];
     }
 
-    public function withValidator($validator)
-    {
-        $validator->after(function ($validator) {
-            $records = $this->input('exam_records', []);
-
-            foreach ($records as $index => $record) {
-                $hasAny = collect($record)->filter(fn($val) => $val !== null && $val !== '')->isNotEmpty();
-
-                if ($hasAny) {
-                    $requiredFields = [
-                        'exam_name',
-                        'exam_major',
-                        'exam_roll_no',
-                        'exam_year',
-                        'exam_pass_fail',
-                    ];
-
-                    foreach ($requiredFields as $field) {
-                        if (empty($record[$field]) && $record[$field] !== '0') {
-                            $validator->errors()->add(
-                                "exam_records.$index.$field",
-                                $this->attributes()["exam_records.*.$field"] . ' ဖြည့်ပေးရန် လိုအပ်သည်။'
-                            );
-                        }
-                    }
-                }
-            }
-
-
-            $studentNrc = $this->nrc_state.$this->nrc_township.$this->nrc_type.$this->nrc_number;
-        $fatherNrc  = $this->father_nrc_state.$this->father_nrc_township.$this->father_nrc_type.$this->father_nrc_number;
-        $motherNrc  = $this->mother_nrc_state.$this->mother_nrc_township.$this->mother_nrc_type.$this->mother_nrc_number;
-
-        if ($studentNrc === $fatherNrc) {
-            $validator->errors()->add('nrc_number', 'ကျောင်သား၏ မှတ်ပုံတင် နံပါတ်သည် ဖခင်၏ မှတ်ပုံတင် နံပါတ်နှင့် တူနေပါသည်။');
-        }
-
-        if ($studentNrc === $motherNrc) {
-            $validator->errors()->add('nrc_number', 'ကျောင်းသား၏ မှတ်ပုံတင် နံပါတ်သည် မိခင်၏ မှတ်ပုံတင် နံပါတ်နှင့် တူနေပါသည်။');
-        }
-
-        if ($fatherNrc === $motherNrc) {
-            $validator->errors()->add('father_nrc_number', 'ဖခင်၏ မှတ်ပုံတင် နံပါတ်သည် မိခင်၏ မှတ်ပုံတင် နံပါတ်နှင့် တူနေပါသည်။');
-        }
-        });
-    }
-
-    public function attributes()
+     public function attributes()
     {
         return [
             'name_myan' => 'ကျောင်းသား မြန်မာအမည်',
@@ -288,6 +190,55 @@ class StudentRequest extends FormRequest
     }
 
 
+    public function withValidator($validator)
+{
+    $studentId = $this->route('student')->id;
+
+    $validator->after(function ($validator) use ($studentId) {
+        // 1️⃣ Validate exam_records partially filled rows
+        $records = $this->input('exam_records', []);
+
+        foreach ($records as $index => $record) {
+            $hasAny = collect($record)->filter(fn($val) => $val !== null && $val !== '')->isNotEmpty();
+
+            if ($hasAny) {
+                $requiredFields = [
+                    'exam_name',
+                    'exam_major',
+                    'exam_roll_no',
+                    'exam_year',
+                    'exam_pass_fail',
+                ];
+
+                foreach ($requiredFields as $field) {
+                    if (empty($record[$field]) && $record[$field] !== '0') {
+                        $validator->errors()->add(
+                            "exam_records.$index.$field",
+                            $this->attributes()["exam_records.*.$field"] . ' ဖြည့်ပေးရန် လိုအပ်သည်။'
+                        );
+                    }
+                }
+            }
+        }
+
+        // 2️⃣ Validate uniqueness of student enrollment
+        $exists = \DB::table('student_enrollments')
+            ->where('student_id', $studentId)
+            ->where('semester_id', $this->semester_id)
+            ->where('major_id', $this->major_id)
+            ->where('academic_year_id', $this->academic_year_id)
+            ->exists();
+
+        if ($exists) {
+            // Attach error to roll_no or any visible field
+            $validator->errors()->add(
+                'roll_no',
+                'ဤကျောင်းသားသည် ယခု သင်တန်းနှစ်၊ ဆယ်မစတာနှင့် မေဂျာအတွက် စာရင်းသွင်းပြီးသား ဖြစ်ပါသည်။'
+            );
+        }
+    });
+}
+    
      protected function prepareForValidation(): void
     {
         $this->merge([
@@ -312,7 +263,4 @@ class StudentRequest extends FormRequest
 
         return $value;
     }
- 
-
- 
 }

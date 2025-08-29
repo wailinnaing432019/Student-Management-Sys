@@ -35,6 +35,15 @@ export default function EditCourseModal({
 
                     <div className="grid gap-4 py-4">
                         <div>
+                            <Label htmlFor="code">ဘာသာရပ် ကုဒ်</Label>
+                            <Input
+                                id="code"
+                                value={data.code}
+                                onChange={(e) => setData("code", e.target.value)}
+                            />
+                            <InputError message={errors.code} />
+                        </div>
+                        <div>
                             <Label htmlFor="name">ဘာသာရပ် အမည်</Label>
                             <Input
                                 id="name"
@@ -44,15 +53,7 @@ export default function EditCourseModal({
                             <InputError message={errors.name} />
                         </div>
 
-                        <div>
-                            <Label htmlFor="code">ဘာသာရပ် ကုဒ်</Label>
-                            <Input
-                                id="code"
-                                value={data.code}
-                                onChange={(e) => setData("code", e.target.value)}
-                            />
-                            <InputError message={errors.code} />
-                        </div>
+
                         <div>
                             <Label>အဓိက ဘာသာရပ် ရွေးချယ်ပါ</Label>
                             <div className="space-y-2 mt-1">
@@ -83,7 +84,7 @@ export default function EditCourseModal({
                             </div>
                             <InputError message={errors.major_ids} />
                         </div>
-                        <div>
+                        {/* <div>
 
                             <Label htmlFor="description">ဖော်ပြချက်</Label>
                             <Input
@@ -92,7 +93,7 @@ export default function EditCourseModal({
                                 onChange={(e) => setData("description", e.target.value)}
                             />
                             <InputError message={errors.description} />
-                        </div>
+                        </div> */}
                     </div>
 
                     <DialogFooter>

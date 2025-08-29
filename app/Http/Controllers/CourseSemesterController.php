@@ -122,6 +122,7 @@ public function create()
             'semesters' => $year->semesters->map(fn ($sem) => [
                 'id' => $sem->id, 
                 'semester_number'=>$sem->semester_number,
+                'year_name'=>$sem->year_name,
             ]),
         ]),
         'courses' => $courses,
@@ -132,17 +133,58 @@ public function create()
         'courseSemesterMap' => $courseSemesterMap,
     ]);
 }
-  public function store(CourseSemesterRequest $request)
+//   public function store(CourseSemesterRequest $request)
+// {
+//     // Validate incoming data
+//     $data = $request->validate([
+//         'semester_id' => 'required|exists:semesters,id',
+//         'courses' => 'required|array',
+//         'courses.*.id' => 'required|exists:courses,id',
+//         'courses.*.is_elective' => 'boolean',
+//     ]); 
+//     try {
+//         // We'll prepare an array to sync the pivot table with
+//         $syncData = [];
+
+//         foreach ($data['courses'] as $course) {
+//             $syncData[$course['id']] = [
+//                 'is_elective' => $course['is_elective'] ?? false,
+//                 'updated_at' => now(),
+//                 'created_at' => now(),
+//             ];
+//         }
+
+//         // Find the semester
+//         $semester = \App\Models\Semester::findOrFail($data['semester_id']);
+
+//         // Sync courses with pivot data (this will update existing and add new)
+//         $semester->courses()->sync($syncData);
+
+ 
+
+//             return to_route('course-semesters.index', [
+//                 'academic_year_id' => $semester->academicYear->id,
+//                 'semester_id' => $data['semester_id'], 
+//             ])->with('success', 'ပညာသင်နှစ် နှင့် သင်ကြားမည့် ဘာသာ အားသတ်မှတ်ပြီးပါပြီ။');
+//     } catch (\Exception $e) {
+ 
+//         // Optionally log error for debugging
+//         Log::error('Failed to assign courses to semester: ' . $e->getMessage());
+
+//         return back()->withErrors('ပညာသင်နှစ် နှင့် သင်ကြားမည့် ဘာသာ အားသတ်မှတ်ရာ တွင်အမှားအယွင်းဖြစ်ပေါ်နေပါသည်။' . $e->getMessage());
+//     }
+// }
+
+public function store(CourseSemesterRequest $request)
 {
-    // Validate incoming data
     $data = $request->validate([
         'semester_id' => 'required|exists:semesters,id',
         'courses' => 'required|array',
         'courses.*.id' => 'required|exists:courses,id',
         'courses.*.is_elective' => 'boolean',
-    ]); 
+    ]);
+
     try {
-        // We'll prepare an array to sync the pivot table with
         $syncData = [];
 
         foreach ($data['courses'] as $course) {
@@ -154,27 +196,44 @@ public function create()
         }
 
         // Find the semester
-        $semester = \App\Models\Semester::findOrFail($data['semester_id']);
+        $semester = \App\Models\Semester::with('academicYear')->findOrFail($data['semester_id']);
 
-        // Sync courses with pivot data (this will update existing and add new)
+        // Sync courses with pivot table
         $semester->courses()->sync($syncData);
 
- 
+        // 🔹 Now update student enrollments (like updateStatus)
+        // Get all students already enrolled in this semester
+        $enrollments = \App\Models\StudentEnrollment::where('semester_id', $semester->id)
+            ->where('status', 'Accept') // only accepted enrollments
+            ->get();
 
-            return to_route('course-semesters.index', [
-                'academic_year_id' => $semester->academicYear->id,
-                'semester_id' => $data['semester_id'], 
-            ])->with('success', 'ပညာသင်နှစ် နှင့် သင်ကြားမည့် ဘာသာ အားသတ်မှတ်ပြီးပါပြီ။');
+        foreach ($enrollments as $enrollment) {
+            $selectedMajorId = $enrollment->major_id;
+
+            // Load only courses for that major
+            $coursesForMajor = $semester->courses()->whereHas('majors', function ($q) use ($selectedMajorId) {
+                $q->where('majors.id', $selectedMajorId);
+            })->get();
+
+            foreach ($coursesForMajor as $course) {
+                \App\Models\StudentCourseEnrollment::firstOrCreate([
+                    'student_enrollment_id' => $enrollment->id,
+                    'course_id' => $course->id,
+                ]);
+            }
+        }
+
+        return to_route('course-semesters.index', [
+            'academic_year_id' => $semester->academicYear->id,
+            'semester_id' => $data['semester_id'],
+        ])->with('success', 'ပညာသင်နှစ်နှင့် သင်ကြားမည့် ဘာသာများကို သတ်မှတ်ပြီး၊ ကျောင်းသားများကို အလိုအလျောက် စာရင်းသွင်းပြီးပါပြီ။');
+
     } catch (\Exception $e) {
-
-        dd($e);
-        // Optionally log error for debugging
         Log::error('Failed to assign courses to semester: ' . $e->getMessage());
 
-        return back()->withErrors('ပညာသင်နှစ် နှင့် သင်ကြားမည့် ဘာသာ အားသတ်မှတ်ရာ တွင်အမှားအယွင်းဖြစ်ပေါ်နေပါသည်။' . $e->getMessage());
+        return back()->withErrors('ပညာသင်နှစ်နှင့် သင်ကြားမည့် ဘာသာ သတ်မှတ်ရာတွင် အမှားအယွင်း ဖြစ်ပေါ်နေပါသည် - ' . $e->getMessage());
     }
 }
-
 
 
     public function unassign(Request $request)

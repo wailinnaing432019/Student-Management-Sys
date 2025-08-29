@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CourseRequest;
+use App\Http\Requests\CourseUpdateRequest;
 use App\Models\Course;
 use App\Models\Major;
 use App\Models\Semester;
@@ -22,6 +23,7 @@ class CourseController extends Controller
     }
 
     $courses = $query->paginate(6)->withQueryString(); // 10 per page
+ 
     $majors = Major::all();
 
     return Inertia::render('Courses/Index', [
@@ -59,7 +61,7 @@ class CourseController extends Controller
 
 }
 
-public function update(CourseRequest $request, Course $course)
+public function update(CourseUpdateRequest $request, Course $course)
 {
     $data = $request->validated();
 

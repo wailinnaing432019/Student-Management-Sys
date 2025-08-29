@@ -5,18 +5,22 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class CourseRequest extends FormRequest
+class CourseUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        // Change to true if authorization is handled elsewhere
         return true;
     }
 
-    public function rules()
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
     {
         return [
         'name' => [
@@ -27,9 +31,11 @@ class CourseRequest extends FormRequest
         'code' => [
             'required',
             'string',
-            Rule::unique('courses')->where(function ($query) {
-                return $query->where('name', $this->name);
-            })->ignore($this->route('course')), // <-- ignore current course when updating
+            Rule::unique('courses')
+                ->where(function ($query) {
+                    return $query->where('name', $this->name);
+                })
+                ->ignore($this->route('course')), // Ignore current course for update
         ],
         'description' => 'nullable|string',
         'is_elective' => 'boolean',
@@ -37,7 +43,6 @@ class CourseRequest extends FormRequest
         'major_ids.*' => 'exists:majors,id',
     ];
     }
-
     public function messages()
     {
         return [

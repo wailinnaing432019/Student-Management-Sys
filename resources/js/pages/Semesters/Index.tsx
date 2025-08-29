@@ -1,5 +1,5 @@
 // resources/js/Pages/Semesters/Index.tsx
-import { useState, useRef, FormEventHandler } from "react";
+import { useState, useRef, FormEventHandler, useMemo, useEffect } from "react";
 import AppLayout from "@/layouts/app-layout";
 import { Head, Link, router, useForm } from "@inertiajs/react";
 import {
@@ -44,13 +44,38 @@ import AcademicYearCreateDialog from "../AcademicYears/AcademicYearCreateDialog"
 import { getSemesterText } from "@/Utils/SemesterText";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
+
+const yearSemesterMap: Record<string, { value: number; label: string }[]> = {
+    "ပထမနှစ်": [
+        { value: 1, label: "Semester I" },
+        { value: 2, label: "Semester II" },
+    ],
+    "ဒုတိယနှစ်": [
+        { value: 3, label: "Semester III" },
+        { value: 4, label: "Semester IV" },
+    ],
+    "တတိယနှစ်": [
+        { value: 5, label: "Semester V" },
+        { value: 6, label: "Semester VI" },
+    ],
+    "စတုတ္ထနှစ်": [
+        { value: 7, label: "Semester VII" },
+        { value: 8, label: "Semester VIII" },
+    ],
+    "DCSC": [
+        { value: 11, label: "Module I" },
+        { value: 12, label: "Module II" },
+        { value: 13, label: "Module III" },
+        { value: 14, label: "Module IV" },
+    ],
+};
 export default function Index({ semesters, academicYears, selectedAcademicYearId }) {
     // Create Form
     const { data, setData, post, processing, errors, reset } = useForm({
         academic_year_id: "",
-        year_name: "",
+        year_name: "ပထမနှစ်",
         name: "",
-        semester_number: 0,
+        semester_number: 1,
         start_date: "",
         end_date: "",
     });
@@ -117,6 +142,35 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
         router.delete(route("semesters.destroy", id));
     };
 
+    const availableSemesters = useMemo(() => {
+        return yearSemesterMap[data.year_name] || [];
+    }, [data.year_name]);
+
+    // Auto-select first semester when year changes
+    useEffect(() => {
+        if (data.year_name && availableSemesters.length > 0) {
+            // if semester not in range or is 0 → reset to first available
+            if (
+                !availableSemesters.some((sem) => sem.value === data.semester_number)
+            ) {
+                setData("semester_number", availableSemesters[0].value);
+            }
+        }
+    }, [data.year_name, availableSemesters, data.semester_number, setData]);
+
+    // edit available semesters
+    const availableSemestersEdit = yearSemesterMap[editData.year_name] || [];
+
+    // Auto-select the first semester when year changes
+    useEffect(() => {
+        if (editData.year_name && availableSemestersEdit.length > 0) {
+            if (
+                !availableSemestersEdit.some((s) => s.value === editData.semester_number)
+            ) {
+                setEditData("semester_number", availableSemestersEdit[0].value);
+            }
+        }
+    }, [editData.year_name, availableSemestersEdit]);
     return (
         <AppLayout title="Semesters" breadcrumbs={[
             { name: "သင်တန်းကာလများ" }
@@ -183,37 +237,44 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
                                         <InputError message={errors.academic_year_id} />
                                     </div>
 
+                                    {/* Year Selection */}
                                     <div>
-                                        <Label htmlFor="number">သင်တန်းနှစ်အမည် (ဥပမာ- ပထမနှစ်)</Label>
-                                        <Input
-                                            id="year_name"
-                                            name="year_name"
-                                            type="text"
-                                            min={1}
-                                            value={data.year_name}
-                                            onChange={(e) => setData("year_name", e.target.value)}
-                                            placeholder="ဥပမာ- ပထမနှစ်"
-                                        />
+                                        <Label htmlFor="year_name">သင်တန်းနှစ်အမည်</Label>
+                                        <Select
+                                            value={String(data.year_name)}
+                                            onValueChange={(value) => setData("year_name", value)}
+                                        >
+                                            <SelectTrigger id="year_name">
+                                                <SelectValue placeholder="သင်တန်းနှစ် ရွေးချယ်ပါ" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="ပထမနှစ်">ပထမနှစ်</SelectItem>
+                                                <SelectItem value="ဒုတိယနှစ်">ဒုတိယနှစ်</SelectItem>
+                                                <SelectItem value="တတိယနှစ်">တတိယနှစ်</SelectItem>
+                                                <SelectItem value="စတုတ္ထနှစ်">စတုတ္ထနှစ်</SelectItem>
+                                                <SelectItem value="DCSC">DCSC</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                         <InputError message={errors.year_name} />
                                     </div>
+
+                                    {/* Semester Selection */}
                                     <div>
                                         <Label htmlFor="semester_number">သင်တန်းကာလ ရွေးချယ်ပါ</Label>
                                         <Select
-                                            value={data.semester_number == 0 ? "" : String(data.semester_number)}
+                                            disabled={!data.year_name} // disable until year selected
+                                            value={data.semester_number ? String(data.semester_number) : ""}
                                             onValueChange={(value) => setData("semester_number", Number(value))}
                                         >
                                             <SelectTrigger id="semester_number">
                                                 <SelectValue placeholder="သင်တန်းကာလ ရွေးချယ်ပါ" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="1">Semester I</SelectItem>
-                                                <SelectItem value="2">Semester II</SelectItem>
-                                                <SelectItem value="3">Semester III</SelectItem>
-                                                <SelectItem value="4">Semester IV</SelectItem>
-                                                <SelectItem value="5">Semester V</SelectItem>
-                                                <SelectItem value="6">Semester VI</SelectItem>
-                                                <SelectItem value="7">Semester VII</SelectItem>
-                                                <SelectItem value="8">Semester VIII</SelectItem>
+                                                {availableSemesters.map((sem) => (
+                                                    <SelectItem key={sem.value} value={String(sem.value)}>
+                                                        {sem.label}
+                                                    </SelectItem>
+                                                ))}
                                             </SelectContent>
                                         </Select>
                                         <InputError message={errors.semester_number} />
@@ -278,7 +339,7 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
                     {semesters.length > 0 ? (
                         semesters.map((semester, index) => (
                             <TableRow key={semester.id}>
-                                <TableCell>{semester.id}</TableCell>
+                                <TableCell>{index + 1}</TableCell>
                                 <TableCell>{semester.academic_year.name}</TableCell>
                                 <TableCell>{semester.year_name}</TableCell>
                                 <TableCell>{getSemesterText(semester.semester_number)}</TableCell>
@@ -290,11 +351,11 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
                                         <Tooltip>
                                             <TooltipTrigger asChild>
                                                 <Button
-                                                    variant="ghost"
+                                                    variant="outline"
                                                     onClick={() => openEditDialog(semester)}
                                                     className="text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
                                                 >
-                                                    <SquarePen className="h-4 w-4" />
+                                                    ပြင်ဆင်ရန်
                                                 </Button>
                                             </TooltipTrigger>
                                             <TooltipContent>
@@ -372,43 +433,47 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
                                         <InputError message={editErrors.academic_year_id} />
                                     </div>
 
+                                    {/* Year Selection */}
                                     <div>
-                                        <Label htmlFor="edit_number">Year Name</Label>
-                                        <Input
-                                            id="edit_number"
-                                            name="year_name"
-                                            type="text"
-                                            min={1}
-                                            value={editData.year_name}
-                                            onChange={(e) => setEditData("year_name", e.target.value)}
-                                            placeholder="First Year"
-                                        />
+                                        <Label htmlFor="edit_year_name">သင်တန်းနှစ်အမည် (ဥပမာ- ပထမနှစ်)</Label>
+                                        <Select
+                                            value={String(editData.year_name)}
+                                            onValueChange={(value) => setEditData("year_name", value)}
+                                        >
+                                            <SelectTrigger id="edit_year_name">
+                                                <SelectValue placeholder="သင်တန်းနှစ် ရွေးချယ်ပါ" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="ပထမနှစ်">ပထမနှစ်</SelectItem>
+                                                <SelectItem value="ဒုတိယနှစ်">ဒုတိယနှစ်</SelectItem>
+                                                <SelectItem value="တတိယနှစ်">တတိယနှစ်</SelectItem>
+                                                <SelectItem value="စတုတ္ထနှစ်">စတုတ္ထနှစ်</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                         <InputError message={editErrors.year_name} />
                                     </div>
+
+                                    {/* Semester Selection */}
                                     <div>
-                                        <Label htmlFor="semester_number">သင်တန်းကာလ ရွေးချယ်ပါ</Label>
+                                        <Label htmlFor="edit_semester_number">သင်တန်းကာလ ရွေးချယ်ပါ</Label>
                                         <Select
-                                            value={String(editData.semester_number)}
+                                            disabled={!editData.year_name}
+                                            value={editData.semester_number ? String(editData.semester_number) : ""}
                                             onValueChange={(value) => setEditData("semester_number", Number(value))}
                                         >
-                                            <SelectTrigger id="semester_number">
+                                            <SelectTrigger id="edit_semester_number">
                                                 <SelectValue placeholder="သင်တန်းကာလ ရွေးချယ်ပါ" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="1">Semester I</SelectItem>
-                                                <SelectItem value="2">Semester II</SelectItem>
-                                                <SelectItem value="3">Semester III</SelectItem>
-                                                <SelectItem value="4">Semester IV</SelectItem>
-                                                <SelectItem value="5">Semester V</SelectItem>
-                                                <SelectItem value="6">Semester VI</SelectItem>
-                                                <SelectItem value="7">Semester VII</SelectItem>
-                                                <SelectItem value="8">Semester VIII</SelectItem>
+                                                {availableSemestersEdit.map((sem) => (
+                                                    <SelectItem key={sem.value} value={String(sem.value)}>
+                                                        {sem.label}
+                                                    </SelectItem>
+                                                ))}
                                             </SelectContent>
                                         </Select>
                                         <InputError message={editErrors.semester_number} />
                                     </div>
-
-
                                     <div>
                                         <Label htmlFor="edit_start_date">စတင်မည့်ရက်စွဲ</Label>
                                         <Input

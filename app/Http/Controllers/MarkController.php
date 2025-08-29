@@ -46,7 +46,15 @@ public function store(Request $request)
     'marks' => 'required|array',
     'marks.*.student_course_enrollment_id' => 'required|exists:student_course_enrollments,id',
     'marks.*.mark' => 'required|numeric|min:0|max:100',
+],[
+    'marks.required' => 'အမှတ်များကိုထည့်ရန် လိုအပ်ပါသည်။',
+    'marks.array' => 'အမှတ်များသည် စာရင်းပုံစံဖြင့် ရှိရမည်။',
+    'marks.*.mark.required' => 'အမှတ်ကိုထည့်ရန် လိုအပ်ပါသည်။',
+    'marks.*.mark.numeric' => 'အမှတ်သည် နံပါတ်ပုံစံဖြင့် ရှိရမည်။',
+    'marks.*.mark.min' => 'အမှတ်သည် ၀ ထက် မနည်းနိုင်ပါ။',
+    'marks.*.mark.max' => 'အမှတ်သည် ၁၀၀ ထက် မပိုနိုင်ပါ။',
 ]); 
+ 
 try{
 
 $academicYears=null;
