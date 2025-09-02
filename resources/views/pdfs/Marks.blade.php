@@ -99,7 +99,7 @@
                 <th>ကျောင်းသား</th>
                 <th>ခုံနံပါတ်</th>
                 @foreach ($allCourses as $course)
-                    <th>{{ $course->name }}</th>
+                    <th>{{ $course->code }}</th>
                 @endforeach
             </tr>
         </thead>
@@ -131,7 +131,7 @@
                 </tr>
             @endforelse
 
-             
+
         </tbody>
     </table>
 </body>

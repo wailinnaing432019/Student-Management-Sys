@@ -96,7 +96,7 @@ const data = {
       ],
     },
     {
-      title: "ချိန်ညှိမှုများ", // Settings
+      title: "ဆက်တင်များ", // Settings
       url: "#",
       icon: UserRoundCog,
       items: [
@@ -159,7 +159,7 @@ const data = {
       ],
     },
     {
-      title: "ချိန်ညှိမှုများ", // Settings
+      title: "ဆက်တင်များ", // Settings
       url: "#",
       icon: UserRoundCog,
       items: [

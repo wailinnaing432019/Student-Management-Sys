@@ -240,7 +240,7 @@
                     <thead>
                         <tr>
                             <th colspan="2" class="border px-3 py-2">၁။ပညာဆက်လက်သင်ခွင့်တောင်းခံသူ</th>
-                            <th class="border px-3 py-2">‌ကျောင်းသား/သူ</th>
+                            <th class="border px-3 py-2">ကျောင်းသား/သူ</th>
                             <th class="border px-3 py-2">အဖအမည်</th>
                             <th class="border px-3 py-2">အမိအမည်</th>
                         </tr>

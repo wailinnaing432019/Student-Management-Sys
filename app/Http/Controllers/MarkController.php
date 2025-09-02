@@ -18,102 +18,81 @@ class MarkController extends Controller
 {
 public function store(Request $request)
 {
-    // dd($request->all());
-//     $rules = [
-//         'marks' => 'required|array',
-//         'marks.*.student_course_enrollment_id' => 'required|exists:student_course_enrollments,id',
-//         'marks.*.mark' => 'required|numeric|min:0|max:100',
-//         'marks.*.grade' => 'required|string',
-//         'marks.*.remark' => 'nullable|string',
-//         'marks.*.course_name' => 'required|string', // Needed for error messages only
-//     ];
-
-
-
-//     // Dynamically build custom attribute names
-//     $attributes = [];
-//     foreach ($request->input('marks', []) as $index => $mark) {
-//         if (!empty($mark['course_name'])) {
-//             $attributes["marks.$index.mark"] = "{$mark['course_name']} mark";
-//             $attributes["marks.$index.grade"] = "{$mark['course_name']} grade";
-//             $attributes["marks.$index.remark"] = "{$mark['course_name']} remark";
-//         }
-//     }
-
-//     $request->validate($rules, [], $attributes); // ✅ Use $attributes for pretty field names
-// dd($request);
     $request->validate([
-    'marks' => 'required|array',
-    'marks.*.student_course_enrollment_id' => 'required|exists:student_course_enrollments,id',
-    'marks.*.mark' => 'required|numeric|min:0|max:100',
-],[
-    'marks.required' => 'အမှတ်များကိုထည့်ရန် လိုအပ်ပါသည်။',
-    'marks.array' => 'အမှတ်များသည် စာရင်းပုံစံဖြင့် ရှိရမည်။',
-    'marks.*.mark.required' => 'အမှတ်ကိုထည့်ရန် လိုအပ်ပါသည်။',
-    'marks.*.mark.numeric' => 'အမှတ်သည် နံပါတ်ပုံစံဖြင့် ရှိရမည်။',
-    'marks.*.mark.min' => 'အမှတ်သည် ၀ ထက် မနည်းနိုင်ပါ။',
-    'marks.*.mark.max' => 'အမှတ်သည် ၁၀၀ ထက် မပိုနိုင်ပါ။',
-]); 
- 
-try{
+        'marks' => 'required|array',
+        'marks.*.student_course_enrollment_id' => 'required|exists:student_course_enrollments,id',
+        'marks.*.mark' => 'nullable|numeric|min:0|max:100', // ✅ allow null
+    ], [
+        'marks.required' => 'အမှတ်များကိုထည့်ရန် လိုအပ်ပါသည်။',
+        'marks.array' => 'အမှတ်များသည် စာရင်းပုံစံဖြင့် ရှိရမည်။',
+        'marks.*.mark.numeric' => 'အမှတ်သည် နံပါတ်ပုံစံဖြင့် ရှိရမည်။',
+        'marks.*.mark.min' => 'အမှတ်သည် ၀ ထက် မနည်းနိုင်ပါ။',
+        'marks.*.mark.max' => 'အမှတ်သည် ၁၀၀ ထက် မပိုနိုင်ပါ။',
+    ]); 
 
-$academicYears=null;
-$semesters=null;
-$majors=null;
+    try {
+        $academicYears = null;
+        $semesters = null;
+        $majors = null;
 
-foreach ($request->marks as $markData) {
-    $markValue = $markData['mark'];
+        foreach ($request->marks as $markData) {
+            $markValue = $markData['mark'];
 
-    // Determine grade based on mark value
-    if ($markValue === null) {
-        $grade = null; // no grade if no mark
-    } elseif ($markValue >= 90) {
-        $grade = 'A+';
-    } elseif ($markValue >= 80) {
-        $grade = 'A';
-    } elseif ($markValue >= 75) {
-        $grade = 'A-';
-    } elseif ($markValue >= 70) {
-        $grade = 'B+';
-    } elseif ($markValue >= 65) {
-        $grade = 'B';
-    } elseif ($markValue >= 60) {
-        $grade = 'B-';
-    } elseif ($markValue >= 55) {
-        $grade = 'C+';
-    } elseif ($markValue >= 50) {
-        $grade = 'C';
-    } elseif ($markValue >= 40) {
-        $grade = 'D';
-    } else {
-        $grade = 'F';
-    }
+            // ✅ Skip if mark is null or empty
+            if ($markValue === null || $markValue === '') {
+                continue;
+            }
 
- // to return according to the related page
-     $studentCourseEnrollment = StudentCourseEnrollment::with('studentEnrollment')
-        ->where('id', $markData['student_course_enrollment_id']) 
-        ->first(); 
-        $academicYears=$studentCourseEnrollment->studentEnrollment->academic_year_id;
-        $semesters=$studentCourseEnrollment->studentEnrollment->semester_id;
-        $majors=$studentCourseEnrollment->studentEnrollment->major_id;
+            // Determine grade based on mark value
+            if ($markValue >= 90) {
+                $grade = 'A+';
+            } elseif ($markValue >= 80) {
+                $grade = 'A';
+            } elseif ($markValue >= 75) {
+                $grade = 'A-';
+            } elseif ($markValue >= 70) {
+                $grade = 'B+';
+            } elseif ($markValue >= 65) {
+                $grade = 'B';
+            } elseif ($markValue >= 60) {
+                $grade = 'B-';
+            } elseif ($markValue >= 55) {
+                $grade = 'C+';
+            } elseif ($markValue >= 50) {
+                $grade = 'C';
+            } elseif ($markValue >= 40) {
+                $grade = 'D';
+            } else {
+                $grade = 'F';
+            }
 
-    Mark::updateOrCreate(
-        ['student_course_enrollment_id' => $markData['student_course_enrollment_id']],
-        [
-            'mark' => $markValue,
-            'grade' => $grade,
-            'remark' => $markData['remark'] ?? null,
-        ]
-        );
-    }
+            // Get related info for redirect
+            $studentCourseEnrollment = StudentCourseEnrollment::with('studentEnrollment')
+                ->where('id', $markData['student_course_enrollment_id']) 
+                ->first(); 
 
-    
-        return to_route('studentMarks.show',[
-                    'academic_year_id' => $academicYears,
-                    'semester_id' => $semesters,
-                    'major_id' => $majors,
-                ])->with('success', 'အမှတ်များအား ထည့်သွင်းခြင်းအောင်မြင်ပါသည်။');
-    }catch(\Exception $e){
+            $academicYears = $studentCourseEnrollment->studentEnrollment->academic_year_id;
+            $semesters = $studentCourseEnrollment->studentEnrollment->semester_id;
+            $majors = $studentCourseEnrollment->studentEnrollment->major_id;
+
+            // Create or update mark
+            Mark::updateOrCreate(
+                ['student_course_enrollment_id' => $markData['student_course_enrollment_id']],
+                [
+                    'mark' => $markValue,
+                    'grade' => $grade,
+                    'remark' => $markData['remark'] ?? null,
+                ]
+            );
+        }
+
+        return to_route('studentMarks.show', [
+            'academic_year_id' => $academicYears,
+            'semester_id' => $semesters,
+            'major_id' => $majors,
+        ])->with('success', 'အမှတ်များအား ထည့်သွင်းခြင်းအောင်မြင်ပါသည်။');
+
+    } catch (\Exception $e) {
         dd($e);
     }
 }
@@ -169,8 +148,7 @@ $enrollment = StudentEnrollment::with([
 ])->findOrFail($id);
 
 // Attach is_elective from course_semesters table
-$studentCourses = $enrollment->studentCourses
-    ->sortBy(fn($sc) => $sc->course->name)
+$studentCourses = $enrollment->studentCourses 
     ->map(function ($sc) use ($enrollment) {
         // Find the course_semester row for this course + enrollment's semester
         $courseSemester = \App\Models\CourseSemester::where('course_id', $sc->course_id)
@@ -217,7 +195,8 @@ $studentCourses = $enrollment->studentCourses
     $majors = Major::orderBy('name', 'asc')->get();
 
     // Handle empty academic years
-    $selectedAcademicYearId = $academicYears->first()?->id;
+        $selectedAcademicYearId = $request->input('academic_year_id', $academicYears->first()?->id);
+    // $selectedAcademicYearId = $academicYears->first()?->id;
 
     // Filter semesters based on academic year, or empty collection
     $semesters = $selectedAcademicYearId 

@@ -1,10 +1,15 @@
 import { Head, useForm } from '@inertiajs/react';
-import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
 import InputError from '@/components/input-error';
 import { getSemesterText } from '@/Utils/SemesterText';
 
@@ -39,18 +44,17 @@ export default function AssignMarks({
     student_enrollment_id,
     student,
     semester,
-    student_courses: initialStudentCourses,
+    student_courses,
 }: Props) {
-    const [studentCourses, setStudentCourses] = useState<StudentCourse[]>(initialStudentCourses);
-
-    // Initialize form data from current studentCourses state
     const { data, setData, post, processing, errors } = useForm({
-        marks: studentCourses.map((sc) => ({
+        marks: student_courses.map((sc) => ({
             student_course_enrollment_id: sc.id,
             mark: sc.mark?.mark || '',
             grade: sc.mark?.grade || '',
             remark: sc.mark?.remark || '',
             course_name: sc.course.name,
+            course_code: sc.course.code,
+            is_elective: sc.course.is_elective,
         })),
     });
 
@@ -60,13 +64,9 @@ export default function AssignMarks({
         setData('marks', updated);
     };
 
-    // When removing a course, remove it from local state and form data
     const handleRemoveCourse = (index: number) => {
-        const updatedCourses = studentCourses.filter((_, i) => i !== index);
-        setStudentCourses(updatedCourses);
-
-        const updatedMarks = data.marks.filter((_, i) => i !== index);
-        setData('marks', updatedMarks);
+        const updated = data.marks.filter((_, i) => i !== index);
+        setData('marks', updated);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -75,68 +75,77 @@ export default function AssignMarks({
     };
 
     return (
-        <AppLayout breadcrumbs={[
-            { name: "ဘာသာရပ်များ အတွက်  အမှတ်များ သတ်မှတ်ခြင်း" },
-        ]}>
+        <AppLayout breadcrumbs={[{ name: "ဘာသာရပ်များ အတွက် အမှတ်များ သတ်မှတ်ခြင်း" }]}>
             <Head title="Assign Marks" />
-            <form onSubmit={handleSubmit} className="space-y-6 p-6 max-w-3xl mx-auto">
-                <Card>
-                    <CardHeader>ကျောင်းသားအမည် : {student.name}</CardHeader>
-                    <CardContent>
+
+            <form onSubmit={handleSubmit} className="space-y-6 p-6">
+                <div className="text-center space-y-2">
+                    <h2 className="text-lg font-semibold">ကျောင်းသားအမည် - {student.name}</h2>
+                    <p className="text-sm text-gray-600">
                         သင်တန်းကာလ : {semester.year_name} - {getSemesterText(semester.semester_number)}
-                    </CardContent>
-                </Card>
-
-                <div className="space-y-6">
-                    {studentCourses.map((sc, index) => (
-                        <div key={sc.id} className="flex gap-4 items-end">
-                            {/* Course Mark */}
-                            <div className="flex-1 min-w-[120px]">
-                                <Label className="block text-sm font-medium">
-                                    {sc.course.name} ({sc.course.code}) Mark
-                                </Label>
-                                <Input
-                                    type="number"
-                                    value={data.marks[index]?.mark || ''}
-                                    onChange={(e) => handleChange(index, 'mark', e.target.value)}
-                                    className="w-full"
-                                />
-                                <InputError message={errors[`marks.${index}.mark`]} className="mt-1" />
-                            </div>
-
-                            {/* Grade */}
-                            <div className="w-24 min-w-[80px]">
-                                <Label className="block text-sm font-medium">Grade</Label>
-                                <Input
-                                    value={data.marks[index]?.grade || ''}
-                                    onChange={(e) => handleChange(index, 'grade', e.target.value)}
-                                    className="w-full"
-                                />
-                            </div>
-
-                            {/* Remove button column (fixed width, always exists but empty if not elective) */}
-                            <div className="w-28 flex items-end">
-                                {Number(sc.course.is_elective) === 1 && (
-                                    <button
-                                        type="button"
-                                        onClick={() => handleRemoveCourse(index)}
-                                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                                    >
-                                        မထည့်ပါ။
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    ))}
+                    </p>
                 </div>
 
+                <div className="rounded-xl border shadow-sm overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[40px] text-center">#</TableHead>
+                                <TableHead className="min-w-[200px]">Course</TableHead>
+                                <TableHead className="text-center">Mark</TableHead>
+                                <TableHead className="text-center">Grade</TableHead>
+                                <TableHead className="text-center">Action</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {data.marks.map((sc, index) => (
+                                <TableRow key={sc.student_course_enrollment_id}>
+                                    {/* Order same as EnrolledStudents */}
+                                    <TableCell className="text-center">{index + 1}</TableCell>
+                                    <TableCell>
+                                        {sc.course_name} ({sc.course_code})
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        <Input
+                                            type="number"
+                                            className="w-24 mx-auto"
+                                            value={sc.mark}
+                                            onChange={(e) => handleChange(index, 'mark', e.target.value)}
+                                        />
+                                        <InputError
+                                            message={errors[`marks.${index}.mark`]}
+                                            className="mt-1"
+                                        />
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        <Input
+                                            className="w-20 mx-auto"
+                                            value={sc.grade}
+                                            onChange={(e) => handleChange(index, 'grade', e.target.value)}
+                                        />
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        {Number(sc.is_elective) === 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveCourse(index)}
+                                                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                                            >
+                                                မထည့်ပါ။
+                                            </button>
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
 
-
-                <CardFooter className="justify-end">
+                <div className="flex justify-end">
                     <Button type="submit" disabled={processing}>
                         အမှတ်များ သိမ်းမည်
                     </Button>
-                </CardFooter>
+                </div>
             </form>
         </AppLayout>
     );

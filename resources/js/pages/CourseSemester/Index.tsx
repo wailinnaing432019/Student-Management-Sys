@@ -187,7 +187,6 @@ export default function CourseSemesterIndex({
                                 <TableHead>ဘာသာရပ် အမည်</TableHead>
                                 <TableHead>ဘာသာရပ် ကုဒ်</TableHead>
                                 <TableHead className="text-center w-24">ရွေးချယ်ဘာသာရပ်</TableHead>
-                                <TableHead className="text-center w-32">လုပ်ဆောင်ချက်များ</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
