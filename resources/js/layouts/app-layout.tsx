@@ -91,7 +91,7 @@ export default function AppLayout({
                         )}
                     </div>
                 </header>
-                <AutoLogout timeout={5 * 60 * 1000} /> {/* 3 min auto logout */}
+                <AutoLogout timeout={60 * 60 * 1000} /> {/* 3 min auto logout */}
                 <Toaster position="top-right" richColors />
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
             </SidebarInset>

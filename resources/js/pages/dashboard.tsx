@@ -9,7 +9,7 @@ export default function Dashboard() {
         <AppLayout title="Dashboard" breadcrumbs={breadcrumbs}>
             <div className="grid text-center auto-rows-min gap-4">
                 <div className="overflow-hidden whitespace-nowrap">
-                    <h2 className="text-3xl inline-block marquee p-3">
+                    <h2 className="text-3xl text-blue-500 inline-block marquee p-3">
                         ကွန်ပျူတာ တက္ကသိုလ်(မိတ္ထီလာ) မှ ကြိုဆိုပါ၏
                     </h2>
                 </div>

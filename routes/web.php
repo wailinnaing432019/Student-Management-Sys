@@ -45,7 +45,11 @@ Route::middleware(['auth', 'verified','role:admin,staff'])->group(function () {
 
     // Route::get('/student-course',[StudentController::class,'stuCourses'])->name('stuCourses');
     // Route::get('/enroll-students',[StudentController::class,'enrollStudents'])->name('enrollStudents');
-    Route::resource('/enroll-students',EnrollStudentController::class);
+    Route::post('/enroll-students/{enroll_student}', [EnrollStudentController::class, 'update'])
+    ->name('enroll-students.update');
+
+Route::resource('/enroll-students', EnrollStudentController::class)
+    ->except(['update']);
     Route::get('/enroll-students/{id}/reregister',[EnrollStudentController::class,'reregister'])->name('enroll-students.reregister');
     Route::post('/enroll-students/{student}/reregister',[EnrollStudentController::class,'updateRegister'])->name('enroll-students.reregister');
     // Route::get('/enroll-students/{id}/pdf', [EnrollStudentController::class, 'downloadPdf'])->name('student-enrollments.download-pdf');
@@ -61,6 +65,8 @@ Route::get('/enroll-students/{id}/print', [EnrollStudentController::class, 'prin
 
 Route::middleware(['auth', 'verified','role:admin'])->group(function () {
 Route::get('/assign-mark/{id}',[MarkController::class,'assignMark'])->name('assign-marks');
+Route::get('/edit-mark/{id}',[MarkController::class,'editMark'])->name('edit-mark');
+Route::put('/marks/{id}', [MarkController::class, 'update'])->name('marks.update');
     Route::get('/marks/show',[MarkController::class,'showMarks'])->name('studentMarks.show');
     Route::get('/marksBySemester',[MarkController::class,'viewMarksByPdf'])->name('marksBySemester.view');
     Route::resource('/marks',MarkController::class);

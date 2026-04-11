@@ -142,7 +142,7 @@ export default function CourseSemesterIndex({
                                 <SelectContent>
                                     {semesters.length > 0 ? semesters.map((sem) => (
                                         <SelectItem key={sem.id} value={String(sem.id)}>
-                                            {getSemesterText(sem.semester_number)}
+                                            {sem.year_name} - {getSemesterText(sem.semester_number)}
                                         </SelectItem>
                                     )) : (
                                         <div className="px-4 py-2 text-red-500 text-sm">သင်တန်းကာလများ မရှိသေးပါ။</div>
@@ -172,7 +172,7 @@ export default function CourseSemesterIndex({
                     </div>
 
                     <TextLink href={route("course-semesters.create")}>
-                        <Button className="bg-green-500 hover:bg-green-600 text-white">
+                        <Button className="  text-white">
                             + သင်တန်းကာလများ အတွက် ဘာသာရပ်များ သတ်မှတ်မည်
                         </Button>
                     </TextLink>

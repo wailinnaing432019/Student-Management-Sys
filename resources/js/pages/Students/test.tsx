@@ -37,10 +37,10 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
 
     return (
 
-        <AppLayout breadcrumbs={[{ name: "Enrolled Students", href: "/enroll-students" }, { name: student.name_eng }]}>
+        <AppLayout breadcrumbs={[{ name: "ကျောင်းအပ်ထားပြီးသော ကျောင်းသားများ", href: "/enroll-students" }, { name: student.name_eng }]}>
             <Head title="Students" />
             <div className="print-area">
-                <div className="flex no-print"  >
+                {/* <div className="flex no-print"  >
                     {studentEnrollment.pdf_path &&
                         <a
                             href={`/storage/${studentEnrollment.pdf_path}`} target="_blank"
@@ -50,7 +50,7 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
                             🖨️ Preview & Print
                         </a>
                     }
-                </div>
+                </div> */}
                 <div className="space-y-6 w-full mx-auto px-4 py-6 print-area">
                     <div className="p-6 space-y-6 text-[14px] leading-relaxed">
 
@@ -305,7 +305,7 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
 
                                     <tr >
 
-                                        <td colSpan={2} rowSpan={4} className="border px-3 py-2">
+                                        <td colSpan={2} rowSpan={5} className="border px-3 py-2">
                                             ၃။ကျောင်းနေရန် အထောက်ပံ့ပြုမည့် ပုဂ္ဂိုလ်
                                         </td>
                                         <td className="border px-3 py-2">(က) အမည်</td>
@@ -335,9 +335,18 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
                                     <tr >
 
 
-                                        <td className="border px-3 py-2">(ဃ) ဆက်သွယ်ရန် လိပ်စာ ဖုန်းနံပါတ်</td>
+                                        <td className="border px-3 py-2">(ဃ) ဆက်သွယ်ရန်  ဖုန်းနံပါတ်</td>
                                         <td colSpan={2} className="border px-3 py-2">
                                             {donor.phone}
+                                        </td>
+
+                                    </tr>
+                                    <tr >
+
+
+                                        <td className="border px-3 py-2">(င) ဆက်သွယ်ရန် လိပ်စာ  </td>
+                                        <td colSpan={2} className="border px-3 py-2">
+                                            {donor.address}
                                         </td>
 
                                     </tr>
@@ -358,7 +367,15 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
 
 
                         </section>
-                        {/* {registrationAgreement !== null &&
+
+                    </div>
+
+                </div>
+            </div>
+        </AppLayout>
+    )
+}
+{/* {registrationAgreement !== null &&
                             <section >
                                 <div className='w-full text-justify justify-evenly leading-loose'>
                                     <div className="mt-4">
@@ -440,8 +457,7 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
                                 </div>
                             </section>
                         } */}
-                    </div>
-                    {userRole !== "staff" && (<form onSubmit={handleSubmit} className="space-y-4 mt-6 max-w-sm no-print">
+{/* {userRole !== "staff" && (<form onSubmit={handleSubmit} className="space-y-4 mt-6 max-w-sm no-print">
                         <div>
                             <Label htmlFor="status">Enrollment Status</Label>
                             <Select
@@ -463,9 +479,4 @@ export default function StudentShowPage({ studentEnrollment }: { studentEnrollme
                         <Button type="submit" disabled={processing}>
                             Update Status
                         </Button>
-                    </form>)}
-                </div>
-            </div>
-        </AppLayout>
-    )
-}
+                    </form>)} */}

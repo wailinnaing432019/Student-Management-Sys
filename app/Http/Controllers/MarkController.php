@@ -96,6 +96,69 @@ public function store(Request $request)
         dd($e);
     }
 }
+public function editMark(string $id)
+{
+    $student = StudentEnrollment::with([
+        'studentCourses.course',  // load course info
+        'studentCourses.marks',
+        'student',
+        'studentSemesterProfile',
+        'semester',
+        'academicYear'   // load related marks
+    ])->findOrFail($id);
+
+    // Keep only student courses that already have a mark
+    $student->studentCourses = $student->studentCourses
+        ->filter(fn($sc) => $sc->marks !== null)
+        ->values();
+// return $student;
+    return Inertia::render('Marks/EditMark', [
+        'enrollment' => $student
+    ]);
+}
+public function update(Request $request, $id)
+{
+    $data = $request->validate([
+        'marks' => 'required|array',
+        'marks.*.student_course_enrollment_id' => 'required|integer',
+        'marks.*.mark' => 'required|numeric|max:100|min:0',
+        'marks.*.grade' => 'nullable|string',
+        'marks.*.remark' => 'nullable|string',
+    ], [
+    'marks.required' => 'အမှတ်များအချက်အလက် လိုအပ်ပါသည်။',
+    'marks.*.student_course_enrollment_id.required' => 'ဘာသာရပ်ကို ရွေးချယ်ရန် လိုအပ်သည်။',
+    'marks.*.mark.required' => 'အမှတ်ကို ထည့်သွင်းရန် လိုအပ်ပါသည်။',
+    'marks.*.mark.numeric' => 'အမှတ်သည် နံပါတ်ဖြစ်ရမည်။',
+    'marks.*.mark.min' => 'အမှတ်သည် နည်းဆုံး 0 ဖြစ်ရမည်။',
+    'marks.*.mark.max' => 'အမှတ်သည် အများဆုံး 100 ဖြစ်ရမည်။',
+]);
+
+    foreach ($data['marks'] as $markData) {
+        Mark::updateOrCreate(
+            ['student_course_enrollment_id' => $markData['student_course_enrollment_id']],
+            [
+                'mark' => $markData['mark'],
+                'grade' => $markData['grade'],
+                'remark' => $markData['remark']
+            ]
+        );
+    }
+
+    // return redirect()->back()->with('success', 'Marks updated successfully.');
+    // Get related info for redirect
+            $studentCourseEnrollment = StudentCourseEnrollment::with('studentEnrollment')
+                ->where('id', $markData['student_course_enrollment_id']) 
+                ->first(); 
+
+            $academicYears = $studentCourseEnrollment->studentEnrollment->academic_year_id;
+            $semesters = $studentCourseEnrollment->studentEnrollment->semester_id;
+            $majors = $studentCourseEnrollment->studentEnrollment->major_id;
+    return to_route('studentMarks.show', [
+            'academic_year_id' => $academicYears,
+            'semester_id' => $semesters,
+            'major_id' => $majors,
+        ])->with('success', 'အမှတ်များအား ပြင်ဆင်ခြင်းအောင်မြင်ပါသည်။');
+}
 
 public function assignMark(string $id){
 //    $enrollment = StudentEnrollment::with([
@@ -139,10 +202,11 @@ public function assignMark(string $id){
 //                 ];
 //             })->values(),
 //     ]);
-
+ 
 $enrollment = StudentEnrollment::with([
     'student',
     'semester',
+    'academicYear',
     'studentCourses.course',
     'studentCourses.mark',
 ])->findOrFail($id);
@@ -183,6 +247,7 @@ $studentCourses = $enrollment->studentCourses
     'semester'=>[
         'semester_number' => $enrollment->semester->semester_number,
         'year_name' => $enrollment->semester->year_name,
+        'academicYear'=>$enrollment->academicYear->name,
     ],
     'student_courses' => $studentCourses,
 ]);

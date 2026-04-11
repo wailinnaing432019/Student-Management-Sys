@@ -37,7 +37,7 @@ export default function AcademicYearCreateDialog() {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button className="bg-green-600 hover:bg-green-700">
+                <Button className="">
                     ပညာသင်နှစ်အသစ်ထည့်ရန်
                 </Button>
             </DialogTrigger>

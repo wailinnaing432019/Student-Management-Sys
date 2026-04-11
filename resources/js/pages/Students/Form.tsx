@@ -1,5 +1,5 @@
-// resources/js/Pages/students/Create.tsx
-import { Head, useForm, usePage } from '@inertiajs/react';
+
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Input } from '@/components/ui/input';
@@ -23,10 +23,13 @@ import TextLink from '@/components/text-link';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import NRCInputFields from '@/components/NRCInputFields';
-import { Table, TableCell, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { getSemesterText } from '@/Utils/SemesterText';
 import ImageUpload from './ImageUpload';
 
+type Props = {
+    enrollment?: any
+}
 type Semester = {
     id: number;
     name: string;
@@ -42,115 +45,110 @@ type CreateProps = {
     courses: Course[];
 };
 
-export default function Create() {
+export default function StudentForm({ enrollment }: Props) {
+    const { academic_years, majors } = usePage().props;
+
+    // Use camelCase keys coming from Laravel
+    const student = enrollment?.student;
+    const profile = enrollment?.student_semester_profile; // corrected 
+    // const profile = studentEnrollment.student_semester_profile
+    const donor = enrollment?.student_semester_profile.donor;
+    const { data, setData, put, post, processing, errors } = useForm({
+        // Student info 
+        name_myan: student?.name_myan ?? '',
+        name_eng: student?.name_eng ?? '',
+        academic_year_id: enrollment?.academic_year_id ?? '',
+        semester_id: enrollment?.semester_id ?? '',
+        major_id: enrollment?.major_id ?? '',
+        roll_no: profile?.roll_no ?? '',
+        uid: student?.uid ?? '',
+        entried_year: student?.entried_year ?? '',
 
 
+        nrc_state: student?.nrc_state ?? '',
+        nrc_township: student?.nrc_township ?? '',
+        nrc_type: student?.nrc_type ?? '',
+        nrc_number: student?.nrc_number ?? '',
 
-    const { academic_years, majors } = usePage().props
+        dob: student?.dob ?? '',
+        // gender: student?.gender ?? '',
+        ethnicity: student?.ethnicity ?? '',
+        religion: student?.religion ?? '',
+        hometown: student?.hometown ?? '',
+        township_state_region: student?.township_state_region ?? '',
+        local_foreign: student?.local_foreign ?? '',
 
+        matriculation_passed_year: student?.matriculation_passed_year ?? '',
+        matriculation_passed_roll_no: student?.matriculation_passed_roll_no ?? '',
+        examination_center: student?.examination_center ?? '',
 
-    const { data, setData, post, processing, errors, reset } = useForm({
-        // Student info
-        name_myan: '',
-        name_eng: '',
-        academic_year_id: '',
-        semester_id: '',
-        major_id: '',
-        roll_no: '',
-        uid: '',
-        entried_year: '',
-        nrc_state: '',
-        nrc_township: '',
-        nrc_type: '',
-        nrc_number: '',
-        dob: '',
-        gender: '',
-        ethnicity: '',
-        religion: '',
-        hometown: '',
-        township_state_region: '',
-        local_foreign: '',
-        matriculation_passed_year: '',
-        matriculation_passed_roll_no: '',
-        examination_center: '',
-        permanent_address: '',
-        temporary_address: '',
-        phone: '',
-        email: '',
+        permanent_address: profile?.permanent_address ?? '',
+        phone: profile?.phone ?? '',
+        email: profile?.email ?? '',
+
+        // mother
+        mother_name_myan: student?.mother?.name_myan ?? '',
+        mother_name_eng: student?.mother?.name_eng ?? '',
+        mother_ethnicity: student?.mother?.ethnicity ?? '',
+        mother_religion: student?.mother?.religion ?? '',
+        mother_hometown: student?.mother?.hometown ?? '',
+        mother_township_state_region: student?.mother?.township_state_region ?? '',
+        mother_nrc_state: student?.mother?.nrc_state ?? '',
+        mother_nrc_township: student?.mother?.nrc_township ?? '',
+        mother_nrc_type: student?.mother?.nrc_type ?? '',
+        mother_nrc_number: student?.mother?.nrc_number ?? '',
+        mother_job: student?.mother?.job ?? '',
+        mother_local_foreign: student?.mother?.local_foreign ?? '',
+
+        // father
+        father_name_myan: student?.father?.name_myan ?? '',
+        father_name_eng: student?.father?.name_eng ?? '',
+        father_ethnicity: student?.father?.ethnicity ?? '',
+        father_religion: student?.father?.religion ?? '',
+        father_hometown: student?.father?.hometown ?? '',
+        father_township_state_region: student?.father?.township_state_region ?? '',
+        father_nrc_state: student?.father?.nrc_state ?? '',
+        father_nrc_township: student?.father?.nrc_township ?? '',
+        father_nrc_type: student?.father?.nrc_type ?? '',
+        father_nrc_number: student?.father?.nrc_number ?? '',
+        father_job: student?.father?.job ?? '',
+        father_local_foreign: student?.father?.local_foreign ?? '',
+
+        // donor
+        donor_name: donor?.name ?? '',
+        donor_relationship: donor?.relationship ?? '',
+        donor_job: donor?.job ?? '',
+        donor_phone: donor?.phone ?? '',
+        donor_address: donor?.address ?? '',
+        donor_status: donor?.status ?? '',
+
         image: null as File | null,
+        // exams
+        exam_records: student?.exams_taken?.length
+            ? student.exams_taken.map((e: any) => ({
+                exam_name: e.exam_name,
+                exam_major: e.major,
+                exam_roll_no: e.roll_no,
+                exam_year: e.year,
+                exam_pass_fail: e.pass_fail,
+            }))
+            : [
+                {
+                    exam_name: '',
+                    exam_major: '',
+                    exam_roll_no: '',
+                    exam_year: '',
+                    exam_pass_fail: '',
+                },
+            ],
 
-        // mother table info
-        mother_name_myan: '',
-        mother_name_eng: '',
-        mother_ethnicity: '',
-        mother_religion: '',
-        mother_hometown: '',
-        mother_township_state_region: '',
-        mother_nrc_state: '',
-        mother_nrc_township: '',
-        mother_nrc_type: '',
-        mother_nrc_number: '',
-        mother_job: '',
-        mother_job_position_address: '',
-        mother_local_foreign: '',
-
-        // donor table info
-        donor_name: '',
-        donor_relationship: '',
-        donor_job: '',
-        donor_phone: '',
-        donor_status: '',
-        donor_address: '',
-
-        // Exams_taken table info
-
-
-        exam_records: [
-            {
-                exam_name: '',
-                exam_major: '',
-                exam_roll_no: '',
-                exam_year: '',
-                exam_pass_fail: '',
-            }
-        ],
-        // mother table info
-
-        father_name_myan: '',
-        father_name_eng: '',
-        father_ethnicity: '',
-        father_religion: '',
-        father_hometown: '',
-        father_township_state_region: '',
-        father_nrc_state: '',
-        father_nrc_township: '',
-        father_nrc_type: '',
-        father_nrc_number: '',
-        father_job: '',
-        father_job_position_address: '',
-        father_local_foreign: '',
-
-
-        name: '',
-        examed_year: '',
-        examed_month: '',
-        examed_name: '',
-        examed_roll_no: '',
-        examed_status: '',
-        class: '',
-        fee: '',
-        guardian: '',
-        g_nrc_state: '',
-        g_nrc_township: '',
-        g_nrc_type: '',
-        g_nrc_number: '',
         agreed: true,
-
     });
+
 
     const breadcrumbs = [
         { name: "Students", href: "/students" },
-        { name: "Create" }
+        { name: "Edit" }
     ];
 
     const [selectedRegion, setSelectedRegion] = useState('');
@@ -158,9 +156,15 @@ export default function Create() {
     const [nrcNumber, setNrcNumber] = useState('');
 
 
+
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('enroll-students.store'));
+
+        post(route('enroll-students.update', enrollment.id), {
+            _method: 'put',
+            forceFormData: true,
+        });
+
     };
 
     const addExamRow = () => {
@@ -205,16 +209,17 @@ export default function Create() {
     return (
         <AppLayout>
 
-            {/* {
-                Object.keys(errors).length > 0 && (
-                    <div className="text-red-500">
-                        {Object.values(errors).map((error, index) => (
-                            <p key={index}>{error}</p>
+
+            <div className="w-full mx-auto  p-2 m-3  rounded shadow" >
+                {/* {Object.keys(errors).length > 0 && (
+                    <div className="bg-red-100 p-4 rounded">
+                        {Object.entries(errors).map(([k, v]) => (
+                            <p key={k} className="text-red-600">
+                                {k}: {v}
+                            </p>
                         ))}
                     </div>
-                )
-            } */}
-            <div className="w-full mx-auto  p-2 m-3  rounded shadow" >
+                )} */}
                 <form onSubmit={submit} className="flex flex-col gap-2">
                     {/* Student Info */}
                     <section >
@@ -258,13 +263,19 @@ export default function Create() {
                     {/* Guardian Info */}
                     <section>
                         <div className="flex mx-auto p-4  rounded shadow ">
-
                             <div className='w-2/5'>
-                                <ImageUpload
-                                    from="enroll"      // your profile object (optional)
-                                    data={data}            // your state object that holds the image
-                                    setData={setData} />
+
+                                <div className="grid gap-2">
+
+
+
+                                    <ImageUpload from="edit" profile={profile}      // your profile object (optional)
+                                        data={data}            // your state object that holds the image
+                                        setData={setData} />
+                                    {/* <InputError message={errors.image} /> */}
+                                </div>
                             </div>
+
                             <div className='w-3/5'>
                                 <div>
 
@@ -422,7 +433,7 @@ export default function Create() {
                                         onChange={(e) => setData('father_ethnicity', e.target.value)}
                                         placeholder="လူမျိုး "
                                     />
-                                    <InputError message={errors.ethnicity} />
+                                    <InputError message={errors.father_ethnicity} />
                                 </div>
                                 <div>
                                     <Label>အဖလူမျိုး</Label>
@@ -721,70 +732,85 @@ export default function Create() {
                                 <Button type="button" onClick={addExamRow} variant="outline">+ ထည့်မည်</Button>
                             </div>
                             <Table>
+                                <TableBody>
+                                    {data.exam_records.map((exam, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell>
+                                                <Input
+                                                    value={exam.exam_name}
+                                                    onChange={(e) =>
+                                                        handleExamChange(index, 'exam_name', e.target.value)
+                                                    }
+                                                    placeholder="စာမေးပွဲအမည်"
+                                                />
+                                                <InputError message={errors?.[`exam_records.${index}.exam_name`]} />
+                                            </TableCell>
 
-                                {data.exam_records.map((exam, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>
-                                            <Input
-                                                value={exam.exam_name}
+                                            <TableCell>
+                                                <Input
+                                                    value={exam.exam_major}
+                                                    onChange={(e) =>
+                                                        handleExamChange(index, 'exam_major', e.target.value)
+                                                    }
+                                                    placeholder="အဓိကဘာသာ"
+                                                />
+                                                <InputError message={errors?.[`exam_records.${index}.exam_major`]} />
+                                            </TableCell>
 
-                                                onChange={(e) => handleExamChange(index, 'exam_name', e.target.value)}
-                                                placeholder="စာမေးပွဲအမည်"
-                                            />
-                                            <InputError message={errors?.[`exam_records.${index}.exam_name`]} />
-                                        </TableCell>
-                                        {/* other cells same pattern */}
-                                        <TableCell>
-                                            <Input
-                                                value={exam.exam_major}
-                                                onChange={(e) => handleExamChange(index, 'exam_major', e.target.value)}
-                                                placeholder="အဓိကဘာသာ"
-                                            />
-                                            <InputError message={errors?.[`exam_records.${index}.exam_major`]} />
-                                        </TableCell>
+                                            <TableCell>
+                                                <Input
+                                                    value={exam.exam_roll_no}
+                                                    onChange={(e) =>
+                                                        handleExamChange(index, 'exam_roll_no', e.target.value)
+                                                    }
+                                                    placeholder="ခုံအမှတ်"
+                                                />
+                                                <InputError message={errors?.[`exam_records.${index}.exam_roll_no`]} />
+                                            </TableCell>
 
-                                        <TableCell>
-                                            <Input
-                                                value={exam.exam_roll_no}
-                                                onChange={(e) => handleExamChange(index, 'exam_roll_no', e.target.value)}
-                                                placeholder="ခုံအမှတ်"
-                                            />
-                                            <InputError message={errors?.[`exam_records.${index}.exam_roll_no`]} />
-                                        </TableCell>
+                                            <TableCell>
+                                                <Input
+                                                    value={exam.exam_year}
+                                                    onChange={(e) =>
+                                                        handleExamChange(index, 'exam_year', e.target.value)
+                                                    }
+                                                    placeholder="ခုနှစ်"
+                                                />
+                                                <InputError message={errors?.[`exam_records.${index}.exam_year`]} />
+                                            </TableCell>
 
-                                        <TableCell>
-                                            <Input
-                                                value={exam.exam_year}
-                                                onChange={(e) => handleExamChange(index, 'exam_year', e.target.value)}
-                                                placeholder="ခုနှစ်"
-                                            />
-                                            <InputError message={errors?.[`exam_records.${index}.exam_year`]} />
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-end gap-2">
-                                                <Select
-                                                    value={exam.exam_pass_fail}
-                                                    onValueChange={(value) => handleExamChange(index, 'exam_pass_fail', value)}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="အောင်/ရှုံး" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="pass">အောင်</SelectItem>
-                                                        <SelectItem value="fail">ရှုံး</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <Button type="button" variant="destructive" onClick={() => removeExamRow(index)}>
-                                                    -
-                                                </Button>
-                                            </div>
-                                            <InputError message={errors?.[`exam_records.${index}.exam_pass_fail`]} />
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                            <TableCell>
+                                                <div className="flex items-end gap-2">
+                                                    <Select
+                                                        value={exam.exam_pass_fail}
+                                                        onValueChange={(value) =>
+                                                            handleExamChange(index, 'exam_pass_fail', value)
+                                                        }
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="အောင်/ရှုံး" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="pass">အောင်</SelectItem>
+                                                            <SelectItem value="fail">ရှုံး</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
 
-                                <TableRow ></TableRow>
+                                                    <Button
+                                                        type="button"
+                                                        variant="destructive"
+                                                        onClick={() => removeExamRow(index)}
+                                                    >
+                                                        -
+                                                    </Button>
+                                                </div>
+                                                <InputError message={errors?.[`exam_records.${index}.exam_pass_fail`]} />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
                             </Table>
+
                         </Card>
                         {/* Section 3 - Exam Records */}
 
@@ -851,207 +877,13 @@ export default function Create() {
 
                         <div >
                             <Button type="submit" disabled={processing} className="mt-6 w-full ">
-                                {processing ? 'စာရင်းသွင်းနေပါသည်...' : 'စာရင်းသွင်းမည်'}
+                                {processing
+                                    ? 'လုပ်ဆောင်နေပါသည်...'
+                                    : 'ပြင်ဆင်သိမ်းဆည်းမည်'}
                             </Button></div>
                     </div>
-                </form>
+                </form >
             </div >
         </AppLayout >
     );
 }
-{/* Creating Register Form */ }
-
-{/* Regitration Agreement */ }
-{/* <section >
-                        <Card className='w-8/9 mt-6 mx-auto'>
-                            <CardHeader>
-                                <p>သို့</p>
-                                <p>ကွန်ပျူတာတက္ကသိုလ်(မိတ္ထီလာ)</p>
-                                <p>အကြောင်းအရာ။ ။ကွန်ပျူတာတက္ကသိုလ်(မိတ္ထီလာ)တွင်  <input
-                                    id="class"
-                                    value={data.class}
-                                    onChange={(e) => setData('class', e.target.value)}
-                                    placeholder=" "
-                                    className={`${errors.class ? "border-red-500" : "border-gray-400"}  w-auto inline rounded-none border-0 border-b-2 focus:border-blue-500 focus:ring-0 h-9 px-1 text-sm`}
-                                /> သင်တန်းတက်ရောက်ခွင့်လျှောက်ထားခြင်း။</p>
-                            </CardHeader>
-                            <CardContent className='space-y-4'>
-                                <p> ၁။ <span className='ml-3'></span> (က)
-                                    <Select value={data.gender}
-                                        onValueChange={(value) => setData('gender', value)} >
-                                        <SelectTrigger
-                                            className={`${errors.gender ? "border-red-500" : "border-gray-400"} w-auto inline rounded-none border-0 border-b-2 focus:border-blue-500 focus:ring-0 h-9 px-1 text-sm`}
-                                        >
-                                            <SelectValue placeholder="ကျွန်တော်/ကျွန်မ" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="male">ကျွန်တော်</SelectItem>
-                                            <SelectItem value="female">ကျွန်မ</SelectItem>
-                                        </SelectContent>
-                                    </Select> <input
-                                        id="name"
-                                        value={data.name}
-                                        onChange={(e) => setData('name', e.target.value)}
-                                        placeholder=" "
-                                        className={`${errors.name ? "border-red-500" : "border-gray-400"}text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                    /> သည် ကွန်ပျူတာတက္ကသိုလ်(မိတ္ထီလာ) သို့ ၀င်ခွင့်အမှတ်စဥ် (<input
-                                        id="uid"
-                                        value={data.uid}
-                                        onChange={(e) => setData('uid', e.target.value)}
-                                        placeholder=" "
-                                        className={`${errors.uid ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                    />) ဖြင့် ပထမနှစ်သက်တန်းသို့ ၀င်ရောက်ခွင့် ရရှိသူဖြစ်ပါသည်။
-                                </p>
-
-                                <div className='ml-6 space-y-4'><p className='space-y-5'> (ခ) <Select value={data.gender}
-                                    onValueChange={(value) => setData('gender', value)} >
-                                    <SelectTrigger
-                                        className={`${errors.gender ? "border-red-500" : "border-gray-400"}  w-auto inline rounded-none border-0 border-b-2 border-gray-400 focus:border-blue-500 focus:ring-0 h-9 px-1 text-sm`}
-                                    >
-                                        <SelectValue placeholder="ကျွန်တော်/ကျွန်မ" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="male">ကျွန်တော်</SelectItem>
-                                        <SelectItem value="female">ကျွန်မ</SelectItem>
-                                    </SelectContent>
-                                </Select><input
-                                        id="name"
-                                        value={data.name}
-                                        onChange={(e) => setData('name', e.target.value)}
-                                        placeholder=" "
-                                        className={`${errors.name ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                    /> သည်  <input
-                                        id="examed_year"
-                                        value={data.examed_year}
-                                        onChange={(e) => setData('examed_year', e.target.value)}
-                                        placeholder=" "
-                                        className={`${errors.examed_year ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                    /> ခုနှစ် ၊  <input
-                                        id="examed_month"
-                                        value={data.examed_month}
-                                        onChange={(e) => setData('examed_month', e.target.value)}
-                                        placeholder=" "
-                                        className={`${errors.examed_month ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                    />. လ အတွင်းကျင်းပခဲ့သော ..<input
-                                        id="examed_name"
-                                        value={data.examed_name}
-                                        onChange={(e) => setData('examed_name', e.target.value)}
-                                        placeholder=" "
-                                        className={`${errors.examed_name ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                    /> သင်တန်းစာမေးပွဲကို ခုံအမှတ် <input
-                                        id="examed_roll_no"
-                                        value={data.examed_roll_no}
-                                        onChange={(e) => setData('examed_roll_no', e.target.value)}
-                                        placeholder=" "
-                                        className={`${errors.examed_roll_no ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                    />  ဖြင့် ဖြေဆို  <Select value={data.examed_status}
-                                        onValueChange={(value) => setData('examed_status', value)} >
-                                        <SelectTrigger
-                                            className={`${errors.examed_status ? "border-red-500" : "border-gray-400"} w-auto inline rounded-none border-0 border-b-2 border-gray-400 focus:border-blue-500 focus:ring-0 h-9 px-1 text-sm`}
-                                        >
-                                            <SelectValue placeholder="အောင်မြင်/ကျရှုံး" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="pass">အောင်မြင်</SelectItem>
-                                            <SelectItem value="fail">ကျရှုံး</SelectItem>
-                                        </SelectContent>
-                                    </Select> ခဲ့ပါ၍ ကွန်ပျူတာတက္ကသိုလ်(မိတ္ထီလာ) တွင် ဖွင့်လှစ်မည့်  <input
-                                        id="class"
-                                        value={data.class}
-                                        onChange={(e) => setData('class', e.target.value)}
-                                        placeholder=" "
-                                        className={`${errors.class ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                    /> သင်တန်းသို့ တက်ရောက်ခွင့်ပြုပါရန် လျှောက်ထားအပ်ပါသည်။
-                                    ကွန်ပျူတာတက္ကသိုလ်(မိတ္ထီလာ)တွင် ပညာသင်ကြားနေစဥ် ကာလအတွင်း ဤတက္ကသိုလ်မှ သတ်မှတ်ထားသည့် အောက်ဖော်ပြပါ အချက်အလက်များကို သိရှိပြီးကြောင်းနှင့် လိုက်နာကျင့်သုံးမည်ဖြစ်ကြောင်း ၀န်ခံကတိ လက်မှတ်ရေးထိုးပါသည်။</p>
-
-                                    <p>(၁) B.C.Sc/B.C.Tech သင်တန်းမှာ(၄) နှစ်သင်တန်းဖြစ်ပါသည်။</p>
-                                    <p>(၂) သင်တန်းကြေးမှာ တစ်လလျှင် <input
-                                        type='text'
-                                        id="fee"
-                                        value={data.fee}
-                                        onChange={(e) => setData('fee', e.target.value)}
-                                        placeholder=" "
-                                        className={`${errors.fee ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                    /> ကျပ်တိတိ (  ) နှုန်းဖြစ်ပါသည်။</p>
-                                    <p>(၃) မိမိအစီအစဉ်ဖြင့် နေထိုင်စားသောက်ရမည်ဖြစ်ပါသည်။</p>
-                                    <p>(၄) ကျွန်တော်/ကျွန်မ သည် မည်သည့်နိုင်ငံရေးပါတီတွင်မျှ ပါတီ၀င်မဟုတ်ပါ။</p>
-                                    <p>(၅) Credit Unit / Credit Hour ပြည့်မှီခြင်းမရှိပါက စာမေးပွဲဖြေဆိုခွင့် မပြုကြောင်းကို သိရှိပါ သည်။</p>
-                                    <p>(၆) နေ့စဉ်ကျောင်းတက်ရောက်ခြင်းဆိုင်ရာကိစ္စ၊ ကျောင်းပြောင်း‌‌ရွှေ့ခြင်းဆိုင်ရာ ကိစ္စ၊ ဆေးခွင့်လျှောက်ထားခြင်း ဆိုင်ရာကိစ္စ၊ စာမေးပွဲဖြေဆိုခြင်းဆိုင်ရာ ကိစ္စများ၏ စည်းကမ်းသတ်မှတ်ချက်များအား ပူးတွဲပါ ကျောင်းစည်းကမ်းဆိုင်ရာ အချက်အလက်များ အတိုင်း သိရှိလိုက်နာသွားရန် ဖြစ်ပါသည်။</p>
-                                    <p>(၇) ကျောင်းမှထုတ်ပြန်ထားသော ပူးတွဲဖော်ပြပါစည်းကမ်းချက်များကို ဖတ်ရှုလက်မှတ်ထိုးပြီး လိုက်နာပါမည်ဟု ကတိပြုပါသည်။</p>
-                                </div>
-                            </CardContent>
-                            <CardFooter className='justify-between'>
-                                <div className='space-y-4'>
-                                    <div className='p-3'>မိဘ/အုပ်ထိန်းသူ၏</div>
-                                    <div>
-
-                                        <label htmlFor="">အမည်</label><input
-                                            id="guardian"
-                                            value={data.guardian}
-                                            onChange={(e) => setData('guardian', e.target.value)}
-                                            placeholder=" "
-                                            className={`${errors.guardian ? "border-red-500" : "border-gray-400"} border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                        />
-
-                                    </div>
-                                    <div >
-
-
-                                        <div className="flex space-x-1 max-w-md">
-                                            <label htmlFor=""  >မှတ်ပုံတင်အမှတ်</label>
-                                            <NRCInputFields
-                                                nrcData={nrcData}
-                                                prefix="g_"
-                                                state={data.g_nrc_state}
-                                                township={data.g_nrc_township}
-                                                type={data.g_nrc_type}
-                                                number={data.g_nrc_number}
-                                                errors={errors}
-                                                onChange={(key, value) => setData(key, value)}
-                                                isDisabled={false}
-                                            />
-
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='space-y-5'>
-                                    <div className='p-3'>ပညာသင်လျှောက်ထားသူ၏</div>
-                                    <div>
-
-                                        <label htmlFor="">အမည်</label><input
-                                            id="name"
-                                            value={data.name}
-                                            onChange={(e) => setData('name', e.target.value)}
-                                            placeholder=" "
-                                            className={`${errors.name ? "border-red-500" : "border-gray-400"} border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                        />
-
-                                    </div>
-                                    <div>
-
-                                        <label htmlFor="">ယခင်နှစ်ခုံအမှတ်</label><input
-                                            id="examed_roll_no"
-                                            value={data.examed_roll_no}
-                                            onChange={(e) => setData('examed_roll_no', e.target.value)}
-                                            placeholder=" "
-                                            className={`${errors.examed_roll_no ? "border-red-500" : "border-gray-400"} border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                        />
-                                    </div>
-
-                                </div>
-                            </CardFooter>
-                            <div>
-                                <div className="flex items-start space-x-2">
-                                    <Checkbox className='w-8 h-6 ml-3 border-red-700'
-                                        id="agreed"
-                                        checked={data.agreed}
-                                        onCheckedChange={(checked) => setData('agreed', checked === true)}
-                                    />
-                                    <Label htmlFor="agreed" className="text-sm leading-snug text-red-700">
-                                        ဤအချက်အလက်များမှန်ကန်ကြောင်း သေချာပါသည်။ ဤအတည်ပြုချက်ကို ကျွန်ုပ်လက်ခံပါသည်။
-                                    </Label>
-                                </div>
-                                {errors.agreed && <p className="text-sm text-red-500">{errors.agreed}</p>}
-                            </div>
-                        </Card>
-                    </section> */}

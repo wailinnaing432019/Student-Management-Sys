@@ -39,6 +39,7 @@ import {
 import { LoaderCircle, SquarePen } from "lucide-react";
 import AcademicYearCreateDialog from "./AcademicYearCreateDialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Card } from "@/components/ui/card";
 
 export default function Index({ academicYears }) {
 
@@ -97,26 +98,27 @@ export default function Index({ academicYears }) {
 
 
             {/* ပညာသင်နှစ်များ Table */}
-            <Table>
-                <TableCaption>ပညာသင်နှစ် စာရင်း</TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>စဉ်</TableHead>
-                        <TableHead>ပညာသင်နှစ်အမည်</TableHead>
-                        <TableHead>စတင်သည့်ရက်စွဲ</TableHead>
-                        <TableHead>ပြီးဆုံးသည့်ရက်စွဲ</TableHead>
-                        {/* <TableHead className="">လုပ်ဆောင်ချက်များ</TableHead> */}
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {academicYears.length > 0 ? (
-                        academicYears.map((year, index) => (
-                            <TableRow key={year.id}>
-                                <TableCell>{index + 1}</TableCell>
-                                <TableCell>{year.name}</TableCell>
-                                <TableCell>{year.start_date}</TableCell>
-                                <TableCell>{year.end_date}</TableCell>
-                                {/* <TableCell className="text-right space-x-2">
+            <Card>
+                <Table>
+                    <TableCaption>ပညာသင်နှစ် စာရင်း</TableCaption>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>စဉ်</TableHead>
+                            <TableHead>ပညာသင်နှစ်အမည်</TableHead>
+                            <TableHead>စတင်သည့်ရက်စွဲ</TableHead>
+                            <TableHead>ပြီးဆုံးသည့်ရက်စွဲ</TableHead>
+                            {/* <TableHead className="">လုပ်ဆောင်ချက်များ</TableHead> */}
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {academicYears.length > 0 ? (
+                            academicYears.map((year, index) => (
+                                <TableRow key={year.id}>
+                                    <TableCell>{index + 1}</TableCell>
+                                    <TableCell>{year.name}</TableCell>
+                                    <TableCell>{year.start_date}</TableCell>
+                                    <TableCell>{year.end_date}</TableCell>
+                                    {/* <TableCell className="text-right space-x-2">
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
@@ -159,18 +161,18 @@ export default function Index({ academicYears }) {
                                         </AlertDialogContent>
                                     </AlertDialog>
                                 </TableCell> */}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center text-muted-foreground">
+                                    ပညာသင်နှစ်မရှိပါ။
+                                </TableCell>
                             </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={5} className="text-center text-muted-foreground">
-                                ပညာသင်နှစ်မရှိပါ။
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-
+                        )}
+                    </TableBody>
+                </Table>
+            </Card>
             {/* Edit Dialog */}
             {
                 editingYear && (

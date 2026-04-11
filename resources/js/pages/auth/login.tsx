@@ -115,7 +115,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                                     <Button type="submit" className="mt-4 w-full " tabIndex={4} disabled={processing}>
                                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                        အကောင့်သို့ ၀င်မည်
+                                        အကောင့်သို့ ဝင်မည်
                                     </Button>
                                 </div>
 
@@ -132,6 +132,34 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
 
             {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
+            <footer className="bg-gray-50 border-t border-gray-200 py-4 mt-4">
+                <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+                    {/* Left Side: Project & University */}
+                    <div className="mb-6 md:mb-0 text-center md:text-left">
+                        <p className="font-bold text-gray-800 text-base">Student Management System</p>
+                        <p className="text-gray-400 italic">University Of Computer Studies (Meiktila)</p>
+                    </div>
+
+                    {/* Right Side: Team & Supervisor */}
+                    <div className="flex flex-col items-center md:items-end space-y-2">
+                        <div className="text-xs uppercase tracking-wider font-semibold text-gray-400">
+                            Supervised by: <span className="text-gray-700 capitalize">Dr. Daw Thuzar Htet</span>
+                        </div>
+
+                        <div className="h-px w-full bg-gray-200 hidden md:block"></div>
+
+                        <div className="text-right">
+                            <p className="text-xs mb-1">&copy; 2026 All Rights Reserved</p>
+                            <p className="text-xs">
+                                Developed by{" "}
+                                <a href="mailto:wailinnaing432019@gmail.com" className="text-blue-500 hover:text-blue-700 transition-colors">Wai Linn Naing</a>
+                                {" & "}
+                                <a href="mailto:minkhantkyaw@example.com" className="text-blue-500 hover:text-blue-700 transition-colors">Min Khant Kyaw</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </>
     );
 }

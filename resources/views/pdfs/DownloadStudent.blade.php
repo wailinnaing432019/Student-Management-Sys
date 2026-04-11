@@ -171,7 +171,7 @@
                 <table style="width: 100%; font-size: 14px; line-height: 1.6;">
                     <tr>
                         <!-- Guardian Info -->
-                        <td style="width: 50%; vertical-align: top;">
+                        <td style="width: 40%; vertical-align: top;">
                             <div>
                                 <div style="display: grid; gap: 0.5rem; justify-content: center;">
                                     <img src="{{ public_path('storage/' . $profile->image) }}"
@@ -179,7 +179,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td style="width: 50%; vertical-align: top;">
+                        <td style="width: 60%; vertical-align: top;">
                             <div>
                                 <table class="table-auto w-full border border-gray-300 text-sm text-left">
                                     <tbody>
@@ -202,7 +202,7 @@
                                                         }
                                                     @endphp
 
-                                                    {{ $semester }}
+                                                    {{ $stuEnrollment->semester->year_name }} - {{ $semester }}
                                                 </div>
                                             </td>
                                         </tr>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StudentRequest;
 use App\Http\Requests\StudentReregisterRequest;
+use App\Http\Requests\UpdateStudentRequest;
 use App\Models\AcademicYear;
 use App\Models\Donor;
 use App\Models\ExamsTaken;
@@ -86,7 +87,7 @@ public function index(Request $request)
             ->orderBy("student_semester_profiles.$sortCol", $sortDir);
         }
 
-        $enrollStudents = $query->paginate(10)->withQueryString();
+        $enrollStudents = $query->paginate(5)->withQueryString();
     }
     
     return Inertia::render('Students/EnrolledStudents', [
@@ -197,16 +198,15 @@ public function print( $id)
         DB::beginTransaction();
 
         try {
-            // Create Student
+            // Create Student 
+            $filePath = null;
+        if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filePath=$file->store('students','public');
+            $filePath = $file->store('students', 'public');
+        }
             $student = Student::create([
                 'name_myan'=>$request->name_myan,
-                'name_eng'=>$request->name_eng,
-                // 'academic_year'=>$request->academic_year,
-                // 'semester_id'=>$request->semester_id,
-                // 'major'=>$request->major,
-                // 'roll_no'=>$request->roll_no,
+                'name_eng'=>$request->name_eng, 
                 'uid'=> $request->uid,
                 'entried_year'=>$request->entried_year, 
                 'nrc_state'=>$request->nrc_state,
@@ -223,24 +223,27 @@ public function print( $id)
                 'matriculation_passed_year'=>$request->matriculation_passed_year,
                 'matriculation_passed_roll_no'=>$request->matriculation_passed_roll_no,
                 'examination_center'=>$request->examination_center,
-                // 'permanent_address'=>$request->permanent_address,
-                // 'temporary_address'=>$request->temporary_address,
-                // 'phone'=>$request->phone, 
-                // 'email'=>$request->email,
-                // 'image'=>$filePath,
+
                 ]);
-                $studentProfile=StudentSemesterProfile::create([
-                    'student_id'=>$student->id,
-                    'academic_year_id'=> $request->academic_year_id,
-                    'semester_id'=>$request->semester_id,
-                    'major_id'=>$request->major_id,
-                    'roll_no'=>$request->roll_no,
-                    'permanent_address'=>$request->permanent_address,
-                    'temporary_address'=>$request->temporary_address,
-                    'phone'=>$request->phone,
-                    'email'=>$request->email,
-                    'image'=>$filePath,
-                ]);
+                 // Student Profile
+        $studentProfileData = [
+            'student_id' => $student->id,
+            'academic_year_id' => $request->academic_year_id,
+            'semester_id' => $request->semester_id,
+            'major_id' => $request->major_id,
+            'roll_no' => $request->roll_no,
+            'permanent_address' => $request->permanent_address,
+            'temporary_address' => $request->temporary_address,
+            'phone' => $request->phone,
+            'email' => $request->email,
+        ];
+
+        // Only add image if uploaded
+        if ($filePath) {
+            $studentProfileData['image'] = $filePath;
+        }
+
+        $studentProfile = StudentSemesterProfile::create($studentProfileData);
 
                 $studentEnrollment=StudentEnrollment::create([
                     'student_id'=>$student->id,
@@ -344,25 +347,7 @@ public function print( $id)
                 }
             }
             
-            // Registration agreement
-            // RegistrationAgreement::create([
-            //     'student_semester_profile_id'=>$studentProfile->id,
-            //     'name'=>$request->name,
-            //     'gender'=>$request->gender,
-            //     'examed_year'=>$request->examed_year,
-            //     'examed_month'=>$request->examed_month,
-            //     'examed_name'=>$request->examed_name,
-            //     'examed_roll_no'=>$request->examed_roll_no,
-            //     'examed_status'=>$request->examed_status,
-            //     'class'=>$request->class,
-            //     'fee'=>$request->fee,
-            //     'guardian'=>$request->guardian,
-            //     'nrc_state'=>$request->g_nrc_state,
-            //     'nrc_township'=>$request->g_nrc_township,
-            //     'nrc_type'=>$request->g_nrc_type,
-            //     'nrc_number'=>$request->g_nrc_number,
-            //     'agreed'=>$request->agreed,
-            // ]);
+
             
             // return Semester::with('courses')->get();
          $fullPath=$this->generateAndStorePdf($student->id,$request->semester_id);
@@ -384,7 +369,25 @@ public function print( $id)
             return back()->withErrors(['error' => 'ကျောင်းသားစားရင်းသွင်းခြင်း မအောင်မြင်ပါ။ ' . $e->getMessage()])->withInput();
         }
     }
-
+            // Registration agreement
+            // RegistrationAgreement::create([
+            //     'student_semester_profile_id'=>$studentProfile->id,
+            //     'name'=>$request->name,
+            //     'gender'=>$request->gender,
+            //     'examed_year'=>$request->examed_year,
+            //     'examed_month'=>$request->examed_month,
+            //     'examed_name'=>$request->examed_name,
+            //     'examed_roll_no'=>$request->examed_roll_no,
+            //     'examed_status'=>$request->examed_status,
+            //     'class'=>$request->class,
+            //     'fee'=>$request->fee,
+            //     'guardian'=>$request->guardian,
+            //     'nrc_state'=>$request->g_nrc_state,
+            //     'nrc_township'=>$request->g_nrc_township,
+            //     'nrc_type'=>$request->g_nrc_type,
+            //     'nrc_number'=>$request->g_nrc_number,
+            //     'agreed'=>$request->agreed,
+            // ]);
     /**
      * Display the specified resource.
      */
@@ -410,6 +413,183 @@ public function print( $id)
         ]);
     }
 
+    /** Edit Session **/
+     public function edit(string $id)
+{
+    $enrollment=StudentEnrollment::with([
+            'student.father',
+            'student.mother',
+            'studentSemesterProfile.donor',
+            'student.examsTaken',
+            'studentSemesterProfile.registrationAgreement',
+            'studentSemesterProfile',
+            'semester',
+            'major',
+            'academicYear',
+
+        ])->findOrFail($id); 
+
+    $academic_years = AcademicYear::with('semesters')->get();
+    $majors = Major::all();
+// return [
+//         'academic_years' => $academic_years,
+//         'majors' => $majors,
+//         'enrollment' => $enrollment,
+// ];
+    return Inertia::render('Students/EnrollEdit', [
+        'academic_years' => $academic_years,
+        'majors' => $majors,
+        'enrollment' => $enrollment,
+    ]);
+}
+public function update(UpdateStudentRequest $request, string $enrollment)
+{    
+    $enrollments=StudentEnrollment::with([
+            'student.father',
+            'student.mother',
+            'studentSemesterProfile.donor',
+            'student.examsTaken',
+            'studentSemesterProfile.registrationAgreement',
+            'studentSemesterProfile',
+            'semester',
+            'major',
+            'academicYear',
+
+        ])->findOrFail($enrollment); 
+    DB::beginTransaction();
+
+    try {
+        $student = $enrollments->student;
+        $profile = $enrollments->studentSemesterProfile;
+
+        // Update Student
+        $student->update([
+            'name_myan' => $request->name_myan,
+            'name_eng' => $request->name_eng,
+            'uid' => $request->uid,
+            'entried_year' => $request->entried_year,
+            'nrc_state' => $request->nrc_state,
+            'nrc_township' => $request->nrc_township,
+            'nrc_type' => $request->nrc_type,
+            'nrc_number' => $request->nrc_number,
+            'dob' => $request->dob,
+            'gender' => $request->gender ?? $student->gender,
+            'ethnicity' => $request->ethnicity,
+            'religion' => $request->religion,
+            'hometown' => $request->hometown,
+            'township_state_region' => $request->township_state_region,
+            'local_foreign' => $request->local_foreign,
+            'matriculation_passed_year' => $request->matriculation_passed_year,
+            'matriculation_passed_roll_no' => $request->matriculation_passed_roll_no,
+            'examination_center' => $request->examination_center,
+        ]);
+
+        // Update StudentSemesterProfile
+        if ($request->hasFile('image')) {
+            // Delete old image
+            if ($profile->image && Storage::disk('public')->exists($profile->image)) {
+                Storage::disk('public')->delete($profile->image);
+            }
+
+            $filePath = $request->file('image')->store('students', 'public');
+        } else {
+            $filePath = $profile->image;
+        }
+
+        $profile->update([
+            'academic_year_id' => $request->academic_year_id,
+            'semester_id' => $request->semester_id,
+            'major_id' => $request->major_id,
+            'roll_no' => $request->roll_no,
+            'permanent_address' => $request->permanent_address,
+            'temporary_address' => $request->temporary_address,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'image' => $filePath,
+        ]);
+
+        // Update Enrollment
+        $enrollments->update([
+            'semester_id' => $request->semester_id,
+            'major_id' => $request->major_id,
+            'academic_year_id' => $request->academic_year_id,
+            'registration_date' => Carbon::now(),
+        ]);
+
+        // Update Father
+        $student->father()->update([
+            'name_myan' => $request->father_name_myan,
+            'name_eng' => $request->father_name_eng,
+            'ethnicity' => $request->father_ethnicity,
+            'religion' => $request->father_religion,
+            'hometown' => $request->father_hometown,
+            'township_state_region' => $request->father_township_state_region,
+            'nrc_state' => $request->father_nrc_state,
+            'nrc_township' => $request->father_nrc_township,
+            'nrc_type' => $request->father_nrc_type,
+            'nrc_number' => $request->father_nrc_number,
+            'job' => $request->father_job,
+            'local_foreign' => $request->father_local_foreign,
+        ]);
+
+        // Update Mother
+        $student->mother()->update([
+            'name_myan' => $request->mother_name_myan,
+            'name_eng' => $request->mother_name_eng,
+            'ethnicity' => $request->mother_ethnicity,
+            'religion' => $request->mother_religion,
+            'hometown' => $request->mother_hometown,
+            'township_state_region' => $request->mother_township_state_region,
+            'nrc_state' => $request->mother_nrc_state,
+            'nrc_township' => $request->mother_nrc_township,
+            'nrc_type' => $request->mother_nrc_type,
+            'nrc_number' => $request->mother_nrc_number,
+            'job' => $request->mother_job,
+            'local_foreign' => $request->mother_local_foreign,
+        ]);
+
+        // Update Donor
+        $profile->donor()->updateOrCreate(
+            ['student_semester_profile_id' => $profile->id],
+            [
+                'name' => $request->donor_name,
+                'relationship' => $request->donor_relationship,
+                'job' => $request->donor_job,
+                'phone' => $request->donor_phone,
+                'address' => $request->donor_address,
+                'status' => $request->donor_status,
+            ]
+        );
+
+        // Update ExamsTaken
+       $student->examsTaken()->delete();
+
+        if ($request->filled('exam_records')) {
+            foreach ($request->exam_records as $record) {
+                if (!empty($record['exam_name'])) {
+                    $student->examsTaken()->create([
+                        'exam_name' => $record['exam_name'],
+                        'major'     => $record['exam_major'],
+                        'roll_no'   => $record['exam_roll_no'],
+                        'year'      => $record['exam_year'],
+                        'pass_fail' => $record['exam_pass_fail'],
+                    ]);
+                }
+            }
+        }
+
+        // Re-generate PDF
+        $fullPath = $this->generateAndStorePdf($student->id, $request->semester_id);
+        $enrollments->update(['pdf_path' => $fullPath]);
+
+        DB::commit();
+
+        return to_route('enroll-students.index')->with('success', 'ကျောင်းသားအား ပြုပြင်ခြင်း အောင်မြင်ပါသည်။');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->withErrors(['error' => 'ကျောင်းသားအား ပြုပြင်ခြင်း မအောင်မြင်ပါ။ ' . $e->getMessage()])->withInput();
+    }
+}
 
        public function reregister(string $id)
     {
@@ -429,6 +609,7 @@ public function print( $id)
 
                 $academic_years=AcademicYear::with('semesters')->get();
             $majors=Major::all();
+    
             return Inertia::render('Students/Reregister', [
             'academic_years'=>$academic_years,
             'majors'=>$majors,
@@ -438,29 +619,29 @@ public function print( $id)
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
-    {
-        $enrollment = StudentEnrollment::with([
-            'student.father',
-            'student.mother',
-            'studentSemesterProfile.donor',
-            'student.examsTaken',
-            'studentSemesterProfile.registrationAgreement',
-            'studentSemesterProfile',
-            'semester',
-            'major',
-            'academicYear',
+    // public function edit(string $id)
+    // {
+    //     $enrollment = StudentEnrollment::with([
+    //         'student.father',
+    //         'student.mother',
+    //         'studentSemesterProfile.donor',
+    //         'student.examsTaken',
+    //         'studentSemesterProfile.registrationAgreement',
+    //         'studentSemesterProfile',
+    //         'semester',
+    //         'major',
+    //         'academicYear',
 
-        ])->findOrFail($id);
+    //     ])->findOrFail($id);
 
-                $academic_years=AcademicYear::with('semesters')->get();
-            $majors=Major::all();
-            return Inertia::render('Students/Edit', [
-            'academic_years'=>$academic_years,
-            'majors'=>$majors,
-            'studentEnrollment' => $enrollment,
-        ]);
-    }
+    //             $academic_years=AcademicYear::with('semesters')->get();
+    //         $majors=Major::all();
+    //         return Inertia::render('Students/Edit', [
+    //         'academic_years'=>$academic_years,
+    //         'majors'=>$majors,
+    //         'studentEnrollment' => $enrollment,
+    //     ]);
+    // }
 
 
     /**
@@ -549,6 +730,7 @@ public function print( $id)
                 'relationship'=>$request->donor_relationship,
                 'job'=>$request->donor_job, 
                 'phone'=>$request->donor_phone,
+                'address'=>$request->donor_address,
                 'status'=>$request->donor_status,
                 'student_semester_profile_id'=>$studentProfile->id,
             ]);

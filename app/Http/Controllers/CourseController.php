@@ -22,7 +22,7 @@ class CourseController extends Controller
         });
     }
 
-    $courses = $query->paginate(6)->withQueryString(); // 10 per page
+    $courses = $query->paginate(20)->withQueryString(); // 10 per page
  
     $majors = Major::all();
 

@@ -291,7 +291,7 @@ export default function Create() {
                                 {data.image && <img src={URL.createObjectURL(data.image)} alt="Preview Image" className="w-42 mt-2 object-cover" />}
                                 <div className="grid gap-2">
 
-                                    {/* <Label htmlFor="amount">Preview Image</Label> */}
+                                    <Label htmlFor="amount">လိုင်စင်ပုံ</Label>
                                     <Input
                                         className='w-2/5 mt-1'
                                         id="image"
@@ -715,7 +715,7 @@ export default function Create() {
 
                                 <div>
                                     <Label>မွေးသက္ကရာဇ်</Label>
-                                    <Input type="date" id="dob" value={data.dob} onChange={(e) => setData('dob', e.target.value)} />
+                                    <Input type="date" id="dob" disabled value={data.dob} onChange={(e) => setData('dob', e.target.value)} />
                                     <InputError message={errors.dob} />
                                 </div>
                                 <div>
@@ -770,16 +770,43 @@ export default function Create() {
                             </div>
 
                             <Table>
-
-
                                 <TableBody>
-                                    {examsTaken.concat(data.exam_records).map((exam, index) => (
-                                        <TableRow key={index}>
+                                    {/* --- Existing Exams from DB --- */}
+                                    {examsTaken?.map((exam, index) => (
+                                        <TableRow key={`db-${index}`}>
+                                            <TableCell>
+                                                <Input value={exam.exam_name} disabled placeholder="စာမေးပွဲအမည်" />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Input value={exam.major} disabled placeholder="အဓိကဘာသာ" />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Input value={exam.roll_no} disabled placeholder="ခုံအမှတ်" />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Input value={exam.year} disabled placeholder="ခုနှစ်" />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Select value={exam.pass_fail} disabled>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="အောင်/ရှုံး" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="pass">အောင်</SelectItem>
+                                                        <SelectItem value="fail">ရှုံး</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+
+                                    {/* --- New Exams (Editable) --- */}
+                                    {data.exam_records.map((exam, index) => (
+                                        <TableRow key={`new-${index}`}>
                                             <TableCell>
                                                 <Input
                                                     value={exam.exam_name}
-                                                    disabled={!!exam.id} // disable if it's an existing record
-                                                    onChange={(e) => handleExamChange(index, 'exam_name', e.target.value)}
+                                                    onChange={(e) => handleExamChange(index, "exam_name", e.target.value)}
                                                     placeholder="စာမေးပွဲအမည်"
                                                 />
                                                 <InputError message={errors?.[`exam_records.${index}.exam_name`]} />
@@ -788,8 +815,7 @@ export default function Create() {
                                             <TableCell>
                                                 <Input
                                                     value={exam.exam_major}
-                                                    disabled={!!exam.id}
-                                                    onChange={(e) => handleExamChange(index, 'exam_major', e.target.value)}
+                                                    onChange={(e) => handleExamChange(index, "exam_major", e.target.value)}
                                                     placeholder="အဓိကဘာသာ"
                                                 />
                                                 <InputError message={errors?.[`exam_records.${index}.exam_major`]} />
@@ -798,8 +824,7 @@ export default function Create() {
                                             <TableCell>
                                                 <Input
                                                     value={exam.exam_roll_no}
-                                                    disabled={!!exam.id}
-                                                    onChange={(e) => handleExamChange(index, 'exam_roll_no', e.target.value)}
+                                                    onChange={(e) => handleExamChange(index, "exam_roll_no", e.target.value)}
                                                     placeholder="ခုံအမှတ်"
                                                 />
                                                 <InputError message={errors?.[`exam_records.${index}.exam_roll_no`]} />
@@ -808,8 +833,7 @@ export default function Create() {
                                             <TableCell>
                                                 <Input
                                                     value={exam.exam_year}
-                                                    disabled={!!exam.id}
-                                                    onChange={(e) => handleExamChange(index, 'exam_year', e.target.value)}
+                                                    onChange={(e) => handleExamChange(index, "exam_year", e.target.value)}
                                                     placeholder="ခုနှစ်"
                                                 />
                                                 <InputError message={errors?.[`exam_records.${index}.exam_year`]} />
@@ -819,15 +843,14 @@ export default function Create() {
                                                 <div className="flex items-end gap-2">
                                                     <Select
                                                         value={exam.exam_pass_fail}
-                                                        disabled={!!exam.id}
-                                                        onValueChange={(value) => handleExamChange(index, 'exam_pass_fail', value)}
+                                                        onValueChange={(value) => handleExamChange(index, "exam_pass_fail", value)}
                                                     >
                                                         <SelectTrigger>
-                                                            <SelectValue placeholder="Result" />
+                                                            <SelectValue placeholder="အောင်/ရှုံး" />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value="pass">Pass</SelectItem>
-                                                            <SelectItem value="fail">Fail</SelectItem>
+                                                            <SelectItem value="pass">အောင်</SelectItem>
+                                                            <SelectItem value="fail">ရှုံး</SelectItem>
                                                         </SelectContent>
                                                     </Select>
 
@@ -835,7 +858,6 @@ export default function Create() {
                                                         type="button"
                                                         variant="destructive"
                                                         onClick={() => removeExamRow(index)}
-                                                        disabled={!!exam.id} // disable removal for existing records if needed
                                                     >
                                                         -
                                                     </Button>
@@ -845,6 +867,7 @@ export default function Create() {
                                     ))}
                                 </TableBody>
                             </Table>
+
                         </Card>
                         {/* Section 3 - Exam Records */}
 
@@ -904,202 +927,7 @@ export default function Create() {
 
                         </Card>
                     </section>
-                    {/* Creating Register Form */}
-                    {/* {semester['semester_number'] % 2 === 0 &&
-                        <section >
-                            <Card className='w-8/9 mt-6 mx-auto'>
-                                <CardHeader>
-                                    <p>သို့</p>
-                                    <p>ကွန်ပျူတာတက္ကသိုလ်(မိတ္ထီလာ)</p>
-                                    <p>အကြောင်းအရာ။ ။ကွန်ပျူတာတက္ကသိုလ်(မိတ္ထီလာ)တွင်  <input
-                                        id="class"
-                                        value={data.class}
-                                        onChange={(e) => setData('class', e.target.value)}
-                                        placeholder=" "
-                                        className={`${errors.class ? "border-red-500" : "border-gray-400"}  w-auto inline rounded-none border-0 border-b-2 focus:border-blue-500 focus:ring-0 h-9 px-1 text-sm`}
-                                    /> သင်တန်းတက်ရောက်ခွင့်လျှောက်ထားခြင်း။</p>
-                                </CardHeader>
-                                <CardContent className='space-y-4'>
-                                    <p> ၁။ <span className='ml-3'></span> (က)
-                                        <Select value={data.gender}
-                                            onValueChange={(value) => setData('gender', value)} >
-                                            <SelectTrigger
-                                                className={`${errors.gender ? "border-red-500" : "border-gray-400"} w-auto inline rounded-none border-0 border-b-2 focus:border-blue-500 focus:ring-0 h-9 px-1 text-sm`}
-                                            >
-                                                <SelectValue placeholder="ကျွန်တော်/ကျွန်မ" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="male">ကျွန်တော်</SelectItem>
-                                                <SelectItem value="female">ကျွန်မ</SelectItem>
-                                            </SelectContent>
-                                        </Select> <input
-                                            id="name"
-                                            value={data.name}
-                                            onChange={(e) => setData('name', e.target.value)}
-                                            placeholder=" "
-                                            className={`${errors.name ? "border-red-500" : "border-gray-400"}text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                        /> သည် ကွန်ပျူတာတက္ကသိုလ်(မိတ္ထီလာ) သို့ ၀င်ခွင့်အမှတ်စဥ် (<input
-                                            id="uid"
-                                            value={data.uid}
-                                            onChange={(e) => setData('uid', e.target.value)}
-                                            placeholder=" "
-                                            className={`${errors.uid ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                        />) ဖြင့် ပထမနှစ်သက်တန်းသို့ ၀င်ရောက်ခွင့် ရရှိသူဖြစ်ပါသည်။
-                                    </p>
 
-                                    <div className='ml-6 space-y-4'><p className='space-y-5'> (ခ) <Select value={data.gender}
-                                        onValueChange={(value) => setData('gender', value)} >
-                                        <SelectTrigger
-                                            className={`${errors.gender ? "border-red-500" : "border-gray-400"}  w-auto inline rounded-none border-0 border-b-2 border-gray-400 focus:border-blue-500 focus:ring-0 h-9 px-1 text-sm`}
-                                        >
-                                            <SelectValue placeholder="ကျွန်တော်/ကျွန်မ" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="male">ကျွန်တော်</SelectItem>
-                                            <SelectItem value="female">ကျွန်မ</SelectItem>
-                                        </SelectContent>
-                                    </Select><input
-                                            id="name"
-                                            value={data.name}
-                                            onChange={(e) => setData('name', e.target.value)}
-                                            placeholder=" "
-                                            className={`${errors.name ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                        /> သည်  <input
-                                            id="examed_year"
-                                            value={data.examed_year}
-                                            onChange={(e) => setData('examed_year', e.target.value)}
-                                            placeholder=" "
-                                            className={`${errors.examed_year ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                        /> ခုနှစ် ၊  <input
-                                            id="examed_month"
-                                            value={data.examed_month}
-                                            onChange={(e) => setData('examed_month', e.target.value)}
-                                            placeholder=" "
-                                            className={`${errors.examed_month ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                        />. လ အတွင်းကျင်းပခဲ့သော ..<input
-                                            id="examed_name"
-                                            value={data.examed_name}
-                                            onChange={(e) => setData('examed_name', e.target.value)}
-                                            placeholder=" "
-                                            className={`${errors.examed_name ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                        /> သင်တန်းစာမေးပွဲကို ခုံအမှတ် <input
-                                            id="examed_roll_no"
-                                            value={data.examed_roll_no}
-                                            onChange={(e) => setData('examed_roll_no', e.target.value)}
-                                            placeholder=" "
-                                            className={`${errors.examed_roll_no ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                        />  ဖြင့် ဖြေဆို  <Select value={data.examed_status}
-                                            onValueChange={(value) => setData('examed_status', value)} >
-                                            <SelectTrigger
-                                                className={`${errors.examed_status ? "border-red-500" : "border-gray-400"} w-auto inline rounded-none border-0 border-b-2 border-gray-400 focus:border-blue-500 focus:ring-0 h-9 px-1 text-sm`}
-                                            >
-                                                <SelectValue placeholder="အောင်မြင်/ကျရှုံး" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="pass">အောင်မြင်</SelectItem>
-                                                <SelectItem value="fail">ကျရှုံး</SelectItem>
-                                            </SelectContent>
-                                        </Select> ခဲ့ပါ၍ ကွန်ပျူတာတက္ကသိုလ်(မိတ္ထီလာ) တွင် ဖွင့်လှစ်မည့်  <input
-                                            id="class"
-                                            value={data.class}
-                                            onChange={(e) => setData('class', e.target.value)}
-                                            placeholder=" "
-                                            className={`${errors.class ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                        /> သင်တန်းသို့ တက်ရောက်ခွင့်ပြုပါရန် လျှောက်ထားအပ်ပါသည်။
-                                        ကွန်ပျူတာတက္ကသိုလ်(မိတ္ထီလာ)တွင် ပညာသင်ကြားနေစဥ် ကာလအတွင်း ဤတက္ကသိုလ်မှ သတ်မှတ်ထားသည့် အောက်ဖော်ပြပါ အချက်အလက်များကို သိရှိပြီးကြောင်းနှင့် လိုက်နာကျင့်သုံးမည်ဖြစ်ကြောင်း ၀န်ခံကတိ လက်မှတ်ရေးထိုးပါသည်။</p>
-
-                                        <p>(၁) B.C.Sc/B.C.Tech သင်တန်းမှာ(၄) နှစ်သင်တန်းဖြစ်ပါသည်။</p>
-                                        <p>(၂) သင်တန်းကြေးမှာ တစ်လလျှင် <input
-                                            type='number'
-                                            id="fee"
-                                            value={data.fee}
-                                            onChange={(e) => setData('fee', e.target.value)}
-                                            placeholder=" "
-                                            className={`${errors.fee ? "border-red-500" : "border-gray-400"} text-center border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                        /> ကျပ်တိတိ (  ) နှုန်းဖြစ်ပါသည်။</p>
-                                        <p>(၃) မိမိအစီအစဉ်ဖြင့် နေထိုင်စားသောက်ရမည်ဖြစ်ပါသည်။</p>
-                                        <p>(၄) ကျွန်တော်/ကျွန်မ သည် မည်သည့်နိုင်ငံရေးပါတီတွင်မျှ ပါတီ၀င်မဟုတ်ပါ။</p>
-                                        <p>(၅) Credit Unit / Credit Hour ပြည့်မှီခြင်းမရှိပါက စာမေးပွဲဖြေဆိုခွင့် မပြုကြောင်းကို သိရှိပါ သည်။</p>
-                                        <p>(၆) နေ့စဉ်ကျောင်းတက်ရောက်ခြင်းဆိုင်ရာကိစ္စ၊ ကျောင်းပြောင်း‌‌ရွှေ့ခြင်းဆိုင်ရာ ကိစ္စ၊ ဆေးခွင့်လျှောက်ထားခြင်း ဆိုင်ရာကိစ္စ၊ စာမေးပွဲဖြေဆိုခြင်းဆိုင်ရာ ကိစ္စများ၏ စည်းကမ်းသတ်မှတ်ချက်များအား ပူးတွဲပါ ကျောင်းစည်းကမ်းဆိုင်ရာ အချက်အလက်များ အတိုင်း သိရှိလိုက်နာသွားရန် ဖြစ်ပါသည်။</p>
-                                        <p>(၇) ကျောင်းမှထုတ်ပြန်ထားသော ပူးတွဲဖော်ပြပါစည်းကမ်းချက်များကို ဖတ်ရှုလက်မှတ်ထိုးပြီး လိုက်နာပါမည်ဟု ကတိပြုပါသည်။</p>
-                                    </div>
-                                </CardContent>
-                                <CardFooter className='justify-between'>
-                                    <div className='space-y-4'>
-                                        <div className='p-3'>မိဘ/အုပ်ထိန်းသူ၏</div>
-                                        <div>
-
-                                            <label htmlFor="">အမည်</label><input
-                                                id="guardian"
-                                                value={data.guardian}
-                                                onChange={(e) => setData('guardian', e.target.value)}
-                                                placeholder=" "
-                                                className={`${errors.guardian ? "border-red-500" : "border-gray-400"} border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                            />
-
-                                        </div>
-                                        <div >
-
-
-                                            <div className="flex space-x-1 max-w-md">
-                                                <label htmlFor=""  >မှတ်ပုံတင်အမှတ်</label>
-                                                <NRCInputFields
-                                                    nrcData={nrcData}
-                                                    prefix="g_"
-                                                    state={data.g_nrc_state}
-                                                    township={data.g_nrc_township}
-                                                    type={data.g_nrc_type}
-                                                    number={data.g_nrc_number}
-                                                    errors={errors}
-                                                    onChange={(key, value) => setData(key, value)}
-                                                    isDisabled={false}
-                                                />
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className='space-y-5'>
-                                        <div className='p-3'>ပညာသင်လျှောက်ထားသူ၏</div>
-                                        <div>
-
-                                            <label htmlFor="">အမည်</label><input
-                                                id="name"
-                                                value={data.name}
-                                                onChange={(e) => setData('name', e.target.value)}
-                                                placeholder=" "
-                                                className={`${errors.name ? "border-red-500" : "border-gray-400"} border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                            />
-
-                                        </div>
-                                        <div>
-
-                                            <label htmlFor="">ယခင်နှစ်ခုံအမှတ်</label><input
-                                                id="examed_roll_no"
-                                                value={data.examed_roll_no}
-                                                onChange={(e) => setData('examed_roll_no', e.target.value)}
-                                                placeholder=" "
-                                                className={`${errors.examed_roll_no ? "border-red-500" : "border-gray-400"} border-0 border-b-2 border-dotted border-gray-400 focus:border-blue-500 focus:ring-0 rounded-none outline-none`}
-                                            />
-                                        </div>
-
-                                    </div>
-                                </CardFooter>
-                                <div>
-                                    <div className="flex items-start space-x-2">
-                                        <Checkbox className='w-8 h-6 ml-3 border-red-700'
-                                            id="agreed"
-                                            checked={data.agreed}
-                                            onCheckedChange={(checked) => setData('agreed', checked === true)}
-                                        />
-                                        <Label htmlFor="agreed" className="text-sm leading-snug text-red-700">
-                                            ဤအချက်အလက်များမှန်ကန်ကြောင်း သေချာပါသည်။ ဤအတည်ပြုချက်ကို ကျွန်ုပ်လက်ခံပါသည်။
-                                        </Label>
-                                    </div>
-                                    {errors.agreed && <p className="text-sm text-red-500">{errors.agreed}</p>}
-                                </div>
-                            </Card>
-                        </section>
-                    } */}
 
                     <div className='flex justify-end me-9'>
 

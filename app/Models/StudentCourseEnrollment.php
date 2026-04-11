@@ -20,6 +20,9 @@ class StudentCourseEnrollment extends Model
     public function mark() {
         return $this->hasOne(Mark::class);
     }
-
+public function marks()
+{
+    return $this->hasOne(Mark::class, 'student_course_enrollment_id', 'id');
+}
     
 }

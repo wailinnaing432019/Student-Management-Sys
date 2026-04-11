@@ -29,17 +29,17 @@ export function TeamSwitcher({
           className="flex items-center justify-between"
         >
           {/* Left: Team logo & info */}
-          <div className="flex items-center gap-3">
-            <div className="text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+          <div className="flex items-center gap-3 ">
+            <div className="text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg ">
               <img
                 src={activeTeam.logo}
                 alt={activeTeam.name}
-                className="size-4 rounded"
+                className="size-10 rounded dark:bg-white"
               />
             </div>
             <div className="grid text-left text-sm leading-tight">
-              <span className="truncate font-medium">{activeTeam.name}</span>
-              <span className="truncate text-xs">{activeTeam.plan}</span>
+              <span className="truncate font-medium text-blue-500">{activeTeam.name}</span>
+              <span className="truncate text-xs text-blue-500">{activeTeam.plan}</span>
             </div>
           </div>
 

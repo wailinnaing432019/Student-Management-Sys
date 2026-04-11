@@ -44,6 +44,11 @@ export default function StudentIndex({ academicYears,
                 selectedSemesterId={selectedSemesterId}
                 initialSearch=""
             />
+            <div className="flex justify-between items-center mb-4">
+                <div className="text-sm text-muted-foreground">
+                    စုစုပေါင်း ကျောင်းသားဦးရေ : <span className="font-semibold">{enrollStudents.length}</span>
+                </div>
+            </div>
 
             <div className="rounded-xl border  shadow-sm">
                 <Table>
@@ -84,6 +89,9 @@ export default function StudentIndex({ academicYears,
                                             {/* </Button> */}
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
+                                            <DropdownMenuItem onClick={() => router.visit(route("enroll-students.edit", row.original.id))}>
+                                                ပြုပြင်ရန် {/* View */}
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => router.visit(route("enroll-students.reregister", enrollStudent.id))}>
                                                 ပြန်အပ်ရန် {/* View */}
                                             </DropdownMenuItem>
@@ -93,6 +101,7 @@ export default function StudentIndex({ academicYears,
                                             {
                                                 enrollStudent.pdf_path && (
                                                     <>
+                                                        <DropdownMenuSeparator />
                                                         <DropdownMenuItem>
                                                             <a href={route('students.download-register-pdf', enrollStudent.id)} target="_blank">
                                                                 Download Register Form
@@ -111,8 +120,8 @@ export default function StudentIndex({ academicYears,
                                                     <DropdownMenuSeparator />
 
 
-                                                    <DropdownMenuItem onClick={() => router.visit(route("assign-marks", enrollStudent.id))}>
-                                                        အမှတ်ပေးရန် {/* Assign Marks */}
+                                                    <DropdownMenuItem onClick={() => router.visit(route("edit-mark", enrollStudent.id))}>
+                                                        အမှတ်ပြင်ရန် {/* Assign Marks */}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem>
                                                         <a href={route("marks.show", enrollStudent.id)} title="View Marks" target='_blank'>

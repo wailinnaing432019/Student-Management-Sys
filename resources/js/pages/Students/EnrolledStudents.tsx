@@ -136,7 +136,11 @@ export default function EnrolledStudents({
                         </Select>
                     </div>
                 </div>
-
+                <div className="flex justify-between items-center mb-4">
+                    <div className="text-sm text-muted-foreground">
+                        စုစုပေါင်း ကျောင်းသားဦးရေ : <span className="font-semibold">{enrollStudents.total}</span>
+                    </div>
+                </div>
                 <div className="rounded-xl border   shadow-sm">
                     {/* {enrollStudents.length !== 0 && ( */}
                     <DataTable columns={enrolledStudentColumns} data={enrollStudents?.data ?? []}

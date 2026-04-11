@@ -188,7 +188,6 @@
                         <tr>
                             <th class="border px-3 py-2">ဘာသာရပ် အမည်</th>
                             <th class="border px-3 py-2">ဘာသာရပ် ကုဒ်</th>
-                            <th class="border px-3 py-2">ဖော်ပြချက်</th>
                             <th class="border px-3 py-2">ရမှတ်</th>
                             <th class="border px-3 py-2">အဆင့်</th>
                             <th class="border px-3 py-2">မှတ်ချက်</th>
@@ -201,7 +200,6 @@
                                 <tr>
                                     <td class="border px-3 py-2">{{ $sc->course->name ?? 'N/A' }}</td>
                                     <td class="border px-3 py-2">{{ $sc->course->code ?? 'N/A' }}</td>
-                                    <td class="border px-3 py-2">{{ $sc->course->description ?? '-' }}</td>
                                     <td class="border px-3 py-2">{{ $sc->mark->mark ?? '-' }}</td>
                                     <td class="border px-3 py-2">{{ $sc->mark->grade ?? '-' }}</td>
                                     <td class="border px-3 py-2">{{ $sc->mark->remark ?? '-' }}</td>

@@ -123,7 +123,7 @@ export default function Index({ majors }) {
             <div className='text-right'>
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Button className="m-2 p-2 bg-green-500 rounded hover:bg-green-900 hover:font-extrabold">အဓိက ဘာသာရပ်ဖန်းတီးမည်</Button>
+                        <Button className="m-2 p-2 ">အဓိက ဘာသာရပ်ဖန်းတီးမည်</Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
                         <form onSubmit={submit}>
@@ -174,9 +174,9 @@ export default function Index({ majors }) {
                             </div>
                             <DialogFooter className='m-3'>
                                 <DialogClose asChild>
-                                    <Button ref={closeRef} className=" bg-red-500  p-2 rounded">ပယ်ဖျက်မည်</Button>
+                                    <Button ref={closeRef} className="   p-2 rounded" variant="outline">ပယ်ဖျက်မည်</Button>
                                 </DialogClose>
-                                <Button type="submit" className="bg-green-500 p-1   rounded" disabled={processing}>
+                                <Button type="submit" className="  p-1   rounded" disabled={processing}>
                                     {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                                     {processing ? "ဖန်တီးနေပါသည်" : "ဖန်တီးမည်"}
                                 </Button>
@@ -212,7 +212,7 @@ export default function Index({ majors }) {
                                                     <Button
                                                         variant="outline"
                                                         onClick={() => openEditDialog(major)}
-                                                        className="text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+                                                        className=""
                                                     >
                                                         ပြင်ဆင်ရန်
                                                     </Button>
@@ -293,7 +293,7 @@ export default function Index({ majors }) {
                             </div>
                             <DialogFooter className="mt-4">
                                 <DialogClose asChild>
-                                    <Button type="button" className="bg-red-500" onClick={() => setEditingMajors(null)}>Cancel</Button>
+                                    <Button type="button" variant="outline" onClick={() => setEditingMajors(null)}>Cancel</Button>
                                 </DialogClose>
                                 <Button type="submit" className="bg-green-600" disabled={updating}>
                                     {updating ? 'Updating...' : 'Update Majors'}

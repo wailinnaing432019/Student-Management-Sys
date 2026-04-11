@@ -41,18 +41,18 @@ public function index(Request $request)
     $search = $request->input('search');
 
     $enrollStudents = StudentEnrollment::with([
-            'student',
-            'studentSemesterProfile',
-            'semester',
-            'major',
-            'academicYear'
-        ])
+        'student',
+        'studentSemesterProfile',
+        'semester',
+        'major',
+        'academicYear'
+    ])
     ->when($selectedAcademicYearId, fn($q) =>
         $q->where('academic_year_id', $selectedAcademicYearId)
     )
     ->when($selectedSemesterId, fn($q) =>
         $q->where('semester_id', $selectedSemesterId)
-    ) 
+    )
     ->when($search, function ($q) use ($search) {
         $q->where(function ($query) use ($search) {
             $query->whereHas('studentSemesterProfile', function ($sub) use ($search) {
@@ -64,8 +64,11 @@ public function index(Request $request)
             });
         });
     })
-    ->orderBy('created_at', 'desc')
-        ->get();
+    ->orderBy(
+        StudentSemesterProfile::select('roll_no')
+            ->whereColumn('student_semester_profiles.id', 'student_enrollments.student_semester_profile_id')
+    )
+    ->get();
 
     return Inertia::render('Students/Index', [
         'academicYears' => $academicYears,

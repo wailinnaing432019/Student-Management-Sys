@@ -60,7 +60,7 @@ export default function CreateCourseDialog({ majors, redirect }: CreateCoursePro
         <div className="text-right mb-4">
             <Dialog>
                 <DialogTrigger asChild>
-                    <Button className="bg-green-600 hover:bg-green-700">ဘာသာရပ် အသစ်ထည့်မည်</Button>
+                    <Button className="">ဘာသာရပ် အသစ်ထည့်မည်</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-lg">
                     <form onSubmit={submitCreate}>

@@ -43,6 +43,7 @@ import TextLink from "@/components/text-link";
 import AcademicYearCreateDialog from "../AcademicYears/AcademicYearCreateDialog";
 import { getSemesterText } from "@/Utils/SemesterText";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Card } from "@/components/ui/card";
 
 
 const yearSemesterMap: Record<string, { value: number; label: string }[]> = {
@@ -202,7 +203,7 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
 
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button className="bg-green-600 hover:bg-green-700 ml-4">သင်တန်းကာလ အသစ်ထည့်မည်</Button>
+                            <Button className="  ml-4">သင်တန်းကာလ အသစ်ထည့်မည်</Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-lg">
                             <form onSubmit={submitCreate}>
@@ -322,50 +323,51 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
             </div >
 
             {/* Semesters Table */}
-            <Table>
-                <TableCaption>သင်တန်းကာလ စာရင်း</TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>စဉ်</TableHead>
-                        <TableHead>ပညာသင်နှစ်</TableHead>
-                        <TableHead>သင်တန်းနှစ် အမည်</TableHead>
-                        <TableHead>သင်တန်းကာလ အမည်</TableHead>
-                        <TableHead>စတင်မည့် ရက်စွဲ</TableHead>
-                        <TableHead>ပြီးဆုံးမည့် ရက်စွဲ</TableHead>
-                        <TableHead className="">လုပ်ဆောင်ချက်များ</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {semesters.length > 0 ? (
-                        semesters.map((semester, index) => (
-                            <TableRow key={semester.id}>
-                                <TableCell>{index + 1}</TableCell>
-                                <TableCell>{semester.academic_year.name}</TableCell>
-                                <TableCell>{semester.year_name}</TableCell>
-                                <TableCell>{getSemesterText(semester.semester_number)}</TableCell>
-                                <TableCell>{semester.start_date}</TableCell>
-                                <TableCell>{semester.end_date}</TableCell>
-                                <TableCell className="text-center space-x-2">
+            <Card>
+                <Table>
+                    <TableCaption>သင်တန်းကာလ စာရင်း</TableCaption>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>စဉ်</TableHead>
+                            <TableHead>ပညာသင်နှစ်</TableHead>
+                            <TableHead>သင်တန်းနှစ် အမည်</TableHead>
+                            <TableHead>သင်တန်းကာလ အမည်</TableHead>
+                            <TableHead>စတင်မည့် ရက်စွဲ</TableHead>
+                            <TableHead>ပြီးဆုံးမည့် ရက်စွဲ</TableHead>
+                            <TableHead className="">လုပ်ဆောင်ချက်များ</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {semesters.length > 0 ? (
+                            semesters.map((semester, index) => (
+                                <TableRow key={semester.id}>
+                                    <TableCell>{index + 1}</TableCell>
+                                    <TableCell>{semester.academic_year.name}</TableCell>
+                                    <TableCell>{semester.year_name}</TableCell>
+                                    <TableCell>{getSemesterText(semester.semester_number)}</TableCell>
+                                    <TableCell>{semester.start_date}</TableCell>
+                                    <TableCell>{semester.end_date}</TableCell>
+                                    <TableCell className="text-center space-x-2">
 
-                                    <TooltipProvider>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Button
-                                                    variant="outline"
-                                                    onClick={() => openEditDialog(semester)}
-                                                    className="text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
-                                                >
-                                                    ပြင်ဆင်ရန်
-                                                </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>Edit</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        onClick={() => openEditDialog(semester)}
+                                                        className="text-gray-500 "
+                                                    >
+                                                        ပြင်ဆင်ရန်
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>Edit</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
 
-                                    {/* Delete Dialog */}
-                                    {/* <AlertDialog>
+                                        {/* Delete Dialog */}
+                                        {/* <AlertDialog>
                                         <AlertDialogTrigger asChild>
                                             <Button variant="destructive">ဖျက်မည်</Button>
                                         </AlertDialogTrigger>
@@ -384,19 +386,19 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
                                     </AlertDialog> */}
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={7} className="text-center text-muted-foreground">
+                                    သင်တန်းကာလမရှိပါ။ သင်တန်းကာလ ဖန်တီးပါ။
                                 </TableCell>
                             </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={7} className="text-center text-muted-foreground">
-                                သင်တန်းကာလမရှိပါ။ သင်တန်းကာလ ဖန်တီးပါ။
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table >
-
+                        )}
+                    </TableBody>
+                </Table >
+            </Card>
             {/* Edit Dialog */}
             {
                 editingSemester && (

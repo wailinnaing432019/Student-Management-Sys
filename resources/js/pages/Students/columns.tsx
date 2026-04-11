@@ -5,7 +5,7 @@ import TextLink from "@/components/text-link"
 import { ArrowUpDown, MoreHorizontal } from "lucide-react"
 import { Button } from "@headlessui/react"
 import { Link, router, useForm, usePage } from "@inertiajs/react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import StatusSelect from "@/components/StatusSelect"
 
@@ -80,7 +80,7 @@ export const getColumns = (
                     src={
                         row.original.student_semester_profile.image
                             ? `/storage/${row.original.student_semester_profile.image}`
-                            : ""
+                            : `/avator.png`
                     }
                     alt="profile"
                     className="h-10 w-10 rounded-full object-cover"
@@ -131,7 +131,9 @@ export const getColumns = (
                         {/* </Button> */}
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-
+                        <DropdownMenuItem onClick={() => router.visit(route("enroll-students.edit", row.original.id))}>
+                            ပြုပြင်ရန် {/* View */}
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => router.visit(route("enroll-students.show", row.original.id))}>
                             ကြည့်ရှုရန် {/* View */}
                         </DropdownMenuItem>
@@ -142,6 +144,7 @@ export const getColumns = (
                         {
                             row.original.pdf_path && (
                                 <>
+                                    <DropdownMenuSeparator />
                                     <DropdownMenuItem>
                                         <a href={route('students.download-register-pdf', row.original.id)} target="_blank">
                                             Download Register Form
@@ -157,8 +160,9 @@ export const getColumns = (
 
                         {userRole == "admin" && (
                             <>
-                                <DropdownMenuItem onClick={() => router.visit(route("assign-marks", row.original.id))}>
-                                    အမှတ်ပေးရန် {/* Assign Marks */}
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => router.visit(route("edit-mark", row.original.id))}>
+                                    အမှတ်ပြင်ရန် {/* Assign Marks */}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     <a href={route("marks.show", row.original.id)} title="View Marks" target='_blank'>

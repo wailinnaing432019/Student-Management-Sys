@@ -50,6 +50,10 @@ export default function NRCInputFields({
 }: Props) {
     const [open, setOpen] = useState(false);
     const [openState, setOpenState] = useState(false);
+
+    const [townshipSearch, setTownshipSearch] = useState("");
+    // 1. Add this Regex at the top of your file (outside the component)
+    const MYANMAR_REGEX = /^[\u1000-\u109F\s]+$/;
     return (
         <div>
             <div className="flex gap-2 max-w-xl text-xs">
@@ -58,15 +62,14 @@ export default function NRCInputFields({
                 <div className="flex-1 min-w-[60px]">
                     <Popover open={openState} onOpenChange={setOpenState}>
                         <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                role="combobox"
-                                className="h-9 text-xs w-full flex justify-between items-center"
+                            <input
+                                type="text"
+                                value={state || ""}
+                                placeholder="ပြည်နယ်"
+                                className="h-9 text-xs w-full border rounded px-2"
                                 disabled={isDisabled}
-                            >
-                                <span className="truncate">{state || ""}</span>
-                                {/* <ChevronsUpDown className="h-3 w-3 opacity-50 ml-2 shrink-0" /> */}
-                            </Button>
+                                onChange={(e) => onChange(`${prefix}nrc_state`, e.target.value)}
+                            />
                         </PopoverTrigger>
                         <PopoverContent className="w-[200px] p-0">
                             <Command>
@@ -80,7 +83,12 @@ export default function NRCInputFields({
                                                 key={key}
                                                 value={key}
                                                 onSelect={(value) => {
+                                                    // set state
                                                     onChange(`${prefix}nrc_state`, value);
+
+                                                    // 🔥 reset township when state changes
+                                                    onChange(`${prefix}nrc_township`, "");
+
                                                     setOpenState(false);
                                                 }}
                                                 className="text-xs"
@@ -97,23 +105,47 @@ export default function NRCInputFields({
                 <div className="flex-[2] min-w-[100px]">
                     <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                role="combobox"
-                                className="h-9 text-xs w-full flex justify-between items-center"
+                            <input
+                                type="text"
+                                value={township || ""}
+                                placeholder="မြို့နယ်"
+                                className="h-9 text-xs w-full border rounded px-2"
                                 disabled={isDisabled}
-                            >
-                                <span className="truncate">{township || ""}</span>
-                                <ChevronsUpDown className="h-3 w-3 opacity-50 ml-2 shrink-0" />
-                            </Button>
+                                onChange={(e) => {
+                                    onChange(`${prefix}nrc_township`, e.target.value);
+                                    setTownshipSearch(e.target.value);
+                                }}
+                            />
                         </PopoverTrigger>
                         <PopoverContent className="w-[200px] p-0">
                             <Command>
                                 <CommandInput
-                                    placeholder=""
+                                    placeholder="ရှာဖွေရန်..."
                                     className="text-xs"
+                                    value={townshipSearch}
+                                    onValueChange={setTownshipSearch}
                                 />
-                                <CommandEmpty>မတွေ့ပါ</CommandEmpty>
+
+                                <CommandEmpty className="p-1">
+                                    {MYANMAR_REGEX.test(townshipSearch) ? (
+                                        <Button
+                                            variant="ghost"
+                                            className="w-full justify-start text-xs font-normal text-blue-600"
+                                            onClick={() => {
+                                                onChange(`${prefix}nrc_township`, townshipSearch);
+                                                setOpen(false);
+                                                setTownshipSearch("");
+                                            }}
+                                        >
+                                            + "{townshipSearch}" ကိုအသစ်ထည့်မည်
+                                        </Button>
+                                    ) : (
+                                        <p className="p-2 text-[10px] text-destructive">
+                                            မြန်မာစာဖြင့်သာ ရိုက်ထည့်ပေးပါ
+                                        </p>
+                                    )}
+                                </CommandEmpty>
+
                                 <CommandGroup>
                                     {(nrcData[state!] ?? []).map((ts) => (
                                         <CommandItem
@@ -122,6 +154,7 @@ export default function NRCInputFields({
                                             onSelect={(value) => {
                                                 onChange(`${prefix}nrc_township`, value);
                                                 setOpen(false);
+                                                setTownshipSearch("");
                                             }}
                                             className="text-xs"
                                         >
@@ -145,6 +178,7 @@ export default function NRCInputFields({
                             <SelectValue placeholder="" />
                         </SelectTrigger>
                         <SelectContent>
+                            {/* <SelectItem value="">- ရွေးရန် -</SelectItem> */}
                             <SelectItem value="နိုင်" className="text-xs">
                                 နိုင်
                             </SelectItem>
@@ -169,6 +203,7 @@ export default function NRCInputFields({
                         }
                         placeholder="၁၂၃၄၅၆"
                         className="h-9 text-xs"
+                        maxLength={6}
                     />
                 </div>
             </div>
