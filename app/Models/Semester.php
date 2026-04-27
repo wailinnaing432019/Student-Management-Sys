@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Semester extends Model
 {
-    protected $fillable = ['academic_year_id', 'year_name',  'semester_number','start_date', 'end_date'];
+    protected $fillable = ['academic_year_id', 'year_name','year_name_eng', 'semester_number','is_final_year','start_date', 'end_date'];
 
 
     public function academicYear()
@@ -17,7 +17,8 @@ class Semester extends Model
 public function courses()
 {
     return $this->belongsToMany(Course::class, 'course_semesters')
-        ->withPivot('is_elective') 
+        ->withPivot('is_elective')
+        ->withPivot('credit_unit') 
         ->withTimestamps();
 }
 

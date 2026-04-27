@@ -150,7 +150,7 @@ export default function Index({ majors }) {
                                         onValueChange={(value) => setData("name", value)}
                                     >
                                         <SelectTrigger id="name">
-                                            <SelectValue placeholder="သင်တန်းနှစ် ရွေးချယ်ပါ" />
+                                            <SelectValue placeholder="အထူးပြု ဘာသာရပ် ရွေးချယ်ပါ" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="CST">CST</SelectItem>
@@ -271,7 +271,7 @@ export default function Index({ majors }) {
                                         onValueChange={(value) => setEditData("name", value)}
                                     >
                                         <SelectTrigger id="name">
-                                            <SelectValue placeholder="သင်တန်းနှစ် ရွေးချယ်ပါ" />
+                                            <SelectValue placeholder="အထူးပြုဘာသာရပ် ရွေးချယ်ပါ" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="CST">CST</SelectItem>
@@ -293,7 +293,7 @@ export default function Index({ majors }) {
                             </div>
                             <DialogFooter className="mt-4">
                                 <DialogClose asChild>
-                                    <Button type="button" variant="outline" onClick={() => setEditingMajors(null)}>Cancel</Button>
+                                    <Button type="button" variant="outline" onClick={() => setEditingMajors(null)} >ပယ်ဖျက်မည်< /Button>
                                 </DialogClose>
                                 <Button type="submit" className="bg-green-600" disabled={updating}>
                                     {updating ? 'Updating...' : 'Update Majors'}

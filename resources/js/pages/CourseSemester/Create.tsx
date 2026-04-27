@@ -16,6 +16,7 @@ import {
 import CreateCourseDialog from "../Courses/CreateCourseDialog";
 import { useState } from "react";
 import { getSemesterText } from "@/Utils/SemesterText";
+import { toast } from "sonner";
 
 
 type Course = {
@@ -46,7 +47,7 @@ type Props = {
     academicYears: AcademicYear[];
     courses: Course[];
     majors: Major[];
-    courseSemesterMap: Record<number, Record<number, Record<number, { is_elective: boolean }>>>;
+    courseSemesterMap: Record<number, Record<number, Record<number, { is_elective: boolean; credit_unit: number | null }>>>;
 };
 
 export default function Create({
@@ -59,7 +60,7 @@ export default function Create({
         academic_year_id: "",
         major_id: "",
         semester_id: "",
-        courses: [] as { id: number; is_elective: boolean }[],
+        courses: [] as { id: number; is_elective: boolean; credit_unit: number | null }[],
     });
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -77,6 +78,7 @@ export default function Create({
                 ([courseId, info]) => ({
                     id: parseInt(courseId),
                     is_elective: info.is_elective,
+                    credit_unit: info.credit_unit ?? null,
                 })
             );
             setData("courses", assigned);
@@ -94,10 +96,20 @@ export default function Create({
         if (currentCourses.some((c) => c.id === id)) {
             setData("courses", currentCourses.filter((c) => c.id !== id));
         } else {
-            setData("courses", [...currentCourses, { id, is_elective: false }]);
+            setData("courses", [...currentCourses, { id, is_elective: false, credit_unit: null }]);
         }
     };
 
+    const updateCreditUnit = (id: number, value: string) => {
+        const currentCourses = data.courses ?? [];
+
+        setData(
+            "courses",
+            currentCourses.map((c) =>
+                c.id === id ? { ...c, credit_unit: value } : c
+            )
+        );
+    };
     const toggleElective = (id: number) => {
         const currentCourses = data.courses ?? [];
         setData(
@@ -110,6 +122,15 @@ export default function Create({
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        const missingCredit = data.courses.some(
+            (course) => course.credit_unit === null || course.credit_unit === ""
+        );
+
+        if (missingCredit) {
+            toast.error("ရွေးထားသော ဘာသာရပ်များအတွက် Credit Unit မဖြစ်မနေ ထည့်ပေးပါ။");
+            return;
+        }
         post(route("course-semesters.store"));
     };
 
@@ -215,67 +236,110 @@ export default function Create({
                             />
                         </div>
                         {/* Courses (filtered by major) */}
+
+
                         <div>
                             <Label className="mb-2 block">ဘာသာရပ်များ</Label>
-                            <div className="space-y-2">
-                                {filteredCourses.length === 0 && (
-                                    <div className="text-sm text-red-500 italic">
-                                        ‌ရွေးချယ်ထားသော အထူးပြုဘာသာ အတွက် ဘာသာရပ်များ မရှိသေးပါ။
-                                    </div>
-                                )}
 
+                            {filteredCourses.length === 0 && (
+                                <div className="text-sm text-red-500 italic">
+                                    ‌ရွေးချယ်ထားသော အထူးပြုဘာသာ အတွက် ဘာသာရပ်များ မရှိသေးပါ။
+                                </div>
+                            )}
 
+                            {filteredCourses.length > 0 && (
+                                <div className="border rounded-lg overflow-hidden">
+                                    <table className="w-full text-sm">
+                                        <thead className="bg-gray-100">
+                                            <tr>
+                                                <th className="p-3 text-left w-16">ရွေးရန်</th>
+                                                <th className="p-3 text-left">ဘာသာရပ်</th>
+                                                <th className="p-3 text-left w-48">Credit Unit</th>
+                                                <th className="p-3 text-left w-40">Elective</th>
+                                            </tr>
+                                        </thead>
 
-                                {filteredCourses.map((course) => {
-                                    const assignedInfo = courseSemesterMap?.[data.semester_id]?.[course.id];
-                                    const isSelected = isCourseSelected(course.id);
-                                    const isAlreadyAssigned = !!assignedInfo; // assigned but not part of current selection
+                                        <tbody>
+                                            {filteredCourses.map((course) => {
+                                                const assignedInfo = courseSemesterMap?.[data.semester_id]?.[course.id];
+                                                const isSelected = isCourseSelected(course.id);
+                                                const isAlreadyAssigned = !!assignedInfo;
 
-                                    const elective = isSelected
-                                        ? data.courses.find((c) => c.id === course.id)?.is_elective ?? false
-                                        : assignedInfo?.is_elective ?? false;
+                                                const elective = isSelected
+                                                    ? data.courses.find((c) => c.id === course.id)?.is_elective ?? false
+                                                    : assignedInfo?.is_elective ?? false;
 
-                                    return (
-                                        <div
-                                            key={course.id}
-                                            className={`flex items-center justify-between border rounded-lg p-3 ${isAlreadyAssigned ? "bg-gray-100" : ""}`}
-                                        >
-                                            <div className="flex items-center space-x-2">
-                                                <Checkbox
-                                                    checked={isSelected} // only check if user selected
-                                                    disabled={isAlreadyAssigned} // cannot change if already assigned
-                                                    onCheckedChange={() => handleCourseToggle(course.id)}
-                                                    className="border-purple-500"
-                                                />
-                                                <span className={isAlreadyAssigned ? "text-gray-400" : ""}>
-                                                    {course.code} - {course.name} {isAlreadyAssigned && "(ပြီးခဲ့သည်)"}
-                                                </span>
-                                            </div>
+                                                return (
+                                                    <tr
+                                                        key={course.id}
+                                                        className={`border-t ${isAlreadyAssigned ? "bg-gray-100" : ""}`}
+                                                    >
+                                                        {/* Select Course */}
+                                                        <td className="p-3">
+                                                            <Checkbox
+                                                                checked={isSelected}
+                                                                disabled={isAlreadyAssigned}
+                                                                onCheckedChange={() => handleCourseToggle(course.id)}
+                                                            />
+                                                        </td>
 
-                                            {/* Elective checkbox */}
-                                            {(isSelected || isAlreadyAssigned) && (
-                                                <div className="flex items-center space-x-2">
-                                                    <Checkbox
-                                                        checked={!!elective}
-                                                        disabled={isAlreadyAssigned} // read-only if already assigned
-                                                        onCheckedChange={() => toggleElective(course.id)}
-                                                        className="border-purple-500"
-                                                    />
-                                                    <span className="text-sm text-gray-600">
-                                                        ရွေးချယ်နိုင်သော ဘာသာရပ်
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
+                                                        {/* Course Name */}
+                                                        <td className={`p-3 ${isAlreadyAssigned ? "text-gray-400" : ""}`}>
+                                                            {course.code} - {course.name}{" "}
+                                                            {isAlreadyAssigned && "(ပြီးခဲ့သည်)"}
+                                                        </td>
 
+                                                        {/* Credit Unit */}
+                                                        <td className="p-3">
+                                                            {isSelected && (
+                                                                <input
+                                                                    type="number"
+                                                                    step="0.5"
+                                                                    min={0}
+                                                                    placeholder="Credit Unit"
+                                                                    className={`w-32 border rounded px-2 py-1 text-sm placeholder-gray-400
+                                                                    ${isSelected &&
+                                                                            (data.courses.find((c) => c.id === course.id)?.credit_unit === null)
+                                                                            ? "border-red-500"
+                                                                            : ""
+                                                                        }`}
+                                                                    value={
+                                                                        data.courses.find((c) => c.id === course.id)?.credit_unit ??
+                                                                        assignedInfo?.credit_unit ??
+                                                                        ""
+                                                                    }
+                                                                    onChange={(e) =>
+                                                                        updateCreditUnit(course.id, e.target.value)
+                                                                    }
+                                                                />
+                                                            )}
+                                                        </td>
 
+                                                        {/* Elective */}
+                                                        <td className="p-3">
+                                                            {(isSelected || isAlreadyAssigned) && (
+                                                                <div className="flex items-center space-x-2">
+                                                                    <Checkbox
+                                                                        checked={!!elective}
+                                                                        disabled={isAlreadyAssigned}
+                                                                        onCheckedChange={() => toggleElective(course.id)}
+                                                                    />
+                                                                    <span className="text-gray-600 text-sm">
+                                                                        Elective
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
 
-                            </div>
                             <InputError message={errors.courses} />
                         </div>
-
                         <Button type="submit" disabled={processing}>
                             {processing ? "သင်တန်းကာလအလိုက် ဘာသာရပ်များ သတ်မှတ်နေပါသည်.." : "သင်တန်းကာလအလိုက် ဘာသာရပ်များ သတ်မှတ်ရန်"}
                         </Button>

@@ -44,8 +44,30 @@ import AcademicYearCreateDialog from "../AcademicYears/AcademicYearCreateDialog"
 import { getSemesterText } from "@/Utils/SemesterText";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 
 
+const yearNameEngMap: Record<string, { value: string, label: string }[]> = {
+    "ပထမနှစ်": [
+        { value: "First Year", label: "First Year" },
+    ],
+    "ဒုတိယနှစ်": [
+        { value: "Second Year", label: "Second Year" },
+    ],
+    "တတိယနှစ်": [
+        { value: "Third Year", label: "Third Year" },
+    ],
+    "စတုတ္ထနှစ်": [
+        { value: "Fourth Year", label: "Fourth Year" },
+    ],
+    "ပဉ္စမနှစ်": [
+        { value: "Fifth Year", label: "Fifth Year" },
+    ],
+    "D.C.Sc.": [
+        { value: "D.C.Sc.", label: "D.C.Sc." },
+    ]
+}
 const yearSemesterMap: Record<string, { value: number; label: string }[]> = {
     "ပထမနှစ်": [
         { value: 1, label: "Semester I" },
@@ -63,7 +85,11 @@ const yearSemesterMap: Record<string, { value: number; label: string }[]> = {
         { value: 7, label: "Semester VII" },
         { value: 8, label: "Semester VIII" },
     ],
-    "DCSC": [
+    "ပဉ္စမနှစ်": [
+        { value: 9, label: "Semester IX" },
+        { value: 10, label: "Semester X" },
+    ],
+    "D.C.Sc.": [
         { value: 11, label: "Module I" },
         { value: 12, label: "Module II" },
         { value: 13, label: "Module III" },
@@ -75,8 +101,10 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
     const { data, setData, post, processing, errors, reset } = useForm({
         academic_year_id: "",
         year_name: "ပထမနှစ်",
+        year_name_eng: "First Year",
         name: "",
         semester_number: 1,
+        is_final_year: false,
         start_date: "",
         end_date: "",
     });
@@ -104,8 +132,10 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
     } = useForm({
         academic_year_id: "",
         year_name: "",
+        year_name_eng: "",
         name: "",
         semester_number: 0,
+        is_final_year: false,
         start_date: "",
         end_date: "",
     });
@@ -120,8 +150,10 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
         setEditData({
             academic_year_id: semester.academic_year_id,
             year_name: semester.year_name,
+            year_name_eng: semester.year_name_eng,
             name: semester.name,
             semester_number: semester.semester_number,
+            is_final_year: Boolean(semester.is_final_year),
             start_date: semester.start_date,
             end_date: semester.end_date,
         });
@@ -143,6 +175,9 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
         router.delete(route("semesters.destroy", id));
     };
 
+    const availableYearEng = useMemo(() => {
+        return yearNameEngMap[data.year_name] || [];
+    }, [data.year_name]);
     const availableSemesters = useMemo(() => {
         return yearSemesterMap[data.year_name] || [];
     }, [data.year_name]);
@@ -159,8 +194,23 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
         }
     }, [data.year_name, availableSemesters, data.semester_number, setData]);
 
+    // Auto-select yearname by english
+    useEffect(() => {
+        if (data.year_name && availableYearEng.length > 0) {
+            // if semester not in range or is 0 → reset to first available
+            if (
+                !availableYearEng.some((sem) => sem.value === data.year_name_eng)
+            ) {
+                setData("year_name_eng", availableYearEng[0].value);
+            }
+        }
+    }, [data.year_name, availableYearEng, data.year_name_eng, setData]);
+
     // edit available semesters
     const availableSemestersEdit = yearSemesterMap[editData.year_name] || [];
+    // edit available year name eng
+    const availableYearEngEdit = yearNameEngMap[editData.year_name] || [];
+
 
     // Auto-select the first semester when year changes
     useEffect(() => {
@@ -172,6 +222,17 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
             }
         }
     }, [editData.year_name, availableSemestersEdit]);
+
+    useEffect(() => {
+        if (editData.year_name && availableYearEngEdit.length > 0) {
+            if (
+                !availableYearEngEdit.some((s) => s.value === editData.year_name_eng)
+            ) {
+                setEditData("year_name_eng", availableYearEngEdit[0].value);
+            }
+        }
+    }, [editData.year_name, availableYearEngEdit]);
+
     return (
         <AppLayout title="Semesters" breadcrumbs={[
             { name: "သင်တန်းကာလများ" }
@@ -253,10 +314,31 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
                                                 <SelectItem value="ဒုတိယနှစ်">ဒုတိယနှစ်</SelectItem>
                                                 <SelectItem value="တတိယနှစ်">တတိယနှစ်</SelectItem>
                                                 <SelectItem value="စတုတ္ထနှစ်">စတုတ္ထနှစ်</SelectItem>
-                                                <SelectItem value="DCSC">DCSC</SelectItem>
+                                                <SelectItem value="ပဉ္စမနှစ်">ပဉ္စမနှစ်</SelectItem>
+                                                <SelectItem value="D.C.Sc.">D.C.Sc.</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <InputError message={errors.year_name} />
+                                    </div>
+                                    {/* Semester Name Eng */}
+                                    <div>
+                                        <Label htmlFor="year_name_eng">သင်တန်းနှစ်အမည် (Eng)</Label>
+                                        <Select
+                                            value={String(data.year_name_eng)}
+                                            onValueChange={(value) => setData("year_name_eng", value)}
+                                        >
+                                            <SelectTrigger id="year_name_eng">
+                                                <SelectValue placeholder="သင်တန်းနှစ် ရွေးချယ်ပါ" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {availableYearEng.map((sem) => (
+                                                    <SelectItem key={sem.value} value={String(sem.value)}>
+                                                        {sem.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <InputError message={errors.year_name_eng} />
                                     </div>
 
                                     {/* Semester Selection */}
@@ -279,6 +361,25 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
                                             </SelectContent>
                                         </Select>
                                         <InputError message={errors.semester_number} />
+                                    </div>
+                                    {/* Final Year Checkbox Section */}
+                                    <div className="flex items-center space-x-2 rounded-md border p-4 shadow-sm bg-slate-50/50">
+                                        <Checkbox
+                                            id="is_final_year"
+                                            checked={data.is_final_year}
+                                            onCheckedChange={(checked) => setData("is_final_year", checked)}
+                                        />
+                                        <div className="grid gap-1.5 leading-none">
+                                            <label
+                                                htmlFor="is_final_year"
+                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                            >
+                                                နောက်ဆုံးနှစ် (Final Year) ဖြစ်ပါသလား။
+                                            </label>
+                                            <p className="text-xs text-muted-foreground">
+                                                နောက်ဆုံးနှစ်ဖြစ်ပါက GPA ကို နှစ်ဝက်နှစ်ခုပေါင်း၍ တွက်ချက်မည်ဖြစ်ပါသည်။
+                                            </p>
+                                        </div>
                                     </div>
                                     <div>
                                         <Label htmlFor="start_date">သင်တန်းကာလ စတင်မည့်ရက်</Label>
@@ -331,6 +432,7 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
                             <TableHead>စဉ်</TableHead>
                             <TableHead>ပညာသင်နှစ်</TableHead>
                             <TableHead>သင်တန်းနှစ် အမည်</TableHead>
+                            <TableHead>သင်တန်းနှစ် အမည် (Eng)</TableHead>
                             <TableHead>သင်တန်းကာလ အမည်</TableHead>
                             <TableHead>စတင်မည့် ရက်စွဲ</TableHead>
                             <TableHead>ပြီးဆုံးမည့် ရက်စွဲ</TableHead>
@@ -340,32 +442,51 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
                     <TableBody>
                         {semesters.length > 0 ? (
                             semesters.map((semester, index) => (
-                                <TableRow key={semester.id}>
-                                    <TableCell>{index + 1}</TableCell>
+                                <TableRow key={semester.id} className="hover:bg-slate-50/50 transition-colors">
+                                    <TableCell className="font-medium text-slate-600">{index + 1}</TableCell>
                                     <TableCell>{semester.academic_year.name}</TableCell>
-                                    <TableCell>{semester.year_name}</TableCell>
-                                    <TableCell>{getSemesterText(semester.semester_number)}</TableCell>
-                                    <TableCell>{semester.start_date}</TableCell>
-                                    <TableCell>{semester.end_date}</TableCell>
-                                    <TableCell className="text-center space-x-2">
+                                    <TableCell className="font-medium">{semester.year_name}
+                                        {semester.is_final_year ? (
+                                            <Badge className="bg-emerald-50 -mt-3 text-emerald-700 border-emerald-200 hover:bg-emerald-50 shadow-none">
+                                                Final Year
+                                            </Badge>
+                                        ) : ""}
+                                    </TableCell>
 
+                                    {/* Year Name Eng Column - Design ပြင်ဆင်ထားမှု */}
+                                    <TableCell>
+                                        <Badge variant="secondary" className="font-normal px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border-none">
+                                            {semester.year_name_eng}
+                                        </Badge>
+                                    </TableCell>
+
+                                    <TableCell className="text-slate-600">
+                                        {getSemesterText(semester.semester_number)}
+                                    </TableCell>
+
+
+
+                                    <TableCell className="text-slate-500 tabular-nums">{semester.start_date}</TableCell>
+                                    <TableCell className="text-slate-500 tabular-nums">{semester.end_date}</TableCell>
+
+                                    <TableCell className="text-center space-x-2">
                                         <TooltipProvider>
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <Button
                                                         variant="outline"
+                                                        size="sm" // ခလုတ်ကို အနည်းငယ် သေးလိုက်တာ ပိုလှပါတယ်
                                                         onClick={() => openEditDialog(semester)}
-                                                        className="text-gray-500 "
+                                                        className="text-slate-600 border-slate-200 hover:bg-slate-100"
                                                     >
                                                         ပြင်ဆင်ရန်
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
-                                                    <p>Edit</p>
+                                                    <p>Edit Semester</p>
                                                 </TooltipContent>
                                             </Tooltip>
                                         </TooltipProvider>
-
                                         {/* Delete Dialog */}
                                         {/* <AlertDialog>
                                         <AlertDialogTrigger asChild>
@@ -450,11 +571,32 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
                                                 <SelectItem value="ဒုတိယနှစ်">ဒုတိယနှစ်</SelectItem>
                                                 <SelectItem value="တတိယနှစ်">တတိယနှစ်</SelectItem>
                                                 <SelectItem value="စတုတ္ထနှစ်">စတုတ္ထနှစ်</SelectItem>
+                                                <SelectItem value="ပဉ္စမနှစ်">ပဉ္စမနှစ်</SelectItem>
+                                                <SelectItem value="D.C.Sc.">D.C.Sc.</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <InputError message={editErrors.year_name} />
                                     </div>
-
+                                    {/* semseter name eng */}
+                                    <div>
+                                        <Label htmlFor="edit_year_name_eng">သင်တန်းနှစ်အမည် (Eng) (ဥပမာ- First Year)</Label>
+                                        <Select
+                                            value={String(editData.year_name_eng)}
+                                            onValueChange={(value) => setEditData("year_name_eng", value)}
+                                        >
+                                            <SelectTrigger id="edit_year_name_eng">
+                                                <SelectValue placeholder="သင်တန်းနှစ် ရွေးချယ်ပါ" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {availableYearEngEdit.map((sem) => (
+                                                    <SelectItem key={sem.value} value={String(sem.value)}>
+                                                        {sem.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <InputError message={editErrors.year_name_eng} />
+                                    </div>
                                     {/* Semester Selection */}
                                     <div>
                                         <Label htmlFor="edit_semester_number">သင်တန်းကာလ ရွေးချယ်ပါ</Label>
@@ -475,6 +617,25 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
                                             </SelectContent>
                                         </Select>
                                         <InputError message={editErrors.semester_number} />
+                                    </div>
+                                    {/* Final Year Checkbox Section */}
+                                    <div className="flex items-center space-x-2 rounded-md border p-4 shadow-sm bg-slate-50/50">
+                                        <Checkbox
+                                            id="is_final_year"
+                                            checked={editData.is_final_year}
+                                            onCheckedChange={(checked) => setEditData("is_final_year", checked)}
+                                        />
+                                        <div className="grid gap-1.5 leading-none">
+                                            <label
+                                                htmlFor="is_final_year"
+                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                            >
+                                                နောက်ဆုံးနှစ် (Final Year) ဖြစ်ပါသလား။
+                                            </label>
+                                            <p className="text-xs text-muted-foreground">
+                                                နောက်ဆုံးနှစ်ဖြစ်ပါက GPA ကို နှစ်ဝက်နှစ်ခုပေါင်း၍ တွက်ချက်မည်ဖြစ်ပါသည်။
+                                            </p>
+                                        </div>
                                     </div>
                                     <div>
                                         <Label htmlFor="edit_start_date">စတင်မည့်ရက်စွဲ</Label>
@@ -503,11 +664,11 @@ export default function Index({ semesters, academicYears, selectedAcademicYearId
 
                                 <DialogFooter className="mt-6 flex justify-end gap-2">
                                     <DialogClose asChild>
-                                        <Button variant="outline">Cancel</Button>
+                                        <Button variant="outline" >ပယ်ဖျက်မည်< /Button>
                                     </DialogClose>
                                     <Button type="submit" disabled={updating}>
                                         {updating && <LoaderCircle className="w-4 h-4 mr-2 animate-spin" />}
-                                        Update
+                                        ပြုပြင်မည်
                                     </Button>
                                 </DialogFooter>
                             </form>

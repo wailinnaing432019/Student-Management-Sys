@@ -25,6 +25,7 @@ class SemesterRequest extends FormRequest
     return [
         'academic_year_id' => 'required|exists:academic_years,id',
         'year_name'        => 'required|string',
+        'year_name_eng'    => 'nullable|string',
         'semester_number'  => [
             'required',
             'numeric',
@@ -36,6 +37,7 @@ class SemesterRequest extends FormRequest
                 )
                 ->ignore($this->semester), // for update case
         ],
+        'is_final_year'=>'boolean',
         'start_date' => 'nullable|date',
         'end_date'   => 'nullable|date|after:start_date',
     ];
@@ -52,7 +54,7 @@ public function messages(): array
 
         'semester_number.required' => 'သင်တန်းကာလ အမှတ်ကို ဖြည့်ရန်လိုအပ်ပါသည်။',
         'semester_number.numeric'  => 'သင်တန်းကာလ အမှတ်သည် ကိန်းဂဏန်း ဖြစ်ရမည်။',
-        'semester_number.unique'   => 'ဒီသင်တန်းနှစ်အမည်နှင့် သင်တန်းကာလမှာ ရှိပြီးသားဖြစ်သည်။',
+        'semester_number.unique'   => 'ယခုသင်တန်းနှစ်အမည်နှင့် သင်တန်းကာလမှာ ရှိပြီးသားဖြစ်သည်။',
 
         'start_date.date' => 'စတင်သည့်နေ့သည် မှန်ကန်သော ရက်စွဲဖြစ်ရမည်။',
 

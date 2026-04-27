@@ -52,7 +52,7 @@ function downloadAllMarksAsCSV(data, courseList) {
     link.click();
     document.body.removeChild(link);
 }
-export default function EnrolledStudents({
+export default function Show({
     academicYears = [],
     majors = [],
     selectedMajorId = null,

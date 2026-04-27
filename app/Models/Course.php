@@ -18,6 +18,7 @@ public function semesters()
 {
     return $this->belongsToMany(Semester::class, 'course_semesters')
         ->withPivot('is_elective')
+        ->withPivot('credit_unit')
         ->withTimestamps();
 }
 public function courseSemesters()

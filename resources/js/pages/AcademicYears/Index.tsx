@@ -150,7 +150,7 @@ export default function Index({ academicYears }) {
                                                 </AlertDialogDescription>
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
-                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogCancel>ပယ်ဖျက်မည်</AlertDialogCancel>
                                                 <AlertDialogAction
                                                     className="text-red-600"
                                                     onClick={() => deleteHandler(year.id)}
@@ -226,13 +226,13 @@ export default function Index({ academicYears }) {
 
                                 <DialogFooter className="mt-6 flex justify-end gap-2">
                                     <DialogClose asChild>
-                                        <Button variant="outline">Cancel</Button>
+                                        <Button variant="outline" >ပယ်ဖျက်မည်< /Button>
                                     </DialogClose>
                                     <Button type="submit" disabled={updating}>
                                         {updating && (
                                             <LoaderCircle className="w-4 h-4 mr-2 animate-spin" />
                                         )}
-                                        Update
+                                        ပြုပြင်မည်
                                     </Button>
                                 </DialogFooter>
                             </form>

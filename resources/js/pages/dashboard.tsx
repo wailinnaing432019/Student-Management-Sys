@@ -14,8 +14,12 @@ export default function Dashboard() {
                     </h2>
                 </div>
             </div>
-            <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min">
-                <img src={`/storage/logos/ucsmtla.jpg`} alt="" />
+            <div className="relative w-full h-screen overflow-hidden rounded-xl">
+                <img
+                    src={`/storage/logos/ucsmtla.jpg`}
+                    alt="UCSMTLA Logo"
+                    className="absolute inset-0 w-full h-full object-cover"
+                />
             </div>
         </AppLayout>
     );

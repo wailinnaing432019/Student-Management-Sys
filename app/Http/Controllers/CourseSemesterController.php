@@ -68,6 +68,7 @@ public function index(Request $request)
             'name' => $course->name,
             'code' => $course->code,
             'is_elective' => $course->pivot->is_elective,
+            'credit_unit' => $course->pivot->credit_unit,
         ];
     });
 
@@ -109,6 +110,7 @@ public function create()
             if ($pivot) {
                 $courseSemesterMap[$semester->id][$course->id] = [
                     'is_elective' => $pivot->is_elective,
+                    'credit_unit' => $pivot->credit_unit,
                 ];
             }
         }
@@ -182,6 +184,7 @@ public function store(CourseSemesterRequest $request)
         'courses' => 'required|array',
         'courses.*.id' => 'required|exists:courses,id',
         'courses.*.is_elective' => 'boolean',
+        'courses.*.credit_unit' => 'required|numeric|min:0',
     ]);
 
     try {
@@ -190,6 +193,7 @@ public function store(CourseSemesterRequest $request)
         foreach ($data['courses'] as $course) {
             $syncData[$course['id']] = [
                 'is_elective' => $course['is_elective'] ?? false,
+                'credit_unit' => $course['credit_unit'] ?? 0.00,
                 'updated_at' => now(),
                 'created_at' => now(),
             ];

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('course_semesters', function (Blueprint $table) {
-            $table->decimal('credit_unit', 4, 2)->after('is_elective')->default(3.00);
+            $table->double('credit_unit')->after('is_elective')->default(0.00);
         });
     }
 

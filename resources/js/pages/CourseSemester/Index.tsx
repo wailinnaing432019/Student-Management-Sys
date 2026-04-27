@@ -186,6 +186,7 @@ export default function CourseSemesterIndex({
                                 <TableHead className="text-center w-10">#</TableHead>
                                 <TableHead>ဘာသာရပ် အမည်</TableHead>
                                 <TableHead>ဘာသာရပ် ကုဒ်</TableHead>
+                                <TableHead>Credit Unit</TableHead>
                                 <TableHead className="text-center w-24">ရွေးချယ်ဘာသာရပ်</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -202,6 +203,7 @@ export default function CourseSemesterIndex({
                                         <TableCell className="text-center">{index + 1}</TableCell>
                                         <TableCell>{course.name}</TableCell>
                                         <TableCell>{course.code}</TableCell>
+                                        <TableCell>{course.credit_unit}</TableCell>
                                         <TableCell className="text-center">
                                             {course.is_elective ? (
                                                 <span className="text-green-600 font-medium">Yes</span>

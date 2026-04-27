@@ -52,7 +52,7 @@ export default function AppLayout({
 
 
     return (
-        <SidebarProvider>
+        <SidebarProvider >
             <Head title={title} />
             <AppSidebar />
             <SidebarInset>

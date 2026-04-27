@@ -4,6 +4,7 @@ use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseSemesterController;
 use App\Http\Controllers\EnrollStudentController;
+use App\Http\Controllers\GPAController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\MarkController;
 use App\Http\Controllers\SemesterController;
@@ -71,7 +72,10 @@ Route::put('/marks/{id}', [MarkController::class, 'update'])->name('marks.update
     Route::get('/marksBySemester',[MarkController::class,'viewMarksByPdf'])->name('marksBySemester.view');
     Route::resource('/marks',MarkController::class);
 });
- 
+
+Route::get('/gpa',[GPAController::class,'index'])->name('gpa.index');
+Route::get('/gpa/{id}',[GPAController::class,'show'])->name('gpa-show');
+Route::get('/gpa/print/{id}',[GPAController::class,'print'])->name('gpa-print');
 
 Route::fallback(function () { 
     return Inertia::render('error/NotFound')->toResponse(request())->setStatusCode(404);

@@ -103,7 +103,7 @@ export default function EditCourseModal({
                             </Button>
                         </DialogClose>
                         <Button type="submit" disabled={processing}>
-                            အဆင့်မြင့်တင်မည်
+                            ပြုပြင်မည်
                         </Button>
                     </DialogFooter>
                 </form>

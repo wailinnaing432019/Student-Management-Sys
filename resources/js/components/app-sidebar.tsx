@@ -65,6 +65,10 @@ const data = {
         {
           title: "အမှတ်များ", // Marks
           url: "/marks/show"
+        },
+        {
+          title: "GPA ထုတ်ယူရန်", // Generate GPA
+          url: "/gpa"
         }
       ],
     },
@@ -183,7 +187,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const userRole = auth?.user?.role || 'staff';
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" {...props}  >
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
